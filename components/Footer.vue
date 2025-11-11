@@ -1,6 +1,6 @@
 <template>
   <footer class="bg-gray-100 py-10">
-    <div class="container mx-auto">
+    <div class="mx-auto max-w-7xl px-4">
       <!-- Top Section -->
       <div class="bg-white rounded-lg shadow-sm p-8 mb-8">
         <div
@@ -346,7 +346,3 @@ const resetEmail = () => {
   email.value = "";
 };
 </script>
-
-<style scoped>
-/* Custom styles nếu cần */
-</style>

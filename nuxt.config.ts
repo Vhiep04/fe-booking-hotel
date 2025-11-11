@@ -5,7 +5,11 @@ export default defineNuxtConfig({
   compatibilityDate: "2025-07-15",
   devtools: { enabled: true },
 
-  css: ["../assets/css/main.css", "primeicons/primeicons.css"],
+  css: [
+    "~/assets/css/main.css", // Tailwind phải ở đầu
+    "primeicons/primeicons.css",
+    // PrimeVue CSS khác (nếu có)
+  ],
 
   vite: {
     plugins: [tailwindcss()],

@@ -4,14 +4,20 @@
     class="relative group hover:cursor-pointer hover:bg-gray-100"
   >
     <template #header>
-      <img alt="user header" src="../assets/images/barca.jpg" />
+      <div class="p-2">
+        <img
+          class="rounded"
+          alt="user header"
+          src="../assets/images/barca.jpg"
+        />
+      </div>
       <img
         src="../assets/icons/Heart.svg"
-        alt=""
-        class="absolute top-2 left-2 opacity-0 transition-opacity duration-300 group-hover:opacity-100 hover:text-white"
+        alt="heart"
+        class="absolute top-5 left-5 opacity-0 transition-opacity duration-300 group-hover:opacity-100 hover:text-white"
       />
     </template>
-    <template #title>BERLIN</template>
+    <template #title class="font-bold">BERLIN</template>
     <template #subtitle>SIDE</template>
     <template #content>
       <p class="m-0">

@@ -12,7 +12,7 @@
     <CityInfoCard />
     <div class="grid grid-cols-[25%_75%] items-start">
       <FilterSearchResult />
-      <HotelCarDetail />
+      <HotelCardDetail />
     </div>
   </div>
 </template>
@@ -20,7 +20,7 @@
 <script setup lang="ts">
 import CityInfoCard from "@/components/CityInfoCard.vue";
 import FilterSearchResult from "@/components/FilterSearchResult.vue";
-import HotelCarDetail from "@/components/HotelCardDetail.vue";
+import HotelCardDetail from "@/components/HotelCardDetail.vue";
 import SearchForm from "@/components/SearchForm.vue";
 </script>
 

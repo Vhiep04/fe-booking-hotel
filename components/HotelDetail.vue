@@ -38,7 +38,7 @@
     <!-- Tabs Section -->
     <div class="bg-white rounded-lg shadow-sm overflow-hidden mb-6">
       <Tabs value="0">
-        <TabList class="border-b">
+        <TabList>
           <Tab
             v-for="tab in tabs"
             :key="tab.value"

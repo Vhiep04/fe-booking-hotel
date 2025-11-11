@@ -21,7 +21,7 @@
             </p>
 
             <!-- Login Form -->
-            <form @submit.prevent="handleLogin" class="space-y-4">
+            <form @submit.prevent="handleLogin">
               <!-- Email Field -->
               <div class="space-y-2">
                 <label
@@ -39,9 +39,9 @@
                   :show-clear="true"
                   @clear="clearEmail"
                 />
-                <small v-if="emailError" class="p-error">{{
-                  emailError
-                }}</small>
+                <small class="block min-h-[20px] text-red-500">
+                  {{ emailError || "" }}
+                </small>
               </div>
 
               <!-- Password Field -->
@@ -61,9 +61,9 @@
                   :toggle-mask="true"
                   @clear="clearPassword"
                 />
-                <small v-if="passwordError" class="p-error">{{
-                  passwordError
-                }}</small>
+                <small class="block min-h-[20px] text-red-500">
+                  {{ passwordError || "" }}
+                </small>
               </div>
 
               <!-- Remember Me & Forgot Password -->
@@ -83,7 +83,7 @@
               <Button
                 type="submit"
                 label="Login"
-                class="w-full text-white mb-4"
+                class="w-full text-white mb-4 mt-4"
                 :loading="isLoading"
                 severity="info"
               />

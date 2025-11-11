@@ -12,21 +12,23 @@
         </div>
 
         <!-- Right side - Register Form -->
-        <div class="flex flex-col justify-center">
+        <div class="flex flex-col justify-center py-6">
           <div class="max-w-md mx-auto w-full">
             <!-- Header -->
-            <h1 class="text-2xl font-bold text-gray-900 mb-2">Register</h1>
-            <p class="text-gray-600 mb-2">Create your EasySet24 account</p>
+            <h1 class="text-xl font-bold text-gray-900 mb-1">Register</h1>
+            <p class="text-sm text-gray-600 mb-3">
+              Create your EasySet24 account
+            </p>
 
             <!-- Register Form -->
             <form @submit.prevent="handleRegister" class="space-y-2">
               <!-- Name Fields Row -->
-              <div class="grid grid-cols-2 gap-4">
+              <div class="grid grid-cols-2 gap-3">
                 <!-- First Name Field -->
-                <div class="space-y-2">
+                <div class="space-y-1">
                   <label
                     for="firstName"
-                    class="block text-sm font-medium text-gray-700"
+                    class="block text-xs font-medium text-gray-700"
                   >
                     First Name
                   </label>
@@ -39,16 +41,16 @@
                     :show-clear="true"
                     @clear="clearFirstName"
                   />
-                  <small v-if="firstNameError" class="p-error">{{
-                    firstNameError
-                  }}</small>
+                  <small class="block min-h-[16px] text-xs text-red-500">
+                    {{ firstNameError || "" }}
+                  </small>
                 </div>
 
                 <!-- Last Name Field -->
-                <div class="space-y-2">
+                <div class="space-y-1">
                   <label
                     for="lastName"
-                    class="block text-sm font-medium text-gray-700"
+                    class="block text-xs font-medium text-gray-700"
                   >
                     Last Name
                   </label>
@@ -61,17 +63,17 @@
                     :show-clear="true"
                     @clear="clearLastName"
                   />
-                  <small v-if="lastNameError" class="p-error">{{
-                    lastNameError
-                  }}</small>
+                  <small class="block min-h-[16px] text-xs text-red-500">
+                    {{ lastNameError || "" }}
+                  </small>
                 </div>
               </div>
 
               <!-- Email Field -->
-              <div class="space-y-2">
+              <div class="space-y-1">
                 <label
                   for="email"
-                  class="block text-sm font-medium text-gray-700"
+                  class="block text-xs font-medium text-gray-700"
                   >Email</label
                 >
                 <CustomInputText
@@ -83,16 +85,37 @@
                   :show-clear="true"
                   @clear="clearEmail"
                 />
-                <small v-if="emailError" class="p-error">{{
-                  emailError
-                }}</small>
+                <small class="block min-h-[16px] text-xs text-red-500">
+                  {{ emailError || "" }}
+                </small>
+              </div>
+
+              <!-- PhoneNumber Field -->
+              <div class="space-y-1">
+                <label
+                  for="phone"
+                  class="block text-xs font-medium text-gray-700"
+                  >Phone number</label
+                >
+                <CustomInputText
+                  id="phoneNumber"
+                  v-model="phoneNumber"
+                  type="text"
+                  placeholder="Phone number"
+                  :invalid="!!phoneNumberError"
+                  :show-clear="true"
+                  @clear="clearPhoneNumber"
+                />
+                <small class="block min-h-[16px] text-xs text-red-500">
+                  {{ phoneNumberError || "" }}
+                </small>
               </div>
 
               <!-- Password Field -->
-              <div class="space-y-2">
+              <div class="space-y-1">
                 <label
                   for="password"
-                  class="block text-sm font-medium text-gray-700"
+                  class="block text-xs font-medium text-gray-700"
                 >
                   Password
                 </label>
@@ -105,20 +128,20 @@
                   :toggle-mask="true"
                   @clear="clearPassword"
                 />
-                <small v-if="passwordError" class="p-error">{{
-                  passwordError
-                }}</small>
+                <small class="block min-h-[16px] text-xs text-red-500">
+                  {{ passwordError || "" }}
+                </small>
               </div>
 
               <!-- Confirm Password Field -->
-              <div class="space-y-2">
+              <div class="space-y-1">
                 <label
                   for="confirmPassword"
-                  class="block text-sm font-medium text-gray-700"
+                  class="block text-xs font-medium text-gray-700"
                 >
                   Confirm Password
                 </label>
-                <CustomPassWord
+                <CustomPassword
                   id="confirmPassword"
                   v-model="confirmPassword"
                   placeholder="Confirm Password"
@@ -127,72 +150,32 @@
                   :toggle-mask="true"
                   @clear="clearConfirmPassword"
                 />
-                <small v-if="confirmPasswordError" class="p-error">{{
-                  confirmPasswordError
-                }}</small>
+                <small class="block min-h-[16px] text-xs text-red-500">
+                  {{ confirmPasswordError || "" }}
+                </small>
               </div>
 
-              <!-- Terms and Privacy -->
-              <!-- <div class="flex items-start">
-                <Checkbox v-model="agreeTerms" inputId="terms" binary class="mt-1" />
-                <label for="terms" class="ml-2 text-sm text-gray-600">
-                  I agree to all the Terms and Privacy Policies
-                </label>
-              </div>
-              <small v-if="termsError" class="p-error">{{ termsError }}</small> -->
-
-              <!-- Register Button -->
               <Button
                 type="submit"
                 label="Register Now"
-                class="w-full text-white mb-4"
+                class="w-full text-white mt-3"
                 :loading="isLoading"
                 severity="info"
               />
             </form>
 
             <!-- Login Link -->
-            <div class="text-center mb-6">
-              <span class="text-sm text-gray-600"
+            <div class="text-center mt-3">
+              <span class="text-xs text-gray-600"
                 >Already have an account?
               </span>
               <a
                 @click="login"
-                class="text-sm cursor-pointer text-blue-600 hover:text-blue-500 font-medium"
+                class="text-xs cursor-pointer text-blue-600 hover:text-blue-500 font-medium"
               >
                 Login
               </a>
             </div>
-
-            <!-- Divider -->
-            <!-- <div class="text-center mb-6">
-              <span class="text-sm text-gray-500">Or</span>
-            </div> -->
-
-            <!-- Social Login Buttons -->
-            <!-- <div class="flex justify-center space-x-4">
-              <Button
-                @click="handleSocialLogin('facebook')"
-                class="p-button-outlined p-button-rounded social-btn facebook-btn"
-                :disabled="isLoading"
-              >
-                <i class="pi pi-facebook text-xl"></i>
-              </Button>
-              <Button
-                @click="handleSocialLogin('apple')"
-                class="p-button-outlined p-button-rounded social-btn apple-btn"
-                :disabled="isLoading"
-              >
-                <i class="pi pi-apple text-xl"></i>
-              </Button>
-              <Button
-                @click="handleSocialLogin('google')"
-                class="p-button-outlined p-button-rounded social-btn google-btn"
-                :disabled="isLoading"
-              >
-                <i class="pi pi-google text-xl"></i>
-              </Button>
-            </div> -->
           </div>
         </div>
       </div>
@@ -218,6 +201,7 @@ const router = useRouter();
 const firstName = ref("");
 const lastName = ref("");
 const email = ref("");
+const phoneNumber = ref("");
 const password = ref("");
 const confirmPassword = ref("");
 const agreeTerms = ref(false);
@@ -227,6 +211,7 @@ const isLoading = ref(false);
 const firstNameError = ref("");
 const lastNameError = ref("");
 const emailError = ref("");
+const phoneNumberError = ref("");
 const passwordError = ref("");
 const confirmPasswordError = ref("");
 const termsError = ref("");
@@ -237,6 +222,7 @@ const validateForm = () => {
   firstNameError.value = "";
   lastNameError.value = "";
   emailError.value = "";
+  phoneNumberError.value = "";
   passwordError.value = "";
   confirmPasswordError.value = "";
   termsError.value = "";
@@ -261,6 +247,15 @@ const validateForm = () => {
     isValid = false;
   } else if (!email.value.includes("@")) {
     emailError.value = "Please enter a valid email";
+    isValid = false;
+  }
+
+  // PhoneNumber validation
+  if (!phoneNumber.value) {
+    phoneNumberError.value = "Phone number is required";
+    isValid = false;
+  } else if (!/^\d{10}$/.test(phoneNumber.value)) {
+    phoneNumberError.value = "Please enter a valid phone number (10 digits)";
     isValid = false;
   }
 
@@ -310,6 +305,7 @@ const handleRegister = async () => {
       firstName: firstName.value,
       lastName: lastName.value,
       email: email.value,
+      phoneNumber: phoneNumber.value,
       password: password.value,
       agreeTerms: agreeTerms.value,
     });
@@ -329,26 +325,6 @@ const handleRegister = async () => {
   }
 };
 
-// Handle social login
-const handleSocialLogin = async (provider: string) => {
-  if (isLoading.value) return;
-
-  isLoading.value = true;
-
-  try {
-    // Simulate social login
-    await new Promise((resolve) => setTimeout(resolve, 1000));
-
-    console.log(`${provider} registration attempt`);
-    alert(`${provider} registration - Feature coming soon!`);
-  } catch (error) {
-    console.error(`${provider} registration error:`, error);
-    alert(`${provider} registration failed. Please try again.`);
-  } finally {
-    isLoading.value = false;
-  }
-};
-
 // Clear functions
 const clearFirstName = () => {
   firstName.value = "";
@@ -360,6 +336,10 @@ const clearLastName = () => {
 
 const clearEmail = () => {
   email.value = "";
+};
+
+const clearPhoneNumber = () => {
+  phoneNumber.value = "";
 };
 
 const clearPassword = () => {
@@ -384,8 +364,9 @@ const clearConfirmPassword = () => {
 
 :deep(.p-inputtext) {
   border-radius: 8px;
-  padding: 12px 16px;
+  padding: 10px 14px;
   border: 1px solid #d1d5db;
+  font-size: 0.875rem;
 }
 
 :deep(.p-inputtext:focus) {
@@ -395,9 +376,10 @@ const clearConfirmPassword = () => {
 
 :deep(.p-password input) {
   border-radius: 8px;
-  padding: 12px 16px;
+  padding: 10px 14px;
   border: 1px solid #d1d5db;
   width: 100%;
+  font-size: 0.875rem;
 }
 
 :deep(.p-password:not(.p-disabled).p-focus) {
@@ -426,42 +408,5 @@ const clearConfirmPassword = () => {
 :deep(.p-error) {
   color: #ef4444;
   font-size: 0.875rem;
-}
-
-/* Social button styles */
-.social-btn {
-  width: 50px;
-  height: 50px;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 0;
-  border: 2px solid #e5e7eb;
-  background: white;
-}
-
-.social-btn:hover {
-  border-color: #d1d5db;
-  background: #f9fafb;
-}
-
-.facebook-btn:hover {
-  border-color: #1877f2;
-  color: #1877f2;
-}
-
-.apple-btn:hover {
-  border-color: #000000;
-  color: #000000;
-}
-
-.google-btn:hover {
-  border-color: #4285f4;
-  color: #4285f4;
-}
-
-:deep(.social-btn .p-button-label) {
-  display: none;
 }
 </style>
