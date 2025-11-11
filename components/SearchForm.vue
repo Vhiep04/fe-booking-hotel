@@ -19,6 +19,7 @@
       dateFormat="dd/mm/yy"
       placeholder="Check In Date - Check Out Date"
       showIcon
+      inputClass="w-full"
     >
       <template #dropdownicon>
         <img 
@@ -37,7 +38,7 @@
       placeholder="Select Room Type"
       checkmark
       :highlightOnSelect="false"
-      class="!w-full md:w-56"
+      
     >
       <template #dropdownicon>
         <img src="../assets/icons/people-plus-one.svg" alt="" />
@@ -47,7 +48,7 @@
     <Button
       type="submit"
       label="Search"
-      class="w-full h-full text-white mb-4 !bg-[#07689F]"
+      class="w-full h-full text-white mb-4 !bg-[#07689F] hover:!bg-[#0A7FBF]  !border-none"
       :loading="isLoading"
       severity="info"
     />

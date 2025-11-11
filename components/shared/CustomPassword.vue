@@ -8,9 +8,9 @@
       :placeholder="placeholder"
       :disabled="disabled"
       :class="[
-        'w-full px-4 py-3 pr-20 border rounded-lg transition-colors duration-200 focus:outline-none  focus:border-green-500',
+        'w-full px-4 py-3 pr-10 border rounded-lg transition-colors duration-200 focus:outline-none focus:ring-green-500 focus:border-green-500 placeholder-gray-400 placeholder:font-normal',
         {
-          'border-red-500  focus:border-red-500': invalid,
+          'border-red-500 focus:border-red-500': invalid,
           'border-gray-300': !invalid,
           'bg-gray-50 cursor-not-allowed': disabled,
         },

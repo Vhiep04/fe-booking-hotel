@@ -1,5 +1,4 @@
-import { Cookies } from "js-cookie";
-
+import Cookies from "js-cookie";
 interface CookieAttributes {
   expires?: number | Date;
   path?: string;

@@ -26,6 +26,7 @@
           :show-clear="true"
           @clear="clearSearch"
           width="50rem"
+          class="bg-white"
         >
           <template #icon>
             <i class="pi pi-search" style="font-size: 1rem"></i>

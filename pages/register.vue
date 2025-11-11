@@ -96,7 +96,7 @@
                 >
                   Password
                 </label>
-                <CustomPassWord
+                <CustomPassword
                   id="password"
                   v-model="password"
                   placeholder="Password"
@@ -205,8 +205,8 @@ import { ref } from "vue";
 import Card from "primevue/card";
 import Button from "primevue/button";
 import CustomInputText from "@/components/shared/CustomInputText.vue";
-import CustomPassWord from "@/components/shared/CustomPassWord.vue";
 import { useRouter } from "vue-router";
+import CustomPassword from "~/components/shared/CustomPassword.vue";
 
 definePageMeta({
   layout: "auth",

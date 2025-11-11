@@ -10,4 +10,6 @@
   </div>
 </template>
 
-<script setup lang="ts"></script>
+<script setup lang="ts">
+import HeaderPage from "~/components/shared/HeaderPage.vue";
+</script>

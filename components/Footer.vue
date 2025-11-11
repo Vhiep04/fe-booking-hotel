@@ -304,7 +304,7 @@
             class="w-64"
             @clear="resetEmail"
           />
-          <Button label="Subscribe" severity="info" class="!bg-[#07689F]" />
+          <Button label="Subscribe" severity="info" class="bg-[#07689F]" />
         </div>
       </div>
 
