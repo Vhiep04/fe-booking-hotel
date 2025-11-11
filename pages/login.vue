@@ -61,7 +61,7 @@
                   :toggle-mask="true"
                   @clear="clearPassword"
                 />
-                <small class="block min-h-[20px] text-red-500">
+                <small class="block min-h-5 text-red-500">
                   {{ passwordError || "" }}
                 </small>
               </div>

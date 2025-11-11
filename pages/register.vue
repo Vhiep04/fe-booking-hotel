@@ -28,7 +28,7 @@
                 <div class="space-y-1">
                   <label
                     for="firstName"
-                    class="block text-xs font-medium text-gray-700"
+                    class="block text-sm font-medium text-gray-700"
                   >
                     First Name
                   </label>
@@ -41,7 +41,7 @@
                     :show-clear="true"
                     @clear="clearFirstName"
                   />
-                  <small class="block min-h-[16px] text-xs text-red-500">
+                  <small class="block min-h-4 text-xs text-red-500">
                     {{ firstNameError || "" }}
                   </small>
                 </div>
@@ -50,7 +50,7 @@
                 <div class="space-y-1">
                   <label
                     for="lastName"
-                    class="block text-xs font-medium text-gray-700"
+                    class="block text-sm font-medium text-gray-700"
                   >
                     Last Name
                   </label>
@@ -63,7 +63,7 @@
                     :show-clear="true"
                     @clear="clearLastName"
                   />
-                  <small class="block min-h-[16px] text-xs text-red-500">
+                  <small class="block min-h-4 text-xs text-red-500">
                     {{ lastNameError || "" }}
                   </small>
                 </div>
@@ -73,7 +73,7 @@
               <div class="space-y-1">
                 <label
                   for="email"
-                  class="block text-xs font-medium text-gray-700"
+                  class="block text-sm font-medium text-gray-700"
                   >Email</label
                 >
                 <CustomInputText
@@ -85,7 +85,7 @@
                   :show-clear="true"
                   @clear="clearEmail"
                 />
-                <small class="block min-h-[16px] text-xs text-red-500">
+                <small class="block min-h-4 text-xs text-red-500">
                   {{ emailError || "" }}
                 </small>
               </div>
@@ -94,7 +94,7 @@
               <div class="space-y-1">
                 <label
                   for="phone"
-                  class="block text-xs font-medium text-gray-700"
+                  class="block text-sm font-medium text-gray-700"
                   >Phone number</label
                 >
                 <CustomInputText
@@ -106,7 +106,7 @@
                   :show-clear="true"
                   @clear="clearPhoneNumber"
                 />
-                <small class="block min-h-[16px] text-xs text-red-500">
+                <small class="block min-h-4 text-xs text-red-500">
                   {{ phoneNumberError || "" }}
                 </small>
               </div>
@@ -115,7 +115,7 @@
               <div class="space-y-1">
                 <label
                   for="password"
-                  class="block text-xs font-medium text-gray-700"
+                  class="block text-sm font-medium text-gray-700"
                 >
                   Password
                 </label>
@@ -128,7 +128,7 @@
                   :toggle-mask="true"
                   @clear="clearPassword"
                 />
-                <small class="block min-h-[16px] text-xs text-red-500">
+                <small class="block min-h-4 text-xs text-red-500">
                   {{ passwordError || "" }}
                 </small>
               </div>
@@ -137,7 +137,7 @@
               <div class="space-y-1">
                 <label
                   for="confirmPassword"
-                  class="block text-xs font-medium text-gray-700"
+                  class="block text-sm font-medium text-gray-700"
                 >
                   Confirm Password
                 </label>
@@ -150,7 +150,7 @@
                   :toggle-mask="true"
                   @clear="clearConfirmPassword"
                 />
-                <small class="block min-h-[16px] text-xs text-red-500">
+                <small class="block min-h-4 text-xs text-red-500">
                   {{ confirmPasswordError || "" }}
                 </small>
               </div>
@@ -166,12 +166,12 @@
 
             <!-- Login Link -->
             <div class="text-center mt-3">
-              <span class="text-xs text-gray-600"
+              <span class="text-sm text-gray-600"
                 >Already have an account?
               </span>
               <a
                 @click="login"
-                class="text-xs cursor-pointer text-blue-600 hover:text-blue-500 font-medium"
+                class="text-sm cursor-pointer text-blue-600 hover:text-blue-500 font-medium"
               >
                 Login
               </a>
