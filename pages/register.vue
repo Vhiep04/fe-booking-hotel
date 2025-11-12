@@ -298,19 +298,6 @@ const handleRegister = async () => {
   isLoading.value = true;
 
   try {
-    // Simulate API call
-    await new Promise((resolve) => setTimeout(resolve, 1500));
-
-    console.log("Registration attempt:", {
-      firstName: firstName.value,
-      lastName: lastName.value,
-      email: email.value,
-      phoneNumber: phoneNumber.value,
-      password: password.value,
-      agreeTerms: agreeTerms.value,
-    });
-
-    // Handle successful registration here
     alert(
       "Registration successful! Please check your email to verify your account."
     );

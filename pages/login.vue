@@ -32,14 +32,14 @@
                 </label>
                 <CustomInputText
                   id="email"
-                  v-model="email"
+                  v-model="form.email"
                   type="email"
                   placeholder="Enter your email"
                   :invalid="!!emailError"
                   :show-clear="true"
                   @clear="clearEmail"
                 />
-                <small class="block min-h-[20px] text-red-500">
+                <small class="block min-h-5 text-red-500">
                   {{ emailError || "" }}
                 </small>
               </div>
@@ -54,7 +54,7 @@
                 </label>
                 <CustomPassword
                   id="password"
-                  v-model="password"
+                  v-model="form.password"
                   placeholder="Enter your password"
                   :invalid="!!passwordError"
                   :show-clear="true"
@@ -100,12 +100,12 @@
                 >Don't have an account in EasySet24 yet?
               </span>
               <br />
-              <a
-                @click="register"
+              <NuxtLink
+                to="/register"
                 class="text-sm cursor-pointer text-blue-600 hover:text-blue-500 font-medium"
               >
                 Register!
-              </a>
+              </NuxtLink>
             </div>
           </div>
         </div>
@@ -119,10 +119,11 @@ import { ref } from "vue";
 import Card from "primevue/card";
 import Button from "primevue/button";
 import Checkbox from "primevue/checkbox";
-import Divider from "primevue/divider";
 import CustomInputText from "~/components/shared/CustomInputText.vue";
 import { useRouter } from "vue-router";
 import CustomPassword from "~/components/shared/CustomPassword.vue";
+import { useAuthStore } from "@/stores/auth";
+import type { LoginResponseData } from "~/stores/interface/response/auth";
 
 definePageMeta({
   layout: "auth",
@@ -130,9 +131,13 @@ definePageMeta({
 
 const router = useRouter();
 
+const authStore = useAuthStore();
+
 // Form data
-const email = ref("");
-const password = ref("");
+const form = ref({
+  email: "",
+  password: "",
+});
 const rememberMe = ref(false);
 const isLoading = ref(false);
 
@@ -145,32 +150,28 @@ const validateForm = () => {
   emailError.value = "";
   passwordError.value = "";
 
-  if (!email.value) {
+  if (!form.value.email) {
     emailError.value = "Email is required";
     return false;
   }
 
-  if (!email.value.includes("@")) {
+  if (!form.value.email.includes("@")) {
     emailError.value = "Please enter a valid email";
     return false;
   }
 
-  if (!password.value) {
+  if (!form.value.password) {
     passwordError.value = "Password is required";
     return false;
   }
 
-  if (password.value.length < 6) {
+  if (form.value.password.length < 6) {
     passwordError.value = "Password must be at least 6 characters";
     return false;
   }
 
   return true;
 };
-
-function register() {
-  router.push({ name: "register" });
-}
 
 // Handle login
 const handleLogin = async () => {
@@ -179,20 +180,16 @@ const handleLogin = async () => {
   isLoading.value = true;
 
   try {
-    // Simulate API call
-    await new Promise((resolve) => setTimeout(resolve, 1000));
-
-    console.log("Login attempt:", {
-      email: email.value,
-      password: password.value,
+    const response = await authStore.userLogin({
+      email: form.value.email.trim().toLowerCase(),
+      password: form.value.password,
       rememberMe: rememberMe.value,
     });
-
-    // Handle successful login here
-    alert("Login successful!");
+    if (authStore.isAuthenticated) {
+      router.push({ path: "/" });
+    }
   } catch (error) {
     console.error("Login error:", error);
-    alert("Login failed. Please try again.");
   } finally {
     isLoading.value = false;
   }
@@ -200,11 +197,11 @@ const handleLogin = async () => {
 
 // Clear functions
 const clearEmail = () => {
-  email.value = "";
+  form.value.email = "";
 };
 
 const clearPassword = () => {
-  password.value = "";
+  form.value.password = "";
 };
 </script>
 

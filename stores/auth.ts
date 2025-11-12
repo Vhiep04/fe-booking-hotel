@@ -8,7 +8,7 @@ import type { RequestLoginPayload } from "./interface/request/auth";
 import type { LoginResponseData } from "./interface/response/auth";
 import { ref } from "vue";
 
-const namespace = "/draft";
+const namespace = "/Auth";
 
 export const useAuthStore = defineStore("auth", () => {
   const apiStore = useApiStore();
@@ -28,21 +28,28 @@ export const useAuthStore = defineStore("auth", () => {
   function userLoginFailed(e: Error) {
     console.log(e);
   }
-  async function userLogin({ userName, password }: RequestLoginPayload) {
+  async function userLogin({
+    email,
+    password,
+    rememberMe,
+  }: RequestLoginPayload) {
     try {
       userLoginRequesting.value = true;
       const response = await apiStore.apiRequest<LoginResponseData>({
         method: "POST",
         endpoint: `${namespace}/login`,
         data: new authRequest.UserLogin({
-          userName,
+          email,
           password,
         }).serialize(),
-        proxy: true,
+        proxy: false,
+        auth: false,
       });
-      userLoginSuccess(response);
+      userLoginSuccess(response.data);
+      return response;
     } catch (e) {
       userLoginFailed(new Error(JSON.stringify(e)));
+      throw e;
     } finally {
       userLoginRequesting.value = false;
     }

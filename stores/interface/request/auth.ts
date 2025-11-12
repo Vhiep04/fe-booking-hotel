@@ -1,4 +1,5 @@
 export interface RequestLoginPayload {
-  userName: string;
+  email: string;
   password: string;
+  rememberMe: boolean;
 }
