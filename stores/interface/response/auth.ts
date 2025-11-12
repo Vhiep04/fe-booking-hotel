@@ -6,3 +6,8 @@ export interface LoginResponseData {
   email: string;
   phoneNumber: string;
 }
+export interface RegisterResponseData {
+  firstName: string;
+  lastName: string;
+  email: string;
+}

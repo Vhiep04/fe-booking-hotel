@@ -123,7 +123,6 @@ import CustomInputText from "~/components/shared/CustomInputText.vue";
 import { useRouter } from "vue-router";
 import CustomPassword from "~/components/shared/CustomPassword.vue";
 import { useAuthStore } from "@/stores/auth";
-import type { LoginResponseData } from "~/stores/interface/response/auth";
 
 definePageMeta({
   layout: "auth",
@@ -180,7 +179,7 @@ const handleLogin = async () => {
   isLoading.value = true;
 
   try {
-    const response = await authStore.userLogin({
+    await authStore.userLogin({
       email: form.value.email.trim().toLowerCase(),
       password: form.value.password,
       rememberMe: rememberMe.value,

@@ -2,7 +2,6 @@
   <Card class="w-full max-w-4xl overflow-hidden shadow-xl">
     <template #content>
       <div class="grid grid-cols-1 lg:grid-cols-[40%_60%] gap-0">
-        <!-- Left side - Image -->
         <div class="hidden lg:block lg:w-80">
           <img
             src="../assets/images/travel_photo.png"
@@ -11,10 +10,8 @@
           />
         </div>
 
-        <!-- Right side - Register Form -->
         <div class="flex flex-col justify-center py-6">
           <div class="max-w-md mx-auto w-full">
-            <!-- Header -->
             <h1 class="text-xl font-bold text-gray-900 mb-1">Register</h1>
             <p class="text-sm text-gray-600 mb-3">
               Create your EasySet24 account
@@ -22,9 +19,7 @@
 
             <!-- Register Form -->
             <form @submit.prevent="handleRegister" class="space-y-2">
-              <!-- Name Fields Row -->
               <div class="grid grid-cols-2 gap-3">
-                <!-- First Name Field -->
                 <div class="space-y-1">
                   <label
                     for="firstName"
@@ -34,19 +29,18 @@
                   </label>
                   <CustomInputText
                     id="firstName"
-                    v-model="firstName"
+                    v-model="form.firstName"
                     type="text"
                     placeholder="First name"
-                    :invalid="!!firstNameError"
+                    :invalid="!!formErrors.firstName"
                     :show-clear="true"
-                    @clear="clearFirstName"
+                    @clear="clearField('firstName')"
                   />
                   <small class="block min-h-4 text-xs text-red-500">
-                    {{ firstNameError || "" }}
+                    {{ formErrors.firstName || "" }}
                   </small>
                 </div>
 
-                <!-- Last Name Field -->
                 <div class="space-y-1">
                   <label
                     for="lastName"
@@ -56,62 +50,61 @@
                   </label>
                   <CustomInputText
                     id="lastName"
-                    v-model="lastName"
+                    v-model="form.lastName"
                     type="text"
                     placeholder="Last name"
-                    :invalid="!!lastNameError"
+                    :invalid="!!formErrors.lastName"
                     :show-clear="true"
-                    @clear="clearLastName"
+                    @clear="clearField('lastName')"
                   />
                   <small class="block min-h-4 text-xs text-red-500">
-                    {{ lastNameError || "" }}
+                    {{ formErrors.lastName || "" }}
                   </small>
                 </div>
               </div>
 
-              <!-- Email Field -->
               <div class="space-y-1">
                 <label
                   for="email"
                   class="block text-sm font-medium text-gray-700"
-                  >Email</label
                 >
+                  Email
+                </label>
                 <CustomInputText
                   id="email"
-                  v-model="email"
+                  v-model="form.email"
                   type="email"
                   placeholder="Email"
-                  :invalid="!!emailError"
+                  :invalid="!!formErrors.email"
                   :show-clear="true"
-                  @clear="clearEmail"
+                  @clear="clearField('email')"
                 />
                 <small class="block min-h-4 text-xs text-red-500">
-                  {{ emailError || "" }}
+                  {{ formErrors.email || "" }}
                 </small>
               </div>
 
-              <!-- PhoneNumber Field -->
               <div class="space-y-1">
                 <label
                   for="phone"
                   class="block text-sm font-medium text-gray-700"
-                  >Phone number</label
                 >
+                  Phone number
+                </label>
                 <CustomInputText
                   id="phoneNumber"
-                  v-model="phoneNumber"
+                  v-model="form.phoneNumber"
                   type="text"
                   placeholder="Phone number"
-                  :invalid="!!phoneNumberError"
+                  :invalid="!!formErrors.phoneNumber"
                   :show-clear="true"
-                  @clear="clearPhoneNumber"
+                  @clear="clearField('phoneNumber')"
                 />
                 <small class="block min-h-4 text-xs text-red-500">
-                  {{ phoneNumberError || "" }}
+                  {{ formErrors.phoneNumber || "" }}
                 </small>
               </div>
 
-              <!-- Password Field -->
               <div class="space-y-1">
                 <label
                   for="password"
@@ -121,19 +114,18 @@
                 </label>
                 <CustomPassword
                   id="password"
-                  v-model="password"
+                  v-model="form.password"
                   placeholder="Password"
-                  :invalid="!!passwordError"
+                  :invalid="!!formErrors.password"
                   :show-clear="true"
                   :toggle-mask="true"
-                  @clear="clearPassword"
+                  @clear="clearField('password')"
                 />
                 <small class="block min-h-4 text-xs text-red-500">
-                  {{ passwordError || "" }}
+                  {{ formErrors.password || "" }}
                 </small>
               </div>
 
-              <!-- Confirm Password Field -->
               <div class="space-y-1">
                 <label
                   for="confirmPassword"
@@ -143,15 +135,15 @@
                 </label>
                 <CustomPassword
                   id="confirmPassword"
-                  v-model="confirmPassword"
+                  v-model="form.confirmPassword"
                   placeholder="Confirm Password"
-                  :invalid="!!confirmPasswordError"
+                  :invalid="!!formErrors.confirmPassword"
                   :show-clear="true"
                   :toggle-mask="true"
-                  @clear="clearConfirmPassword"
+                  @clear="clearField('confirmPassword')"
                 />
                 <small class="block min-h-4 text-xs text-red-500">
-                  {{ confirmPasswordError || "" }}
+                  {{ formErrors.confirmPassword || "" }}
                 </small>
               </div>
 
@@ -164,10 +156,9 @@
               />
             </form>
 
-            <!-- Login Link -->
             <div class="text-center mt-3">
-              <span class="text-sm text-gray-600"
-                >Already have an account?
+              <span class="text-sm text-gray-600">
+                Already have an account?
               </span>
               <a
                 @click="login"
@@ -184,112 +175,116 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from "vue";
+import { reactive, ref } from "vue";
 import Card from "primevue/card";
 import Button from "primevue/button";
 import CustomInputText from "@/components/shared/CustomInputText.vue";
 import { useRouter } from "vue-router";
 import CustomPassword from "~/components/shared/CustomPassword.vue";
+import { useAuthStore } from "@/stores/auth";
 
 definePageMeta({
   layout: "auth",
 });
 
 const router = useRouter();
+const authStore = useAuthStore();
 
-// Form data
-const firstName = ref("");
-const lastName = ref("");
-const email = ref("");
-const phoneNumber = ref("");
-const password = ref("");
-const confirmPassword = ref("");
-const agreeTerms = ref(false);
+// Form data - Single reactive object
+const form = reactive({
+  firstName: "",
+  lastName: "",
+  email: "",
+  phoneNumber: "",
+  password: "",
+  confirmPassword: "",
+});
+
+// Form errors - Single reactive object
+const formErrors = reactive({
+  firstName: "",
+  lastName: "",
+  email: "",
+  phoneNumber: "",
+  password: "",
+  confirmPassword: "",
+});
+
 const isLoading = ref(false);
 
-// Validation errors
-const firstNameError = ref("");
-const lastNameError = ref("");
-const emailError = ref("");
-const phoneNumberError = ref("");
-const passwordError = ref("");
-const confirmPasswordError = ref("");
-const termsError = ref("");
+// Reset all errors
+const resetErrors = () => {
+  Object.keys(formErrors).forEach((key) => {
+    formErrors[key as keyof typeof formErrors] = "";
+  });
+};
 
 // Form validation
-const validateForm = () => {
-  // Reset errors
-  firstNameError.value = "";
-  lastNameError.value = "";
-  emailError.value = "";
-  phoneNumberError.value = "";
-  passwordError.value = "";
-  confirmPasswordError.value = "";
-  termsError.value = "";
-
+const validateForm = (): boolean => {
+  resetErrors();
   let isValid = true;
 
   // First name validation
-  if (!firstName.value.trim()) {
-    firstNameError.value = "First name is required";
+  if (!form.firstName.trim()) {
+    formErrors.firstName = "First name is required";
     isValid = false;
   }
 
   // Last name validation
-  if (!lastName.value.trim()) {
-    lastNameError.value = "Last name is required";
+  if (!form.lastName.trim()) {
+    formErrors.lastName = "Last name is required";
     isValid = false;
   }
 
   // Email validation
-  if (!email.value) {
-    emailError.value = "Email is required";
+  if (!form.email) {
+    formErrors.email = "Email is required";
     isValid = false;
-  } else if (!email.value.includes("@")) {
-    emailError.value = "Please enter a valid email";
+  } else if (!form.email.includes("@")) {
+    formErrors.email = "Please enter a valid email";
     isValid = false;
   }
 
-  // PhoneNumber validation
-  if (!phoneNumber.value) {
-    phoneNumberError.value = "Phone number is required";
+  // Phone number validation
+  if (!form.phoneNumber) {
+    formErrors.phoneNumber = "Phone number is required";
     isValid = false;
-  } else if (!/^\d{10}$/.test(phoneNumber.value)) {
-    phoneNumberError.value = "Please enter a valid phone number (10 digits)";
+  } else if (!/^\d{10}$/.test(form.phoneNumber)) {
+    formErrors.phoneNumber = "Please enter a valid phone number (10 digits)";
     isValid = false;
   }
 
   // Password validation
-  if (!password.value) {
-    passwordError.value = "Password is required";
+  if (!form.password) {
+    formErrors.password = "Password is required";
     isValid = false;
-  } else if (password.value.length < 6) {
-    passwordError.value = "Password must be at least 6 characters";
+  } else if (form.password.length < 6) {
+    formErrors.password = "Password must be at least 6 characters";
     isValid = false;
   }
 
   // Confirm password validation
-  if (!confirmPassword.value) {
-    confirmPasswordError.value = "Please confirm your password";
+  if (!form.confirmPassword) {
+    formErrors.confirmPassword = "Please confirm your password";
     isValid = false;
-  } else if (password.value !== confirmPassword.value) {
-    confirmPasswordError.value = "Passwords do not match";
-    isValid = false;
-  }
-
-  // Terms validation
-  if (!agreeTerms.value) {
-    termsError.value = "You must agree to the terms and privacy policies";
+  } else if (form.password !== form.confirmPassword) {
+    formErrors.confirmPassword = "Passwords do not match";
     isValid = false;
   }
 
   return isValid;
 };
 
-// Navigation functions
-function login() {
+// Clear individual field
+const clearField = (fieldName: keyof typeof form) => {
+  form[fieldName] = "";
+  formErrors[fieldName] = "";
+};
+
+// Navigation function
+const login = () => {
   router.push({ name: "login" });
-}
+};
 
 // Handle registration
 const handleRegister = async () => {
@@ -298,43 +293,27 @@ const handleRegister = async () => {
   isLoading.value = true;
 
   try {
-    alert(
-      "Registration successful! Please check your email to verify your account."
-    );
+    const response = await authStore.userRegister({
+      firstName: form.firstName.trim(),
+      lastName: form.lastName.trim(),
+      email: form.email.trim().toLowerCase(),
+      phoneNumber: form.phoneNumber.trim(),
+      password: form.password,
+      confirmPassword: form.confirmPassword,
+    });
 
-    // Redirect to login or dashboard
-    router.push({ name: "login" });
+    if (response?.success) {
+      alert(
+        "Registration successful! Please check your email to verify your account."
+      );
+      router.push({ path: "/login" });
+    }
   } catch (error) {
     console.error("Registration error:", error);
     alert("Registration failed. Please try again.");
   } finally {
     isLoading.value = false;
   }
-};
-
-// Clear functions
-const clearFirstName = () => {
-  firstName.value = "";
-};
-
-const clearLastName = () => {
-  lastName.value = "";
-};
-
-const clearEmail = () => {
-  email.value = "";
-};
-
-const clearPhoneNumber = () => {
-  phoneNumber.value = "";
-};
-
-const clearPassword = () => {
-  password.value = "";
-};
-
-const clearConfirmPassword = () => {
-  confirmPassword.value = "";
 };
 </script>
 
