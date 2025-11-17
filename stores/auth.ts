@@ -25,13 +25,46 @@ export const useAuthStore = defineStore("auth", () => {
   const userLoginRequesting = ref(false);
   const userRegisterRequesting = ref(false);
 
+  // FIX: Thêm function để init auth state từ cookie
+  function initAuthFromCookie() {
+    const savedToken = getCookie("token");
+    if (savedToken) {
+      try {
+        const decoded = new authResponse.AuthToken(savedToken).deserialize();
+
+        // Check token còn hạn không
+        const now = Math.floor(Date.now() / 1000);
+        if (decoded.exp > now) {
+          token.value = savedToken;
+          jwtPayload.value = decoded;
+          isAuthenticated.value = true;
+          console.log("Auth restored from cookie");
+        } else {
+          // Token hết hạn, xóa cookie
+          deleteCookie("token");
+          console.log("Token expired, cleared cookie");
+        }
+      } catch (e) {
+        console.error("Invalid token in cookie:", e);
+        deleteCookie("token");
+      }
+    }
+  }
+
   function userLoginSuccess(data: LoginResponseData) {
     token.value = data.token;
     jwtPayload.value = new authResponse.AuthToken(data.token).deserialize();
     isAuthenticated.value = true;
+
+    const expiresDate = new Date(data.expiration);
+
     setCookie("token", data.token, {
-      expires: new Date(jwtPayload.value.exp),
+      expires: expiresDate,
+      path: "/",
+      sameSite: "Lax",
     });
+
+    console.log("Login successful, token saved");
   }
 
   function userLoginFailed(e: Error) {
@@ -40,10 +73,6 @@ export const useAuthStore = defineStore("auth", () => {
 
   function userRegisterSuccess(data: RegisterResponseData) {
     console.log("Registration successful:", data);
-    // Nếu API trả về token luôn sau khi register, có thể tự động login
-    // if (data.token) {
-    //   userLoginSuccess(data);
-    // }
   }
 
   function userRegisterFailed(e: Error) {
@@ -125,6 +154,7 @@ export const useAuthStore = defineStore("auth", () => {
     isAuthenticated,
     userLoginRequesting,
     userRegisterRequesting,
+    initAuthFromCookie, // Export function mới
     userLogin,
     userRegister,
     userLogout,

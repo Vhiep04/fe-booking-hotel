@@ -303,14 +303,10 @@ const handleRegister = async () => {
     });
 
     if (response?.success) {
-      alert(
-        "Registration successful! Please check your email to verify your account."
-      );
       router.push({ path: "/login" });
     }
   } catch (error) {
     console.error("Registration error:", error);
-    alert("Registration failed. Please try again.");
   } finally {
     isLoading.value = false;
   }

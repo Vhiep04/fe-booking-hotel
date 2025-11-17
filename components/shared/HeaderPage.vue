@@ -5,13 +5,13 @@
       <div class="flex items-center space-x-6">
         <img src="../../assets/images/logo_easyset24.svg" alt="" />
         <i
-          v-if="!storeOfAuth.isAuthenticated"
+          v-if="!authStore.isAuthenticated"
           class="pi pi-question-circle cursor-pointer"
           style="font-size: 1.2rem"
         ></i>
 
         <img
-          v-if="!storeOfAuth.isAuthenticated"
+          v-if="!authStore.isAuthenticated"
           src="../../assets/images/england-flag.svg"
           alt=""
         />
@@ -35,10 +35,7 @@
       </div>
 
       <!-- Authenticated User Section -->
-      <div
-        v-if="storeOfAuth.isAuthenticated"
-        class="flex items-center space-x-5"
-      >
+      <div v-if="authStore.isAuthenticated" class="flex items-center space-x-5">
         <!-- Language Flag -->
         <button class="hover:opacity-80 transition-opacity">
           <img
@@ -70,22 +67,17 @@
           <i class="pi pi-phone" style="font-size: 1.2rem"></i>
         </button>
 
-        <!-- User Profile -->
-        <button
-          @click="toggleUserMenu"
-          class="flex items-center space-x-2 hover:opacity-80 transition-opacity"
-        >
-          <Avatar
-            :image="userAvatar"
-            shape="circle"
-            size="large"
-            class="border-2 border-gray-200"
-          />
-          <div class="text-left">
-            <div class="text-sm font-semibold text-blue-600">Your Account</div>
-            <div class="text-xs text-gray-600">{{ userName }}</div>
-          </div>
-        </button>
+        <!-- User Profile Component -->
+        <UserProfile
+          :full-name="userData.fullName"
+          :email="userData.email"
+          :avatar-url="userData.avatarUrl"
+          @my-account="handleMyAccount"
+          @payments="handlePayments"
+          @settings="handleSettings"
+          @support="handleSupport"
+          @sign-out="handleSignOut"
+        />
       </div>
 
       <!-- Guest User Section -->
@@ -112,22 +104,29 @@
 </template>
 
 <script setup lang="ts">
-import { Button, Avatar } from "primevue";
-import CustomInputText from "./CustomInputText.vue";
-import { ref, computed } from "vue";
+import { ref, reactive, onMounted, watch } from "vue";
 import { useRouter } from "vue-router";
+import CustomInputText from "./CustomInputText.vue";
+import UserProfile from "../UserProfile.vue";
+import { useApiStore } from "@/stores/api";
 import { useAuthStore } from "@/stores/auth";
+import { getCookie, deleteCookie } from "@/utils/storageHelper";
+import type { UserInfoResponse } from "~/stores/interface/response/getUserInfo";
 
 const router = useRouter();
-const storeOfAuth = useAuthStore();
+const apiStore = useApiStore();
+const authStore = useAuthStore();
 
 const search = ref("");
+const namespace = "/Auth";
 
-// User data - lấy từ store
-const userName = computed(() => storeOfAuth.user?.name || "Anna Carina");
-const userAvatar = computed(
-  () => storeOfAuth.user?.avatar || "../assets/images/avt.jpg"
-);
+const userData = reactive<UserInfoResponse>({
+  fullName: "",
+  avatarUrl: "",
+  email: "",
+  phoneNumber: "",
+  birthDate: undefined,
+});
 
 const clearSearch = () => {
   search.value = "";
@@ -141,10 +140,94 @@ function register() {
   router.push({ name: "register" });
 }
 
-function toggleUserMenu() {
-  // Handle user menu toggle
-  console.log("Toggle user menu");
-}
+// Handle user menu actions
+const handleMyAccount = () => {
+  router.push({ name: "my-account" });
+};
+
+const handlePayments = () => {
+  router.push({ name: "payments" });
+};
+
+const handleSettings = () => {
+  router.push({ name: "settings" });
+};
+
+const handleSupport = () => {
+  router.push({ name: "support" });
+};
+
+const handleSignOut = () => {
+  // Clear auth state
+  authStore.token = "";
+  authStore.isAuthenticated = false;
+
+  // Remove cookie
+  deleteCookie("token");
+
+  // Clear user data
+  userData.fullName = "";
+  userData.avatarUrl = "";
+  userData.email = "";
+  userData.phoneNumber = "";
+  userData.birthDate = undefined;
+
+  // Redirect to home or login
+  router.push({ name: "login" });
+};
+
+const getUserInfo = async () => {
+  try {
+    const res = await apiStore.apiRequest<{
+      success: boolean;
+      data: UserInfoResponse;
+    }>({
+      method: "GET",
+      endpoint: `${namespace}/me`,
+      auth: true,
+      proxy: false,
+    });
+
+    const payload = res.data;
+
+    userData.fullName = payload.fullName;
+    userData.avatarUrl = payload.avatarUrl ?? "";
+    userData.email = payload.email ?? "";
+    userData.phoneNumber = payload.phoneNumber ?? "";
+    userData.birthDate = payload.birthDate ?? undefined;
+
+    console.log("User info loaded:", userData);
+  } catch (e) {
+    console.error("getUserInfo error:", e);
+  }
+};
+
+// Check authentication trước khi gọi API
+onMounted(() => {
+  const token = getCookie("token");
+
+  if (token) {
+    authStore.token = token;
+    authStore.isAuthenticated = true;
+    void getUserInfo();
+  }
+});
+
+// Watch auth state để load user info khi login
+watch(
+  () => authStore.isAuthenticated,
+  (newVal) => {
+    if (newVal) {
+      void getUserInfo();
+    } else {
+      userData.fullName = "";
+      userData.avatarUrl = "";
+      userData.email = "";
+      userData.phoneNumber = "";
+      userData.birthDate = undefined;
+    }
+  }
+);
 </script>
 
 <style scoped></style>

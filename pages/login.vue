@@ -118,7 +118,7 @@
 import { ref } from "vue";
 import Card from "primevue/card";
 import Button from "primevue/button";
-import Checkbox from "primevue/checkbox";
+// import Checkbox from "primevue/checkbox";
 import CustomInputText from "~/components/shared/CustomInputText.vue";
 import { useRouter } from "vue-router";
 import CustomPassword from "~/components/shared/CustomPassword.vue";
