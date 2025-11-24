@@ -112,24 +112,27 @@
       </div>
     </template>
   </Card>
+  <Toast />
 </template>
 
 <script setup lang="ts">
-import { ref } from "vue";
+import { ref, onMounted } from "vue"; // Thêm onMounted vào import
 import Card from "primevue/card";
 import Button from "primevue/button";
-// import Checkbox from "primevue/checkbox";
 import CustomInputText from "~/components/shared/CustomInputText.vue";
 import { useRouter } from "vue-router";
 import CustomPassword from "~/components/shared/CustomPassword.vue";
 import { useAuthStore } from "@/stores/auth";
+import { useToast } from "primevue/usetoast";
+import Toast from "primevue/toast";
+
+let toast: ReturnType<typeof useToast> | null = null;
 
 definePageMeta({
   layout: "auth",
 });
 
 const router = useRouter();
-
 const authStore = useAuthStore();
 
 // Form data
@@ -179,16 +182,46 @@ const handleLogin = async () => {
   isLoading.value = true;
 
   try {
-    await authStore.userLogin({
+    const res = await authStore.userLogin({
       email: form.value.email.trim().toLowerCase(),
       password: form.value.password,
       rememberMe: rememberMe.value,
     });
-    if (authStore.isAuthenticated) {
-      router.push({ path: "/" });
+
+    if (res.success) {
+      toast?.add({
+        severity: "success",
+        summary: "Success",
+        detail: res.message,
+        life: 3000,
+      });
+
+      if (authStore.isAuthenticated) {
+        router.push({ path: "/" });
+      }
     }
-  } catch (error) {
-    console.error("Login error:", error);
+  } catch (error: any) {
+    // console.error("Login error:", error);
+    // // Xử lý error từ store nếu vẫn throw
+    // let errorMessage = "An unexpected error occurred";
+    // if (error?.data) {
+    //   errorMessage = error.data.message || errorMessage;
+    //   if (error.data.requiresVerification) {
+    //     toast?.add({
+    //       severity: "error",
+    //       summary: "Email Verification Required",
+    //       detail: error.data.message,
+    //       life: 5000,
+    //     });
+    //     return;
+    //   }
+    // }
+    // toast?.add({
+    //   severity: "error",
+    //   summary: "Error",
+    //   detail: errorMessage,
+    //   life: 3000,
+    // });
   } finally {
     isLoading.value = false;
   }
@@ -197,11 +230,18 @@ const handleLogin = async () => {
 // Clear functions
 const clearEmail = () => {
   form.value.email = "";
+  emailError.value = "";
 };
 
 const clearPassword = () => {
   form.value.password = "";
+  passwordError.value = "";
 };
+
+// Khởi tạo toast
+onMounted(() => {
+  toast = useToast();
+});
 </script>
 
 <style scoped>

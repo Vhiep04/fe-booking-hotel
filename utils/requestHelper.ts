@@ -10,9 +10,12 @@ export default <ResponseDataType>({
   data = {},
   uri = "",
   headers = {},
+  credentials,
 }: Payload): Promise<ResponseDataType> =>
   $fetch(uri || `${baseURL}${endpoint}`, {
+    method,
     headers,
+    credentials: credentials || "include",
     ...(method.toUpperCase() === "GET"
       ? { query: { ...params } }
       : { method, body: { ...data } }),

@@ -172,6 +172,39 @@
       </div>
     </template>
   </Card>
+  <Dialog
+    v-model:visible="visible"
+    modal
+    header="Verify Email"
+    :style="{ width: '25rem' }"
+  >
+    <span class="text-surface-500 dark:text-surface-400 block mb-8"
+      >Message
+    </span>
+    <div class="flex justify-center items-center gap-4 mb-4">
+      <InputOtp :length="6" v-model="otpCode" integerOnly />
+    </div>
+    <div class="mb-5 mt-5">
+      <p>
+        DO you received OTP?
+        <u
+          @click="resendOtpCode"
+          class="text-blue-500 hover:text-blue-800 hover:cursor-pointer"
+          >Resend OTP</u
+        >
+      </p>
+    </div>
+    <div class="flex justify-end gap-2">
+      <Button
+        type="button"
+        label="Cancel"
+        severity="secondary"
+        @click="visible = false"
+      ></Button>
+      <Button type="button" label="Confirm" @click="sendOtpCode"></Button>
+    </div>
+  </Dialog>
+  <Toast />
 </template>
 
 <script setup lang="ts">
@@ -182,13 +215,19 @@ import CustomInputText from "@/components/shared/CustomInputText.vue";
 import { useRouter } from "vue-router";
 import CustomPassword from "~/components/shared/CustomPassword.vue";
 import { useAuthStore } from "@/stores/auth";
+import { Dialog, InputOtp, Toast } from "primevue";
+import { useToast } from "primevue/usetoast";
+
+let toast: ReturnType<typeof useToast> | null = null;
 
 definePageMeta({
   layout: "auth",
 });
 
-const router = useRouter();
 const authStore = useAuthStore();
+const visible = ref(false);
+const otpCode = ref();
+const router = useRouter();
 
 // Form data - Single reactive object
 const form = reactive({
@@ -224,19 +263,16 @@ const validateForm = (): boolean => {
   resetErrors();
   let isValid = true;
 
-  // First name validation
   if (!form.firstName.trim()) {
     formErrors.firstName = "First name is required";
     isValid = false;
   }
 
-  // Last name validation
   if (!form.lastName.trim()) {
     formErrors.lastName = "Last name is required";
     isValid = false;
   }
 
-  // Email validation
   if (!form.email) {
     formErrors.email = "Email is required";
     isValid = false;
@@ -245,7 +281,6 @@ const validateForm = (): boolean => {
     isValid = false;
   }
 
-  // Phone number validation
   if (!form.phoneNumber) {
     formErrors.phoneNumber = "Phone number is required";
     isValid = false;
@@ -254,7 +289,6 @@ const validateForm = (): boolean => {
     isValid = false;
   }
 
-  // Password validation
   if (!form.password) {
     formErrors.password = "Password is required";
     isValid = false;
@@ -263,7 +297,6 @@ const validateForm = (): boolean => {
     isValid = false;
   }
 
-  // Confirm password validation
   if (!form.confirmPassword) {
     formErrors.confirmPassword = "Please confirm your password";
     isValid = false;
@@ -288,22 +321,39 @@ const login = () => {
 
 // Handle registration
 const handleRegister = async () => {
-  if (!validateForm()) return;
+  // if (!validateForm()) return;
 
   isLoading.value = true;
 
   try {
-    const response = await authStore.userRegister({
-      firstName: form.firstName.trim(),
-      lastName: form.lastName.trim(),
-      email: form.email.trim().toLowerCase(),
-      phoneNumber: form.phoneNumber.trim(),
-      password: form.password,
-      confirmPassword: form.confirmPassword,
-    });
+    // const response = await authStore.userRegister({
+    //   firstName: form.firstName.trim(),
+    //   lastName: form.lastName.trim(),
+    //   email: form.email.trim().toLowerCase(),
+    //   phoneNumber: form.phoneNumber.trim(),
+    //   password: form.password,
+    //   confirmPassword: form.confirmPassword,
+    // });
+    const response = {
+      success: true,
+      message: "Success",
+    };
 
     if (response?.success) {
-      router.push({ path: "/login" });
+      toast?.add({
+        severity: "success",
+        summary: "Message",
+        detail: response?.message,
+        life: 5000,
+      });
+      visible.value = true;
+    } else {
+      toast?.add({
+        severity: "error",
+        summary: "Message",
+        detail: response?.message,
+        life: 5000,
+      });
     }
   } catch (error) {
     console.error("Registration error:", error);
@@ -311,6 +361,80 @@ const handleRegister = async () => {
     isLoading.value = false;
   }
 };
+
+const sendOtpCode = async () => {
+  const res = await authStore.sendOtpVerify({
+    otpCode: otpCode.value,
+    email: form.email.trim().toLowerCase(),
+  });
+  isLoading.value = true;
+  try {
+    if (res?.success) {
+      visible.value = false;
+      toast?.add({
+        severity: "success",
+        summary: "Message",
+        detail: res?.message,
+        life: 3000,
+      });
+      router.push({ path: "/login" });
+    } else {
+      toast?.add({
+        severity: "error",
+        summary: "Message",
+        detail: res?.message,
+        life: 3000,
+      });
+    }
+  } catch (error) {
+    console.error("Send otp error:", error);
+    // Xử lý error từ store nếu vẫn throw
+    let errorMessage = "An unexpected error occurred";
+    if (error) {
+      errorMessage = res?.message || errorMessage;
+      toast?.add({
+        severity: "error",
+        summary: "Error",
+        detail: errorMessage,
+        life: 3000,
+      });
+    }
+  } finally {
+    isLoading.value = false;
+  }
+};
+
+const resendOtpCode = async () => {
+  isLoading.value = true;
+  try {
+    const res = await authStore.resendOtpVerify({
+      email: form.email.trim().toLowerCase(),
+    });
+    if (res?.success) {
+      toast?.add({
+        severity: "success",
+        summary: "Message",
+        detail: res?.message,
+        life: 3000,
+      });
+    } else {
+      toast?.add({
+        severity: "error",
+        summary: "Message",
+        detail: res?.message,
+        life: 3000,
+      });
+    }
+  } catch (error) {
+    console.error("Send otp error:", error);
+  } finally {
+    isLoading.value = false;
+  }
+};
+
+onMounted(() => {
+  toast = useToast();
+});
 </script>
 
 <style scoped>

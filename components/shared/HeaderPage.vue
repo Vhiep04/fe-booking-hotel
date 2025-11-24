@@ -26,7 +26,7 @@
           :show-clear="true"
           @clear="clearSearch"
           width="50rem"
-          class="bg-white"
+          class="bg-white rounded-2xl"
         >
           <template #icon>
             <i class="pi pi-search" style="font-size: 1rem"></i>
@@ -34,9 +34,7 @@
         </CustomInputText>
       </div>
 
-      <!-- Authenticated User Section -->
       <div v-if="authStore.isAuthenticated" class="flex items-center space-x-5">
-        <!-- Language Flag -->
         <button class="hover:opacity-80 transition-opacity">
           <img
             src="../../assets/images/england-flag.svg"
@@ -45,29 +43,24 @@
           />
         </button>
 
-        <!-- Currency -->
         <button class="text-gray-700 hover:text-blue-600 transition-colors">
           <i class="pi pi-dollar" style="font-size: 1.2rem"></i>
         </button>
 
-        <!-- Help/Support -->
         <button class="text-gray-700 hover:text-blue-600 transition-colors">
           <i class="pi pi-question-circle" style="font-size: 1.2rem"></i>
         </button>
 
-        <!-- Favorites/Wishlist -->
         <button
           class="text-gray-700 hover:text-red-600 transition-colors relative"
         >
           <i class="pi pi-heart" style="font-size: 1.2rem"></i>
         </button>
 
-        <!-- Phone/Contact -->
         <button class="text-gray-700 hover:text-blue-600 transition-colors">
           <i class="pi pi-phone" style="font-size: 1.2rem"></i>
         </button>
 
-        <!-- User Profile Component -->
         <UserProfile
           :full-name="userData.fullName"
           :email="userData.email"
@@ -79,8 +72,6 @@
           @sign-out="handleSignOut"
         />
       </div>
-
-      <!-- Guest User Section -->
       <div v-else class="flex items-center space-x-3">
         <Button
           @click="login"
@@ -112,6 +103,7 @@ import { useApiStore } from "@/stores/api";
 import { useAuthStore } from "@/stores/auth";
 import { getCookie, deleteCookie } from "@/utils/storageHelper";
 import type { UserInfoResponse } from "~/stores/interface/response/getUserInfo";
+import { Button } from "primevue";
 
 const router = useRouter();
 const apiStore = useApiStore();
@@ -204,12 +196,16 @@ const getUserInfo = async () => {
 
 // Check authentication trước khi gọi API
 onMounted(() => {
+  console.log(authStore.isAuthenticated);
   const token = getCookie("token");
 
   if (token) {
     authStore.token = token;
     authStore.isAuthenticated = true;
     void getUserInfo();
+  } else {
+    // Explicitly set to false
+    authStore.isAuthenticated = false;
   }
 });
 

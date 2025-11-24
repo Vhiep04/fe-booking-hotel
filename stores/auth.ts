@@ -6,11 +6,14 @@ import { auth as authResponse } from "./entity/response";
 import type { CustomJwtPayload } from "../interface/jwtPayload";
 import type {
   RequestLoginPayload,
+  RequestOtpVerify,
   RequestRegisterPayload,
+  RequestResendOtpVerify,
 } from "./interface/request/auth";
 import type {
   LoginResponseData,
   RegisterResponseData,
+  SendOtpResponseData,
 } from "./interface/response/auth";
 import { ref } from "vue";
 
@@ -24,6 +27,8 @@ export const useAuthStore = defineStore("auth", () => {
   const isAuthenticated = ref(false);
   const userLoginRequesting = ref(false);
   const userRegisterRequesting = ref(false);
+  const userSendOtpCode = ref(false);
+  const reSendOtpCode = ref(false);
 
   // FIX: Thêm function để init auth state từ cookie
   function initAuthFromCookie() {
@@ -114,6 +119,47 @@ export const useAuthStore = defineStore("auth", () => {
     }
   }
 
+  async function sendOtpVerify({ email, otpCode }: RequestOtpVerify) {
+    try {
+      userSendOtpCode.value = true;
+      const res = await apiStore.apiRequest<SendOtpResponseData>({
+        method: "POST",
+        endpoint: `${namespace}/verify-otp`,
+        proxy: false,
+        auth: false,
+        data: {
+          email,
+          otpCode,
+        },
+      });
+      return res;
+    } catch (e) {
+      console.log("verify otp-failed: ", e);
+    } finally {
+      userRegisterRequesting.value = false;
+    }
+  }
+
+  async function resendOtpVerify({ email }: RequestResendOtpVerify) {
+    try {
+      reSendOtpCode.value = true;
+      const res = await apiStore.apiRequest<SendOtpResponseData>({
+        method: "POST",
+        endpoint: `${namespace}/resend-otp`,
+        proxy: false,
+        auth: false,
+        data: {
+          email,
+        },
+      });
+      return res;
+    } catch (e) {
+      console.log("resend verify-otp failed: ", e);
+    } finally {
+      reSendOtpCode.value = false;
+    }
+  }
+
   async function userLogin({
     email,
     password,
@@ -121,21 +167,30 @@ export const useAuthStore = defineStore("auth", () => {
   }: RequestLoginPayload) {
     try {
       userLoginRequesting.value = true;
-      const response = await apiStore.apiRequest<LoginResponseData>({
+      const response = await apiStore.apiRequest<{
+        success: boolean;
+        message: string;
+        data: LoginResponseData;
+      }>({
         method: "POST",
         endpoint: `${namespace}/login`,
-        data: new authRequest.UserLogin({
+        data: {
           email,
           password,
-        }).serialize(),
+        },
         proxy: false,
         auth: false,
       });
 
-      userLoginSuccess(response.data);
-      return response;
-    } catch (e) {
-      userLoginFailed(new Error(JSON.stringify(e)));
+      if (response.success && response.data) {
+        userLoginSuccess(response.data);
+        return response;
+      } else {
+        throw new Error(response.message || "Login failed");
+      }
+    } catch (e: any) {
+      console.error("Login error:", e);
+      userLoginFailed(new Error(e.message || "Login failed"));
       throw e;
     } finally {
       userLoginRequesting.value = false;
@@ -158,6 +213,8 @@ export const useAuthStore = defineStore("auth", () => {
     userLogin,
     userRegister,
     userLogout,
+    sendOtpVerify,
+    resendOtpVerify,
   };
 });
 

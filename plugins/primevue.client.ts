@@ -1,5 +1,6 @@
 import PrimeVue from "primevue/config";
-import Aura from "@primevue/themes/aura"; // hoặc Lara / Saga tùy bạn
+import Aura from "@primevue/themes/aura";
+import ToastService from "primevue/toastservice";
 
 export default defineNuxtPlugin((nuxtApp) => {
   nuxtApp.vueApp.use(PrimeVue, {
@@ -7,4 +8,6 @@ export default defineNuxtPlugin((nuxtApp) => {
       preset: Aura,
     },
   });
+
+  nuxtApp.vueApp.use(ToastService);
 });

@@ -23,11 +23,13 @@ export const useApiStore = defineStore("api", () => {
             ...payload,
             headers,
           },
+          credentials: "include",
         });
       } else {
         response = await requestHelper<ResponseDataType>({
           ...payload,
           headers,
+          credentials: "include",
         });
       }
       return response;

@@ -1,13 +1,33 @@
-export interface LoginResponseData {
+interface loginData {
   token: string;
   firstName: string;
   lastName: string;
   avatarUrl: string;
   email: string;
   phoneNumber: string;
+  expiration: string;
+}
+interface registerData {
+  email: string;
+  expiresIn: string;
+}
+
+export interface LoginResponseData {
+  success: boolean;
+  message: string;
+  data: loginData;
 }
 export interface RegisterResponseData {
-  firstName: string;
-  lastName: string;
-  email: string;
+  success: boolean;
+  message: string;
+  data: registerData;
+}
+
+export interface SendOtpResponseData {
+  success: boolean;
+  message: string;
+}
+export interface ResendOtpResponseData {
+  success: boolean;
+  message: string;
 }

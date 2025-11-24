@@ -29,4 +29,5 @@ export interface Payload {
   auth?: boolean;
   extra?: string;
   proxy?: boolean;
+  credentials?: RequestCredentials;
 }
