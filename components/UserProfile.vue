@@ -89,7 +89,7 @@ const avatarImage = computed(() => {
   if (props.avatarUrl) {
     return props.avatarUrl;
   }
-  return "/assets/images/avt.jpg";
+  return "/assets/images/avt-df.jpg";
 });
 
 const menuItems = ref([

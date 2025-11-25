@@ -1,5 +1,5 @@
 import { defineStore } from "pinia";
-import { setCookie, deleteCookie } from "../utils/storageHelper";
+import { setCookie, deleteCookie, getCookie } from "../utils/storageHelper";
 import { useApiStore } from "./api";
 import { auth as authRequest } from "./entity/request";
 import { auth as authResponse } from "./entity/response";

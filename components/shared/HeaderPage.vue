@@ -72,6 +72,7 @@
           @sign-out="handleSignOut"
         />
       </div>
+
       <div v-else class="flex items-center space-x-3">
         <Button
           @click="login"
@@ -150,21 +151,17 @@ const handleSupport = () => {
 };
 
 const handleSignOut = () => {
-  // Clear auth state
   authStore.token = "";
   authStore.isAuthenticated = false;
 
-  // Remove cookie
   deleteCookie("token");
 
-  // Clear user data
   userData.fullName = "";
   userData.avatarUrl = "";
   userData.email = "";
   userData.phoneNumber = "";
   userData.birthDate = undefined;
 
-  // Redirect to home or login
   router.push({ name: "login" });
 };
 

@@ -52,6 +52,11 @@ import banner3 from "../assets/images/banner3.png";
 import banner4 from "../assets/images/banner4.png";
 import banner5 from "../assets/images/banner5.png";
 import banner6 from "../assets/images/banner6.png";
+import HotelCard from "~/components/HotelCard.vue";
+
+definePageMeta({
+  ssr: false,
+});
 
 const banners = ref([banner1, banner2, banner3, banner4, banner5, banner6]);
 </script>
