@@ -2,6 +2,15 @@
   <div class="flex bg-gray-100 gap-6 p-6 max-w-7xl mx-auto">
     <!-- Map Section -->
     <div class="w-[383px] h-[393px] flex-shrink-0">
+      <div class="mb-3">
+        <input
+          v-model="searchQuery"
+          @keyup.enter="searchLocation"
+          type="text"
+          placeholder="Search location..."
+          class="w-full px-3 py-2 border rounded-lg shadow bg-white"
+        />
+      </div>
       <div
         ref="mapContainer"
         class="w-full h-full rounded-lg overflow-hidden shadow-lg"
@@ -62,6 +71,8 @@ import Dropdown from "primevue/dropdown";
 
 const mapContainer = ref<HTMLElement | null>(null);
 let map: L.Map | null = null;
+let marker: L.Marker | null = null;
+const searchQuery = ref("");
 
 const selectedSort = ref(null);
 const sortOptions = ref([
@@ -74,6 +85,35 @@ const sortOptions = ref([
 
 // Tọa độ Gothenburg
 const gothenburgCoords: [number, number] = [57.7089, 11.9746];
+
+// Search function
+const searchLocation = async () => {
+  if (!searchQuery.value.trim()) return;
+
+  const url = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(
+    searchQuery.value
+  )}`;
+
+  const res = await fetch(url);
+  const data = await res.json();
+
+  if (data.length === 0) {
+    alert("Không tìm thấy địa điểm!");
+    return;
+  }
+
+  const lat = parseFloat(data[0].lat);
+  const lon = parseFloat(data[0].lon);
+
+  // Move map
+  map?.setView([lat, lon], 14);
+
+  // Move marker
+  if (marker) marker.remove();
+  marker = $L.marker([lat, lon]).addTo(map);
+
+  marker.bindPopup(`<b>${searchQuery.value}</b>`).openPopup();
+};
 
 onMounted(() => {
   if (mapContainer.value) {

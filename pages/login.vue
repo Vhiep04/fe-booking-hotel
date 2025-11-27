@@ -201,27 +201,27 @@ const handleLogin = async () => {
       }
     }
   } catch (error: any) {
-    // console.error("Login error:", error);
-    // // Xử lý error từ store nếu vẫn throw
-    // let errorMessage = "An unexpected error occurred";
-    // if (error?.data) {
-    //   errorMessage = error.data.message || errorMessage;
-    //   if (error.data.requiresVerification) {
-    //     toast?.add({
-    //       severity: "error",
-    //       summary: "Email Verification Required",
-    //       detail: error.data.message,
-    //       life: 5000,
-    //     });
-    //     return;
-    //   }
-    // }
-    // toast?.add({
-    //   severity: "error",
-    //   summary: "Error",
-    //   detail: errorMessage,
-    //   life: 3000,
-    // });
+    console.error("Login error:", error);
+    // Xử lý error từ store nếu vẫn throw
+    let errorMessage = "An unexpected error occurred";
+    if (error?.data) {
+      errorMessage = error.data.message || errorMessage;
+      if (error.data.requiresVerification) {
+        toast?.add({
+          severity: "error",
+          summary: "Email Verification Required",
+          detail: error.data.message,
+          life: 5000,
+        });
+        return;
+      }
+    }
+    toast?.add({
+      severity: "error",
+      summary: "Error",
+      detail: errorMessage,
+      life: 3000,
+    });
   } finally {
     isLoading.value = false;
   }

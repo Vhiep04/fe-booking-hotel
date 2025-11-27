@@ -1,27 +1,25 @@
 <template>
   <Card
-    style="width: 20rem; overflow: hidden"
+    style="width: 18rem; overflow: hidden"
     class="relative group hover:cursor-pointer hover:bg-gray-100"
   >
     <template #header>
-      <div class="p-2">
-        <img
-          class="rounded"
-          alt="user header"
-          src="../assets/images/barca.jpg"
-        />
-      </div>
+      <img
+        :src="props.imgUrl"
+        alt="Hotel Image"
+        class="w-full h-50 object-cover rounded"
+      />
       <img
         src="../assets/icons/Heart.svg"
         alt="heart"
-        class="absolute top-5 left-5 opacity-0 transition-opacity duration-300 group-hover:opacity-100 hover:text-white"
+        class="absolute top-3 left-3 opacity-0 transition-opacity duration-300 group-hover:opacity-100 hover:text-white"
       />
     </template>
-    <template #title class="font-bold">BERLIN</template>
-    <template #subtitle>SIDE</template>
+    <template #title class="font-bold">{{ props.cityName }}</template>
+    <template #subtitle>{{ props.location }}</template>
     <template #content>
-      <p class="m-0">
-        A tour of the city and its surroundings led by a professional guide..
+      <p class="m-0 line-clamp-2">
+        {{ props.description }}
       </p>
     </template>
   </Card>
@@ -29,4 +27,14 @@
 
 <script setup lang="ts">
 import Card from "primevue/card";
+
+interface Props {
+  cityName: string;
+  country?: string;
+  location: string;
+  imgUrl: string;
+  description: string;
+}
+
+const props = defineProps<Props>();
 </script>

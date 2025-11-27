@@ -209,7 +209,7 @@ export const useAuthStore = defineStore("auth", () => {
     isAuthenticated,
     userLoginRequesting,
     userRegisterRequesting,
-    initAuthFromCookie, // Export function mới
+    initAuthFromCookie,
     userLogin,
     userRegister,
     userLogout,

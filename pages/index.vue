@@ -32,12 +32,12 @@
         <SearchForm />
       </div>
     </div>
-    <div class="flex flex-col items-start ml-36 mt-6">
+    <div class="flex flex-col items-start ml-36 mr-36 mt-6">
       <p class="text-2xl font-bold mb-2">
         Explore Stays In Trending Destinations
       </p>
       <p class="font-medium mb-4">Find Hot Stays!</p>
-      <HotelCard />
+      <HotelGrid />
     </div>
   </div>
 </template>
@@ -53,6 +53,7 @@ import banner4 from "../assets/images/banner4.png";
 import banner5 from "../assets/images/banner5.png";
 import banner6 from "../assets/images/banner6.png";
 import HotelCard from "~/components/HotelCard.vue";
+import HotelGrid from "~/components/HotelGrid.vue";
 
 definePageMeta({
   ssr: false,

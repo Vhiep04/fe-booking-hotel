@@ -72,6 +72,7 @@ const rooms = ref([
   { name: 'Two Single Beds', code: 'tsb' },
   { name: 'Single Beds', code: 'sb' },
   { name: 'Double Beds', code: 'db' },
+  { name: 'Family Suite', code: 'fs' },
 ])
 
 const clearSearch = () => {
