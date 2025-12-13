@@ -2,6 +2,96 @@
   <Card
     class="group h-auto hover:cursor-pointer hover:shadow-xl transition-shadow duration-300"
     style="overflow: hidden"
+    v-if="isLoading"
+  >
+    <template #content>
+      <div>
+        <!-- Card Container -->
+        <div class="flex flex-col sm:flex-row">
+          <!-- Image Section - Left Side -->
+          <div class="relative w-full sm:w-48 h-48 sm:h-auto flex-shrink-0">
+            <Skeleton
+              width="100%"
+              height="100%"
+              class="rounded-none"
+            ></Skeleton>
+          </div>
+
+          <!-- Content Section - Right Side -->
+          <div class="flex-1 p-4 sm:p-5">
+            <div class="flex justify-between items-start mb-3">
+              <!-- Hotel Name -->
+              <div class="flex-1">
+                <Skeleton width="10rem" height="1.5rem" class="mb-2"></Skeleton>
+
+                <!-- Location Info -->
+                <div class="flex items-center gap-2 mb-2">
+                  <Skeleton shape="circle" size="1rem"></Skeleton>
+                  <Skeleton width="15rem" height="0.875rem"></Skeleton>
+                </div>
+
+                <!-- Amenities -->
+                <div class="flex items-center gap-2 mb-2">
+                  <Skeleton shape="circle" size="1rem"></Skeleton>
+                  <Skeleton width="8rem" height="0.875rem"></Skeleton>
+                </div>
+
+                <!-- Guest Info -->
+                <div class="flex items-center gap-2 mb-3">
+                  <Skeleton shape="circle" size="1rem"></Skeleton>
+                  <Skeleton width="12rem" height="0.875rem"></Skeleton>
+                </div>
+              </div>
+
+              <!-- Price Section -->
+              <div class="mt-14">
+                <div class="flex gap-6 mb-1">
+                  <Skeleton
+                    width="4rem"
+                    height="2rem"
+                    class="mb-1 ml-auto"
+                  ></Skeleton>
+                  <Skeleton
+                    width="4rem"
+                    height="2rem"
+                    class="mb-1 ml-auto"
+                  ></Skeleton>
+                </div>
+                <Skeleton
+                  width="10rem"
+                  height="0.75rem"
+                  class="mb-1"
+                ></Skeleton>
+              </div>
+            </div>
+
+            <!-- Tags Section -->
+            <div class="mb-3">
+              <Skeleton width="12rem" height="0.875rem" class="mb-2"></Skeleton>
+              <Skeleton width="8rem" height="0.875rem"></Skeleton>
+            </div>
+
+            <!-- Rating and Availability Section -->
+            <div class="flex justify-between items-center">
+              <div class="flex items-center gap-2">
+                <Skeleton width="5rem" height="1.25rem"></Skeleton>
+                <Skeleton width="6rem" height="0.875rem"></Skeleton>
+              </div>
+
+              <div class="flex items-center gap-2">
+                <Skeleton width="8rem" height="1.5rem"></Skeleton>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </template>
+  </Card>
+
+  <Card
+    v-else
+    class="group h-auto hover:cursor-pointer hover:shadow-xl transition-shadow duration-300"
+    style="overflow: hidden"
   >
     <template #content>
       <div class="flex gap-6 p-0">
@@ -138,16 +228,23 @@
       </div>
     </template>
   </Card>
+  <!-- <button @click="isLoading = !isLoading">Render</button> -->
 </template>
 
 <script setup lang="ts">
 import Card from "primevue/card";
 import Button from "primevue/button";
 import { ref } from "vue";
+import Skeleton from "primevue/skeleton";
 
 const like = ref(false);
+
+const isLoading = ref(false);
 </script>
 
 <style scoped>
 /* Custom styles if needed */
+.card {
+  max-width: 800px;
+}
 </style>

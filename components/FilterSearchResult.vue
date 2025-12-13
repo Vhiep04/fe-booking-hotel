@@ -9,222 +9,180 @@
         Your Budget For Per Night
       </h3>
 
-      <!-- Slider -->
       <Slider
-        v-model="budgetRange"
+        v-model="localBudgetRange"
         :min="0"
         :max="500"
         :step="10"
         range
         class="mb-4"
+        @change="emitPriceChange"
       />
 
-      <!-- Price Inputs -->
       <div class="flex gap-2">
         <InputGroup>
           <InputNumber
-            v-model="budgetRange[0]"
+            v-model="localBudgetRange[0]"
             inputId="minprice"
             prefix="$"
             class="w-20"
             :min="0"
-            :max="budgetRange[1]"
+            :max="localBudgetRange[1]"
+            @update:modelValue="emitPriceChange"
           />
         </InputGroup>
         <InputGroup>
           <InputNumber
-            v-model="budgetRange[1]"
+            v-model="localBudgetRange[1]"
             inputId="maxprice"
             prefix="$"
             class="w-20"
-            :min="budgetRange[0]"
+            :min="localBudgetRange[0]"
             :max="500"
+            @update:modelValue="emitPriceChange"
           />
         </InputGroup>
       </div>
     </div>
 
     <!-- Popular Filters -->
-    <div class="mb-6">
+    <div class="p-4">
       <h3 class="text-sm font-semibold text-gray-900 mb-3">Popular Filters</h3>
+
       <div class="flex flex-col gap-2">
-        <div class="flex items-center">
+        <div
+          v-for="item in popularFilterOptions"
+          :key="item.value"
+          class="flex items-center gap-2"
+        >
           <Checkbox
-            v-model="popularFilters"
-            inputId="breakfast"
-            value="breakfast"
+            v-model="localPopularFilters"
+            :inputId="item.value"
+            :value="item.value"
+            @change="emitFiltersChange"
           />
-          <label
-            for="breakfast"
-            class="ml-2 text-sm text-gray-700 cursor-pointer"
-          >
-            Breakfast Included
-          </label>
-        </div>
-
-        <div class="flex items-center">
-          <Checkbox
-            v-model="popularFilters"
-            inputId="inclusive"
-            value="inclusive"
-          />
-          <label
-            for="inclusive"
-            class="ml-2 text-sm text-gray-700 cursor-pointer"
-          >
-            All-Inclusive
-          </label>
-        </div>
-
-        <div class="flex items-center">
-          <Checkbox
-            v-model="popularFilters"
-            inputId="cancellation"
-            value="cancellation"
-          />
-          <label
-            for="cancellation"
-            class="ml-2 text-sm text-gray-700 cursor-pointer"
-          >
-            Free Cancellation
-          </label>
-        </div>
-
-        <div class="flex items-center">
-          <Checkbox v-model="popularFilters" inputId="pool" value="pool" />
-          <label for="pool" class="ml-2 text-sm text-gray-700 cursor-pointer">
-            Pool
-          </label>
-        </div>
-
-        <div class="flex items-center">
-          <Checkbox
-            v-model="popularFilters"
-            inputId="petFriendly"
-            value="petFriendly"
-          />
-          <label
-            for="petFriendly"
-            class="ml-2 text-sm text-gray-700 cursor-pointer"
-          >
-            Pet Friendly
+          <label :for="item.value" class="text-sm text-gray-700">
+            {{ item.label }}
           </label>
         </div>
       </div>
     </div>
 
     <!-- Room Facilities -->
-    <div class="mb-6">
+    <div class="mb-6 p-4">
       <h3 class="text-sm font-semibold text-gray-900 mb-3">Room Facilities</h3>
+
       <div class="flex flex-col gap-2">
-        <div class="flex items-center">
+        <div
+          v-for="item in displayedFacilities"
+          :key="item.id"
+          class="flex items-center"
+        >
           <Checkbox
-            v-model="roomFacilities"
-            inputId="bathroom"
-            value="bathroom"
+            v-model="localRoomFacilities"
+            :inputId="'facility-' + item.id"
+            :value="item.id"
+            @change="emitFiltersChange"
           />
-          <label
-            for="bathroom"
-            class="ml-2 text-sm text-gray-700 cursor-pointer"
-          >
-            Own Bathroom
-          </label>
-        </div>
 
-        <div class="flex items-center">
-          <Checkbox
-            v-model="roomFacilities"
-            inputId="kitchen"
-            value="kitchen"
-          />
           <label
-            for="kitchen"
+            :for="'facility-' + item.id"
             class="ml-2 text-sm text-gray-700 cursor-pointer"
           >
-            Kitchen
-          </label>
-        </div>
-
-        <div class="flex items-center">
-          <Checkbox
-            v-model="roomFacilities"
-            inputId="seeView"
-            value="seeView"
-          />
-          <label
-            for="seeView"
-            class="ml-2 text-sm text-gray-700 cursor-pointer"
-          >
-            See View
-          </label>
-        </div>
-
-        <div class="flex items-center">
-          <Checkbox
-            v-model="roomFacilities"
-            inputId="babyBed"
-            value="babyBed"
-          />
-          <label
-            for="babyBed"
-            class="ml-2 text-sm text-gray-700 cursor-pointer"
-          >
-            Baby Bed
-          </label>
-        </div>
-
-        <div class="flex items-center">
-          <Checkbox
-            v-model="roomFacilities"
-            inputId="bathtub"
-            value="bathtub"
-          />
-          <label
-            for="bathtub"
-            class="ml-2 text-sm text-gray-700 cursor-pointer"
-          >
-            Bathtub
+            {{ item.name }}
           </label>
         </div>
       </div>
+
+      <button
+        class="text-sm text-blue-600 mt-2 flex items-center gap-1"
+        @click="showMore = !showMore"
+      >
+        {{ showMore ? "Show Less" : "Show More" }}
+        <i :class="showMore ? 'pi pi-chevron-up' : 'pi pi-chevron-down'"></i>
+      </button>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref } from "vue";
+import { ref, computed } from "vue";
 import Slider from "primevue/slider";
 import Checkbox from "primevue/checkbox";
 import InputNumber from "primevue/inputnumber";
 import InputGroup from "primevue/inputgroup";
-import InputGroupAddon from "primevue/inputgroupaddon";
 
-// State
-const budgetRange = ref([0, 500]);
-const popularFilters = ref<string[]>([]);
-const roomFacilities = ref<string[]>([]);
+// Props
+interface Props {
+  minPrice?: number;
+  maxPrice?: number;
+  facilities?: number[];
+}
 
-// Watch for changes if needed
-const emits = defineEmits(["filterChange"]);
+const props = withDefaults(defineProps<Props>(), {
+  minPrice: 0,
+  maxPrice: 500,
+  facilities: () => [],
+});
 
-// Emit filter changes
-const emitFilterChange = () => {
-  emits("filterChange", {
-    budgetRange: budgetRange.value,
-    popularFilters: popularFilters.value,
-    roomFacilities: roomFacilities.value,
+// Emits
+const emit = defineEmits<{
+  filterChange: [
+    filters: {
+      minPrice?: number;
+      maxPrice?: number;
+      facilities: number[];
+    }
+  ];
+}>();
+
+// Local state
+const localBudgetRange = ref([props.minPrice, props.maxPrice]);
+const localPopularFilters = ref<string[]>([]);
+const localRoomFacilities = ref<number[]>(props.facilities);
+const showMore = ref(false);
+
+const displayedFacilities = computed(() =>
+  showMore.value ? allFacilities.value : allFacilities.value.slice(0, 5)
+);
+
+// Emit changes
+const emitPriceChange = () => {
+  emit("filterChange", {
+    minPrice: localBudgetRange.value[0],
+    maxPrice: localBudgetRange.value[1],
+    facilities: localRoomFacilities.value,
   });
 };
+
+const emitFiltersChange = () => {
+  emit("filterChange", {
+    minPrice: localBudgetRange.value[0],
+    maxPrice: localBudgetRange.value[1],
+    facilities: localRoomFacilities.value,
+  });
+};
+
+const popularFilterOptions = [
+  { value: "breakfast", label: "Breakfast Included" },
+  { value: "inclusive", label: "All-Inclusive" },
+  { value: "cancellation", label: "Free Cancellation" },
+  { value: "pool", label: "Pool" },
+  { value: "petFriendly", label: "Pet Friendly" },
+];
+
+const allFacilities = ref([
+  { id: 1, name: "Own Bathroom" },
+  { id: 2, name: "Kitchen" },
+  { id: 3, name: "Sea View" },
+  { id: 4, name: "Baby Bed" },
+  { id: 5, name: "Bathtub" },
+  { id: 6, name: "Air Conditioning" },
+  { id: 7, name: "Balcony" },
+  { id: 8, name: "Mini Bar" },
+  { id: 9, name: "Safe Box" },
+  { id: 10, name: "TV" },
+  { id: 11, name: "WiFi" },
+  { id: 12, name: "Coffee Maker" },
+]);
 </script>
-
-<style scoped>
-/* Custom checkbox styles if needed */
-:deep(.p-checkbox .p-checkbox-box) {
-  border-radius: 4px;
-}
-
-:deep(.p-checkbox .p-checkbox-box.p-highlight) {
-  background-color: #2563eb;
-  border-color: #2563eb;
-}
-</style>

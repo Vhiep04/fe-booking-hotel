@@ -10,7 +10,7 @@
     </div>
     <SearchForm />
     <CityInfoCard />
-    <div class="grid grid-cols-[25%_75%] items-start">
+    <div class="grid grid-cols-[25%_75%] items-start mt-6">
       <FilterSearchResult />
       <HotelCardDetail />
     </div>

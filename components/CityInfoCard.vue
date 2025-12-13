@@ -13,7 +13,7 @@
       </div>
       <div
         ref="mapContainer"
-        class="w-full h-full rounded-lg overflow-hidden shadow-lg"
+        class="h-[80%] rounded-lg overflow-hidden shadow-lg"
       ></div>
     </div>
 
