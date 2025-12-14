@@ -6,8 +6,8 @@ export interface CityListRequest {
   minPrice?: number;
   maxPrice?: number;
   sortBy?: SortBy;
-  checkInDate?: Date;
-  checkOutDate?: Date;
+  checkIn?: string;
+  checkOut?: string;
   bedType?: string;
   facilities?: string[];
 }

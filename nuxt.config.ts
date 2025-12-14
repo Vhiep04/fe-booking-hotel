@@ -47,4 +47,5 @@ export default defineNuxtConfig({
   experimental: {
     payloadExtraction: false, // Tắt nếu gặp lỗi hydration
   },
+  plugins: ["~/plugins/dayjs"],
 });

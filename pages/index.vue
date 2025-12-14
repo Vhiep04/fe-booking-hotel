@@ -66,15 +66,15 @@ const banners = ref([banner1, banner2, banner3, banner4, banner5, banner6]);
 
 const handleSearch = async (params: {
   keyword: string;
-  checkInDate: Date | null;
-  checkOutDate: Date | null;
+  checkIn: string | null;
+  checkOut: string | null;
   bedType: string;
 }) => {
   // Update filters in store
   hotelStore.updateFilters({
     cityName: params.keyword,
-    checkInDate: params.checkInDate || undefined,
-    checkOutDate: params.checkOutDate || undefined,
+    checkIn: params.checkIn || undefined,
+    checkOut: params.checkOut || undefined,
     bedType: params.bedType || undefined,
   });
 

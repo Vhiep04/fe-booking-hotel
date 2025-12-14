@@ -75,18 +75,18 @@
       <div class="flex flex-col gap-2">
         <div
           v-for="item in displayedFacilities"
-          :key="item.id"
+          :key="item.facilityId"
           class="flex items-center"
         >
           <Checkbox
             v-model="localRoomFacilities"
-            :inputId="'facility-' + item.id"
-            :value="item.id"
+            :inputId="'facility-' + item.facilityId"
+            :value="item.facilityId"
             @change="emitFiltersChange"
           />
 
           <label
-            :for="'facility-' + item.id"
+            :for="'facility-' + item.facilityId"
             class="ml-2 text-sm text-gray-700 cursor-pointer"
           >
             {{ item.name }}
@@ -111,7 +111,12 @@ import Slider from "primevue/slider";
 import Checkbox from "primevue/checkbox";
 import InputNumber from "primevue/inputnumber";
 import InputGroup from "primevue/inputgroup";
+import { useFacilityStore } from "~/stores/facilityList";
+import type { FacilityData } from "~/stores/interface/response/facilities";
 
+const facilityStore = useFacilityStore();
+
+const facilities = computed(() => facilityStore.facilities);
 // Props
 interface Props {
   minPrice?: number;
@@ -142,9 +147,10 @@ const localPopularFilters = ref<string[]>([]);
 const localRoomFacilities = ref<number[]>(props.facilities);
 const showMore = ref(false);
 
-const displayedFacilities = computed(() =>
-  showMore.value ? allFacilities.value : allFacilities.value.slice(0, 5)
-);
+const displayedFacilities = computed(() => {
+  const list = facilities.value ?? [];
+  return showMore.value ? list : list.slice(0, 5);
+});
 
 // Emit changes
 const emitPriceChange = () => {
@@ -171,18 +177,7 @@ const popularFilterOptions = [
   { value: "petFriendly", label: "Pet Friendly" },
 ];
 
-const allFacilities = ref([
-  { id: 1, name: "Own Bathroom" },
-  { id: 2, name: "Kitchen" },
-  { id: 3, name: "Sea View" },
-  { id: 4, name: "Baby Bed" },
-  { id: 5, name: "Bathtub" },
-  { id: 6, name: "Air Conditioning" },
-  { id: 7, name: "Balcony" },
-  { id: 8, name: "Mini Bar" },
-  { id: 9, name: "Safe Box" },
-  { id: 10, name: "TV" },
-  { id: 11, name: "WiFi" },
-  { id: 12, name: "Coffee Maker" },
-]);
+onMounted(() => {
+  facilityStore.getFacility();
+});
 </script>

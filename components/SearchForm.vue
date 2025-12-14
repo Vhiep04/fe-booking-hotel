@@ -64,13 +64,13 @@
     <div
       class="w-[1190px] grid grid-cols-4 lg:grid-cols-[40%_30%_20%_10%] gap-0"
     >
-      <div class="text-red-500 text-sm px-4 min-h-[20px]">
+      <div class="text-red-500 text-sm px-4 min-h-5">
         {{ errors.search }}
       </div>
-      <div class="text-red-500 text-sm px-4 min-h-[20px]">
+      <div class="text-red-500 text-sm px-4 min-h-5">
         {{ errors.dates }}
       </div>
-      <div class="text-red-500 text-sm px-4 min-h-[20px]"></div>
+      <div class="text-red-500 text-sm px-4 min-h-5"></div>
     </div>
   </div>
 </template>
@@ -81,8 +81,8 @@ import CustomInputText from "./shared/CustomInputText.vue";
 import Calendar from "primevue/calendar";
 import Select from "primevue/select";
 import Button from "primevue/button";
+import { toDateOnly } from "#imports";
 
-// Props để nhận initial values từ store (nếu cần)
 interface Props {
   initialKeyword?: string;
   initialDates?: [Date, Date] | null;
@@ -100,8 +100,8 @@ const emit = defineEmits<{
   search: [
     params: {
       keyword: string;
-      checkInDate: Date | null;
-      checkOutDate: Date | null;
+      checkIn: string | null;
+      checkOut: string | null;
       bedType: string;
     }
   ];
@@ -157,8 +157,8 @@ const handleSearch = () => {
 
   emit("search", {
     keyword: localSearch.value,
-    checkInDate: localDates.value?.[0] ?? null,
-    checkOutDate: localDates.value?.[1] ?? null,
+    checkIn: toDateOnly(localDates.value?.[0]),
+    checkOut: toDateOnly(localDates.value?.[1]),
     bedType: localRoomType.value?.code ?? "",
   });
 };
