@@ -27,12 +27,32 @@ export interface HotelData {
 export interface CityData {
   cityId: number;
   cityName: string;
+}
+
+export interface CitiesResponseData {
   hotels: HotelData[];
+  totalCount: number;
 }
 
 export interface CitiesResponse {
   success: boolean;
   message: string;
-  data: CityData;
+  data: CitiesResponseData;
+}
+
+export interface City {
+  cityId: number;
+  name: string;
+  country: string;
+  description: string;
+  latitude: number;
+  longitude: number;
+}
+
+export interface CityResponse {
+  success: boolean;
+  message: string;
+  data: City;
+  searchTerm: string;
   totalCount: number;
 }

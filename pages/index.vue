@@ -28,6 +28,7 @@
           Discover Your Trips <br />
           Worldwide !
         </p>
+        <!-- Chỉ cần SearchForm, không cần CityInfoCard -->
         <SearchForm @search="handleSearch" />
       </div>
     </div>
@@ -60,41 +61,31 @@ definePageMeta({
 });
 
 const router = useRouter();
-const hotelStore = useCityStore();
+const cityStore = useCityStore();
 
 const banners = ref([banner1, banner2, banner3, banner4, banner5, banner6]);
 
 const handleSearch = async (params: {
-  keyword: string;
+  cityName: string;
   checkIn: string | null;
   checkOut: string | null;
   bedType: string;
 }) => {
+  await cityStore.getCity({ name: params.cityName });
+
   // Update filters in store
-  hotelStore.updateFilters({
-    cityName: params.keyword,
+  cityStore.updateFilters({
+    cityName: params.cityName,
     checkIn: params.checkIn || undefined,
     checkOut: params.checkOut || undefined,
     bedType: params.bedType || undefined,
   });
 
-  await hotelStore.fetchHotels();
+  await cityStore.fetchHotels();
 
-  router.push("/hotel-search-result");
+  router.push({
+    path: "/hotel-search-result",
+    query: { city: params.cityName },
+  });
 };
 </script>
-
-<style>
-@reference "tailwindcss";
-:deep(.p-carousel-indicator button) {
-  @apply bg-white/50 w-2 h-2 rounded-full;
-}
-
-:deep(.p-carousel-indicator.p-highlight button) {
-  @apply bg-white w-8;
-}
-
-:deep(.p-carousel-indicators) {
-  @apply pb-4;
-}
-</style>

@@ -89,22 +89,26 @@ interface Props {
   initialRoomType?: string;
 }
 
+type SearchParams = {
+  cityName: string;
+  checkIn: string | null;
+  checkOut: string | null;
+  bedType: string;
+};
+
+type GetCity = {
+  name: string;
+};
+
 const props = withDefaults(defineProps<Props>(), {
   initialKeyword: "",
   initialDates: null,
   initialRoomType: "",
 });
 
-// Emits
 const emit = defineEmits<{
-  search: [
-    params: {
-      keyword: string;
-      checkIn: string | null;
-      checkOut: string | null;
-      bedType: string;
-    }
-  ];
+  search: [params: SearchParams];
+  getCity: [params: GetCity];
 }>();
 
 // Local state
@@ -156,10 +160,14 @@ const handleSearch = () => {
   if (!validateForm()) return;
 
   emit("search", {
-    keyword: localSearch.value,
+    cityName: localSearch.value,
     checkIn: toDateOnly(localDates.value?.[0]),
     checkOut: toDateOnly(localDates.value?.[1]),
     bedType: localRoomType.value?.code ?? "",
+  });
+
+  emit("getCity", {
+    name: localSearch.value,
   });
 };
 
