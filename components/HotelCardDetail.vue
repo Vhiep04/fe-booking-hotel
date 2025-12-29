@@ -170,7 +170,6 @@ import type { HotelData } from "~/stores/interface/response/cityList";
 
 const like = ref(false);
 
-// Đổi từ hotelList (array) thành hotel (single object)
 const props = defineProps<{
   hotel: HotelData;
 }>();

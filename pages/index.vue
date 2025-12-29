@@ -29,7 +29,7 @@
           Worldwide !
         </p>
         <!-- Chỉ cần SearchForm, không cần CityInfoCard -->
-        <SearchForm @search="handleSearch" />
+        <SearchForm :loading="cityStore.isLoading" @search="handleSearch" />
       </div>
     </div>
     <div class="flex flex-col items-start ml-36 mr-36 mt-6">

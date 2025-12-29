@@ -102,12 +102,6 @@ const cityCoords = computed<[number, number] | null>(() => {
     return null;
   }
 
-  // const cityData = Array.isArray(cityInfo.value.data)
-  //   ? cityInfo.value.data[0]
-  //   : cityInfo.value.data;
-
-  console.log("cityData:", cityData);
-
   if (!cityData) {
     console.log("cityData is null/undefined");
     return null;

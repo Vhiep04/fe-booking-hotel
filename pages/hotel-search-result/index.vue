@@ -8,7 +8,11 @@
         Find exclusive Genius rewards in every corner of the world!
       </p>
     </div>
-    <SearchForm @get-city="getCity" />
+    <SearchForm
+      :loading="cityStore.isLoading"
+      @search="handleSearch"
+      @get-city="getCity"
+    />
 
     <CityInfoCard
       v-if="cityInfo"
@@ -17,7 +21,7 @@
     />
 
     <div class="grid grid-cols-[25%_75%] items-start mt-6">
-      <FilterSearchResult />
+      <FacilityHotel @filter-change="handleFilterChange" />
 
       <!-- Hotels List Container -->
       <div class="space-y-4">
@@ -46,12 +50,12 @@
 
 <script setup lang="ts">
 import CityInfoCard from "@/components/CityInfoCard.vue";
-import FilterSearchResult from "@/components/FilterSearchResult.vue";
 import SearchForm from "@/components/SearchForm.vue";
 import { useCityStore } from "#imports";
 import { useRoute } from "vue-router";
 import HotelCardDetail from "~/components/HotelCardDetail.vue";
 import HotelCardSkeleton from "~/components/shared/HotelCardSkeleton.vue";
+import FacilityHotel from "~/components/FacilityHotel.vue";
 
 const cityStore = useCityStore();
 const route = useRoute();
@@ -65,8 +69,42 @@ type GetCity = {
   name: string;
 };
 
-const getCity = async (name: GetCity) => {
-  await cityStore.getCity(name);
+type SearchParams = {
+  cityName: string;
+  checkIn: string | null;
+  checkOut: string | null;
+  bedType: string;
+};
+
+type FilterParams = {
+  minPrice?: number;
+  maxPrice?: number;
+  facilities: number[];
+};
+
+const handleSearch = async (params: SearchParams) => {
+  cityStore.updateFilters({
+    cityName: params.cityName,
+    checkIn: params.checkIn || undefined,
+    checkOut: params.checkOut || undefined,
+    bedType: params.bedType,
+  });
+
+  await cityStore.fetchHotels();
+};
+
+const getCity = async (params: GetCity) => {
+  await cityStore.getCity(params);
+};
+
+const handleFilterChange = async (filters: FilterParams) => {
+  cityStore.updateFilters({
+    minPrice: filters.minPrice,
+    maxPrice: filters.maxPrice,
+    facilities: filters.facilities,
+  });
+
+  await cityStore.debouncedFetchHotels();
 };
 
 onMounted(async () => {

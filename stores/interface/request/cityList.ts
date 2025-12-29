@@ -9,5 +9,5 @@ export interface CityListRequest {
   checkIn?: string;
   checkOut?: string;
   bedType?: string;
-  facilities?: string[];
+  facilities?: number[];
 }

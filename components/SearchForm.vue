@@ -56,6 +56,7 @@
         label="Search"
         class="w-full h-full text-white mb-4 bg-[#07689F]! hover:bg-[#0A7FBF]! border-none!"
         severity="info"
+        :loading="loading"
         @click="handleSearch"
       />
     </div>
@@ -84,6 +85,7 @@ import Button from "primevue/button";
 import { toDateOnly } from "#imports";
 
 interface Props {
+  loading: boolean;
   initialKeyword?: string;
   initialDates?: [Date, Date] | null;
   initialRoomType?: string;

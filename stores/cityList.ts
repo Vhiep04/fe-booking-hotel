@@ -116,7 +116,7 @@ export const useCityStore = defineStore(
     };
   },
   {
-    // Thêm persist config
+    // config persist localStorage
     persist: {
       key: "cityListStore",
       storage: process.client ? localStorage : undefined,
