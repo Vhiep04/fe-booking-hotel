@@ -55,5 +55,3 @@ export const useHotelStore = defineStore("hotelListStore", () => {
     getHotelList,
   };
 });
-
-export default null;

@@ -1,96 +1,6 @@
 <template>
   <Card
-    class="group h-auto hover:cursor-pointer hover:shadow-xl transition-shadow duration-300"
-    style="overflow: hidden"
-    v-if="isLoading"
-  >
-    <template #content>
-      <div>
-        <!-- Card Container -->
-        <div class="flex flex-col sm:flex-row">
-          <!-- Image Section - Left Side -->
-          <div class="relative w-full sm:w-48 h-48 sm:h-auto flex-shrink-0">
-            <Skeleton
-              width="100%"
-              height="100%"
-              class="rounded-none"
-            ></Skeleton>
-          </div>
-
-          <!-- Content Section - Right Side -->
-          <div class="flex-1 p-4 sm:p-5">
-            <div class="flex justify-between items-start mb-3">
-              <!-- Hotel Name -->
-              <div class="flex-1">
-                <Skeleton width="10rem" height="1.5rem" class="mb-2"></Skeleton>
-
-                <!-- Location Info -->
-                <div class="flex items-center gap-2 mb-2">
-                  <Skeleton shape="circle" size="1rem"></Skeleton>
-                  <Skeleton width="15rem" height="0.875rem"></Skeleton>
-                </div>
-
-                <!-- Amenities -->
-                <div class="flex items-center gap-2 mb-2">
-                  <Skeleton shape="circle" size="1rem"></Skeleton>
-                  <Skeleton width="8rem" height="0.875rem"></Skeleton>
-                </div>
-
-                <!-- Guest Info -->
-                <div class="flex items-center gap-2 mb-3">
-                  <Skeleton shape="circle" size="1rem"></Skeleton>
-                  <Skeleton width="12rem" height="0.875rem"></Skeleton>
-                </div>
-              </div>
-
-              <!-- Price Section -->
-              <div class="mt-14">
-                <div class="flex gap-6 mb-1">
-                  <Skeleton
-                    width="4rem"
-                    height="2rem"
-                    class="mb-1 ml-auto"
-                  ></Skeleton>
-                  <Skeleton
-                    width="4rem"
-                    height="2rem"
-                    class="mb-1 ml-auto"
-                  ></Skeleton>
-                </div>
-                <Skeleton
-                  width="10rem"
-                  height="0.75rem"
-                  class="mb-1"
-                ></Skeleton>
-              </div>
-            </div>
-
-            <!-- Tags Section -->
-            <div class="mb-3">
-              <Skeleton width="12rem" height="0.875rem" class="mb-2"></Skeleton>
-              <Skeleton width="8rem" height="0.875rem"></Skeleton>
-            </div>
-
-            <!-- Rating and Availability Section -->
-            <div class="flex justify-between items-center">
-              <div class="flex items-center gap-2">
-                <Skeleton width="5rem" height="1.25rem"></Skeleton>
-                <Skeleton width="6rem" height="0.875rem"></Skeleton>
-              </div>
-
-              <div class="flex items-center gap-2">
-                <Skeleton width="8rem" height="1.5rem"></Skeleton>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </template>
-  </Card>
-
-  <Card
-    v-else
-    class="group h-auto hover:cursor-pointer hover:shadow-xl transition-shadow duration-300"
+    class="group h-auto hover:cursor-pointer hover:shadow-xl transition-shadow duration-300 mb-6"
     style="overflow: hidden"
   >
     <template #content>
@@ -98,8 +8,10 @@
         <!-- Left - Image Section -->
         <div class="relative w-64 flex-shrink-0">
           <img
-            alt="Radisson Blu Hotel"
-            src="../assets/images/detail_hotel_1.jpg"
+            :alt="hotel.name"
+            :src="
+              hotel.primaryImageUrl || '../assets/images/detail_hotel_1.jpg'
+            "
             class="w-full h-full object-cover rounded-lg"
           />
 
@@ -120,17 +32,22 @@
 
           <!-- Image Indicators -->
           <div class="absolute bottom-3 left-3 flex gap-1">
-            <span class="w-2 h-2 bg-white rounded-full opacity-100"></span>
-            <span class="w-2 h-2 bg-white rounded-full opacity-50"></span>
-            <span class="w-2 h-2 bg-white rounded-full opacity-50"></span>
-            <span class="w-2 h-2 bg-white rounded-full opacity-50"></span>
+            <span
+              v-for="(img, index) in hotel.images.slice(0, 4)"
+              :key="index"
+              :class="[
+                'w-2 h-2 bg-white rounded-full',
+                index === 0 ? 'opacity-100' : 'opacity-50',
+              ]"
+            ></span>
           </div>
 
           <!-- Rating Badge -->
           <div
+            v-if="hotel.averageRating"
             class="absolute bottom-3 right-3 bg-gray-800 text-white px-2 py-1 rounded text-sm font-semibold"
           >
-            8.2
+            {{ hotel.averageRating }}
           </div>
         </div>
 
@@ -139,45 +56,58 @@
           <!-- Middle - Hotel Info -->
           <div class="flex-1">
             <!-- Title -->
-            <h2 class="text-2xl font-bold text-gray-900 mb-3">Radisson Blu</h2>
+            <h2 class="text-2xl font-bold text-gray-900 mb-3">
+              {{ hotel.name }}
+            </h2>
 
             <!-- Location -->
             <div class="flex items-center gap-2 text-gray-600 mb-2">
               <i class="pi pi-map-marker text-sm"></i>
-              <span class="text-sm"
-                >Located In Downton, 500m Distance to Shore</span
-              >
+              <span class="text-sm">{{ hotel.location }}</span>
             </div>
 
-            <!-- Breakfast -->
-            <div class="flex items-center gap-2 text-gray-600 mb-2">
+            <!-- Facilities -->
+            <div
+              v-if="hotel.popularFacilities?.length > 0"
+              class="flex items-center gap-2 text-gray-600 mb-2"
+            >
               <i class="pi pi-shopping-bag text-sm"></i>
-              <span class="text-sm">Breakfast Included</span>
+              <span class="text-sm">
+                {{
+                  hotel.popularFacilities
+                    .slice(0, 5)
+                    .map((f) => f.name)
+                    .join(", ")
+                }}
+                <span v-if="hotel.popularFacilities.length > 5">...</span>
+              </span>
             </div>
 
             <!-- Guest Info -->
-            <div class="flex items-center gap-4 text-gray-600 mb-4">
+            <!-- <div class="flex items-center gap-4 text-gray-600 mb-4">
               <div class="flex items-center gap-2">
                 <i class="pi pi-user text-sm"></i>
-
                 <span class="text-sm">1 Adult, 2 Children</span>
               </div>
               <div class="flex items-center gap-2">
                 <i class="pi pi-clock text-sm"></i>
                 <span class="text-sm">4 Nights</span>
               </div>
-            </div>
+            </div> -->
 
-            <!-- Experience -->
-            <p class="text-gray-400 text-sm mb-1">
-              Experience Unique Opportunity
+            <p
+              v-if="hotel.availableRoomTypes?.length > 0"
+              class="text-gray-700 font-medium mb-3"
+            >
+              {{ hotel.availableRoomTypes.join(", ") }}
             </p>
-            <p class="text-gray-700 font-medium mb-3">Standard rooms</p>
 
             <!-- Rating -->
             <div class="flex items-center gap-2">
               <span class="font-bold text-gray-900">Very Good</span>
-              <span class="text-gray-500 text-sm">2,259 Reviews</span>
+              <span class="text-gray-500 text-sm"
+                >{{ hotel.totalReviews }} Reviews</span
+              >
               <i class="pi pi-chevron-down text-sm text-gray-500"></i>
             </div>
           </div>
@@ -194,7 +124,9 @@
 
               <!-- Price -->
               <div class="text-right mb-2">
-                <span class="text-4xl font-bold text-green-600">$125</span>
+                <span class="text-4xl font-bold text-green-600">
+                  ${{ hotel.minPricePerNight }}
+                </span>
               </div>
 
               <!-- Tax Info -->
@@ -228,22 +160,23 @@
       </div>
     </template>
   </Card>
-  <!-- <button @click="isLoading = !isLoading">Render</button> -->
 </template>
 
 <script setup lang="ts">
 import Card from "primevue/card";
 import Button from "primevue/button";
 import { ref } from "vue";
-import Skeleton from "primevue/skeleton";
+import type { HotelData } from "~/stores/interface/response/cityList";
 
 const like = ref(false);
 
-const isLoading = ref(false);
+// Đổi từ hotelList (array) thành hotel (single object)
+const props = defineProps<{
+  hotel: HotelData;
+}>();
 </script>
 
 <style scoped>
-/* Custom styles if needed */
 .card {
   max-width: 800px;
 }

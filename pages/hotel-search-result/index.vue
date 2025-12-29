@@ -18,7 +18,28 @@
 
     <div class="grid grid-cols-[25%_75%] items-start mt-6">
       <FilterSearchResult />
-      <HotelCardDetail />
+
+      <!-- Hotels List Container -->
+      <div class="space-y-4">
+        <!-- Loading State -->
+        <template v-if="cityStore.isLoading">
+          <HotelCardSkeleton v-for="i in 3" :key="i" />
+        </template>
+
+        <!-- Hotels List -->
+        <template v-else-if="hotels && hotels.length > 0">
+          <HotelCardDetail
+            v-for="hotel in hotels"
+            :key="hotel.hotelId"
+            :hotel="hotel"
+          />
+        </template>
+
+        <!-- Empty State -->
+        <div v-else class="text-center py-12">
+          <p class="text-gray-500 text-lg">No hotels found</p>
+        </div>
+      </div>
     </div>
   </div>
 </template>
@@ -26,18 +47,19 @@
 <script setup lang="ts">
 import CityInfoCard from "@/components/CityInfoCard.vue";
 import FilterSearchResult from "@/components/FilterSearchResult.vue";
-import HotelCardDetail from "@/components/HotelCardDetail.vue";
 import SearchForm from "@/components/SearchForm.vue";
 import { useCityStore } from "#imports";
 import { useRoute } from "vue-router";
+import HotelCardDetail from "~/components/HotelCardDetail.vue";
+import HotelCardSkeleton from "~/components/shared/HotelCardSkeleton.vue";
 
 const cityStore = useCityStore();
 const route = useRoute();
 
-// Dùng computed để tự động lấy data từ store
+// Computed properties
 const cityInfo = computed(() => cityStore.cityCurrent);
 const hotelTotal = computed(() => cityStore.hotelTotal);
-console.log("hotelTotal", hotelTotal);
+const hotels = computed(() => cityStore.hotels);
 
 type GetCity = {
   name: string;

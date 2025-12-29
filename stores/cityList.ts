@@ -124,5 +124,3 @@ export const useCityStore = defineStore(
     },
   }
 );
-
-export default null;
