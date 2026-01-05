@@ -2,6 +2,7 @@
   <Card
     class="group h-auto hover:cursor-pointer hover:shadow-xl transition-shadow duration-300 mb-6"
     style="overflow: hidden"
+    @click="goToHotelDetail"
   >
     <template #content>
       <div class="flex gap-6 p-0">
@@ -18,7 +19,7 @@
           <!-- Heart Icon -->
           <button
             class="absolute top-3 left-3 rounded-full"
-            @click="like = !like"
+            @click.stop="like = !like"
           >
             <i
               :class="[
@@ -83,18 +84,6 @@
               </span>
             </div>
 
-            <!-- Guest Info -->
-            <!-- <div class="flex items-center gap-4 text-gray-600 mb-4">
-              <div class="flex items-center gap-2">
-                <i class="pi pi-user text-sm"></i>
-                <span class="text-sm">1 Adult, 2 Children</span>
-              </div>
-              <div class="flex items-center gap-2">
-                <i class="pi pi-clock text-sm"></i>
-                <span class="text-sm">4 Nights</span>
-              </div>
-            </div> -->
-
             <p
               v-if="hotel.availableRoomTypes?.length > 0"
               class="text-gray-700 font-medium mb-3"
@@ -125,7 +114,7 @@
               <!-- Price -->
               <div class="text-right mb-2">
                 <span class="text-4xl font-bold text-green-600">
-                  ${{ hotel.minPricePerNight }}
+                  {{ formatPrice(hotel.minPricePerNight) }}
                 </span>
               </div>
 
@@ -154,6 +143,7 @@
               iconPos="right"
               class="bg-white text-blue-600 border-none hover:bg-blue-50 font-semibold shadow-none"
               text
+              @click.stop="goToHotelDetail"
             />
           </div>
         </div>
@@ -166,13 +156,26 @@
 import Card from "primevue/card";
 import Button from "primevue/button";
 import { ref } from "vue";
+import { useRouter } from "vue-router";
 import type { HotelData } from "~/stores/interface/response/cityList";
 
+const router = useRouter();
 const like = ref(false);
 
 const props = defineProps<{
   hotel: HotelData;
 }>();
+
+const formatPrice = (price: number): string => {
+  return new Intl.NumberFormat("vi-VN", {
+    style: "currency",
+    currency: "VND",
+  }).format(price);
+};
+
+const goToHotelDetail = () => {
+  router.push(`/hotels/${props.hotel.hotelId}`);
+};
 </script>
 
 <style scoped>

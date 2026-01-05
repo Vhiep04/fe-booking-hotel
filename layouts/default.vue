@@ -1,5 +1,5 @@
 <template>
-  <div class="bg-gray-100">
+  <div class="bg-gray-100 min-h-screen">
     <HeaderPage />
     <container>
       <div>
@@ -12,4 +12,5 @@
 
 <script setup lang="ts">
 import HeaderPage from "~/components/shared/HeaderPage.vue";
+import Footer from "~/components/Footer.vue";
 </script>

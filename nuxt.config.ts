@@ -18,7 +18,37 @@ export default defineNuxtConfig({
     plugins: [tailwindcss()],
   },
 
-  modules: ["@pinia/nuxt"],
+  modules: ["@pinia/nuxt", "@nuxtjs/i18n"],
+
+  i18n: {
+    defaultLocale: "en",
+
+    strategy: "no_prefix",
+
+    langDir: "locales/",
+
+    locales: [
+      {
+        code: "en",
+        iso: "en-US",
+        file: "en.json",
+        name: "English",
+      },
+      {
+        code: "vi",
+        iso: "vi-VN",
+        file: "vi.json",
+        name: "Tiếng Việt",
+      },
+    ],
+
+    detectBrowserLanguage: {
+      useCookie: true,
+      cookieKey: "i18n_language",
+      alwaysRedirect: false,
+      fallbackLocale: "en",
+    },
+  },
 
   build: {
     transpile: ["primevue"],
@@ -27,6 +57,7 @@ export default defineNuxtConfig({
   // Config cho ofetch global
   app: {
     head: {
+      // title: "Booking.com",
       charset: "utf-8",
       viewport: "width=device-width, initial-scale=1",
     },

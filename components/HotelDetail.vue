@@ -247,8 +247,19 @@
 <script setup lang="ts">
 import { ref } from "vue";
 import { Button, Tabs, TabList, Tab, TabPanels, TabPanel } from "primevue";
+import BreadCrumb from "./shared/layout/BreadCrumb.vue";
+import SearchForm from "./SearchForm.vue";
 
 const like = ref(false);
+
+const breadcrumbList = computed(() => {
+  return [
+    {
+      title: "Home",
+      path: "/",
+    },
+  ];
+});
 
 const tabs = ref([
   { title: "Place Details", value: "0" },

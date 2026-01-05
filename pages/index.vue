@@ -60,6 +60,10 @@ definePageMeta({
   ssr: false,
 });
 
+useHead({
+  title: "Dashboard",
+});
+
 const router = useRouter();
 const cityStore = useCityStore();
 
