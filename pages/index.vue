@@ -34,9 +34,9 @@
     </div>
     <div class="flex flex-col items-start ml-36 mr-36 mt-6">
       <p class="text-2xl font-bold mb-2">
-        Explore Stays In Trending Destinations
+        {{ t("Explore Stays In Trending Destinations") }}
       </p>
-      <p class="font-medium mb-4">Find Hot Stays!</p>
+      <p class="font-medium mb-4">{{ t("Find Hot Stays!") }}</p>
       <HotelGrid />
     </div>
   </div>
@@ -55,6 +55,9 @@ import banner4 from "../assets/images/banner4.png";
 import banner5 from "../assets/images/banner5.png";
 import banner6 from "../assets/images/banner6.png";
 import HotelGrid from "~/components/HotelGrid.vue";
+import { useI18n } from "#imports";
+
+const { t } = useI18n();
 
 definePageMeta({
   ssr: false,

@@ -126,6 +126,10 @@ import { useAuthStore } from "@/stores/auth";
 import { useToast } from "primevue/usetoast";
 import Toast from "primevue/toast";
 
+useHead({
+  title: "Login",
+});
+
 let toast: ReturnType<typeof useToast> | null = null;
 
 definePageMeta({

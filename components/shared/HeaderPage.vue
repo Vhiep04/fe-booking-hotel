@@ -10,11 +10,32 @@
           style="font-size: 1.2rem"
         ></i>
 
-        <img
+        <button
           v-if="!authStore.isAuthenticated"
-          src="../../assets/images/england-flag.svg"
-          alt=""
-        />
+          @click="toggleLangPanel"
+          class="hover:opacity-80 transition-opacity"
+        >
+          <img :src="currentFlag" alt="Language" class="w-8 h-6" />
+        </button>
+
+        <OverlayPanel ref="langPanel" class="lang-overlay">
+          <ul class="min-w-40">
+            <li
+              v-for="lang in languages"
+              :key="lang.code"
+              @click="changeLanguage(lang.code)"
+              class="flex items-center gap-3 px-4 py-2 cursor-pointer hover:bg-gray-100"
+            >
+              <img :src="lang.flag" class="w-6 h-4" />
+              <span class="text-sm">{{ lang.label }}</span>
+
+              <i
+                v-if="locale === lang.code"
+                class="pi pi-check text-blue-600 ml-auto"
+              ></i>
+            </li>
+          </ul>
+        </OverlayPanel>
       </div>
 
       <div class="flex items-center">
@@ -35,13 +56,32 @@
       </div>
 
       <div v-if="authStore.isAuthenticated" class="flex items-center space-x-5">
-        <button class="hover:opacity-80 transition-opacity">
-          <img
-            src="../../assets/images/england-flag.svg"
-            alt="Language"
-            class="w-8 h-6"
-          />
+        <button
+          v-if="!authStore.isAuthenticated"
+          @click="toggleLangPanel"
+          class="hover:opacity-80 transition-opacity"
+        >
+          <img :src="currentFlag" alt="Language" class="w-8 h-6" />
         </button>
+
+        <OverlayPanel ref="langPanel" class="p-0">
+          <ul class="min-w-[160px]">
+            <li
+              v-for="lang in languages"
+              :key="lang.code"
+              @click="changeLanguage(lang.code)"
+              class="flex items-center gap-3 px-4 py-2 cursor-pointer hover:bg-gray-100"
+            >
+              <img :src="lang.flag" class="w-6 h-4" />
+              <span class="text-sm">{{ lang.label }}</span>
+
+              <i
+                v-if="locale === lang.code"
+                class="pi pi-check text-blue-600 ml-auto"
+              ></i>
+            </li>
+          </ul>
+        </OverlayPanel>
 
         <button class="text-gray-700 hover:text-blue-600 transition-colors">
           <i class="pi pi-dollar" style="font-size: 1.2rem"></i>
@@ -76,7 +116,7 @@
       <div v-else class="flex items-center space-x-3">
         <Button
           @click="login"
-          label="Sign in"
+          :label="t('Sign in')"
           size="normal"
           severity="info"
           raised
@@ -84,7 +124,7 @@
         />
         <Button
           @click="register"
-          label="Register"
+          :label="t('Register')"
           size="normal"
           severity="info"
           raised
@@ -105,6 +145,41 @@ import { useAuthStore } from "@/stores/auth";
 import { getCookie, deleteCookie } from "@/utils/storageHelper";
 import type { UserInfoResponse } from "~/stores/interface/response/getUserInfo";
 import { Button } from "primevue";
+import OverlayPanel from "primevue/overlaypanel";
+import { useI18n } from "vue-i18n";
+import enFlag from "@/assets/images/england-flag.svg";
+import viFlag from "@/assets/images/vietnam-flag.svg";
+
+const { t } = useI18n();
+
+const currentFlag = computed(() => {
+  return locale.value === "vi" ? viFlag : enFlag;
+});
+
+const { locale, setLocale } = useI18n();
+type LocaleCode = "en" | "vi";
+
+const langPanel = ref();
+
+const languages: {
+  code: LocaleCode;
+  label: string;
+  flag: string;
+}[] = [
+  { code: "en", label: "English", flag: enFlag },
+  { code: "vi", label: "Tiếng Việt", flag: viFlag },
+];
+
+const toggleLangPanel = (event: Event) => {
+  langPanel.value.toggle(event);
+};
+
+const changeLanguage = async (code: LocaleCode) => {
+  if (locale.value !== code) {
+    await setLocale(code);
+  }
+  langPanel.value.hide();
+};
 
 const router = useRouter();
 const apiStore = useApiStore();
@@ -223,4 +298,12 @@ watch(
 );
 </script>
 
-<style scoped></style>
+<style scoped>
+.lang-overlay {
+  padding: 0 !important;
+}
+
+.lang-overlay .p-overlaypanel-content {
+  padding: 0 !important;
+}
+</style>

@@ -27,6 +27,16 @@ export const useSearchStore = defineStore(
       return null;
     });
 
+    const checkInDateOnly = computed(() => {
+      if (!checkInDate.value) return null;
+      return toDateOnly(checkInDate.value); // Use your existing helper
+    });
+
+    const checkOutDateOnly = computed(() => {
+      if (!checkOutDate.value) return null;
+      return toDateOnly(checkOutDate.value);
+    });
+
     const hasDates = computed(() => {
       return !!(checkIn.value && checkOut.value);
     });
@@ -78,6 +88,8 @@ export const useSearchStore = defineStore(
       checkOutDate,
       dateRange,
       hasDates,
+      checkInDateOnly,
+      checkOutDateOnly,
       // Actions
       setDates,
       setDateRange,

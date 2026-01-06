@@ -11,7 +11,7 @@
           id="search_global"
           v-model="searchStore.cityName"
           type="text"
-          placeholder="Where are you going to ?"
+          :placeholder="t('Where are you going to ?')"
           :show-clear="true"
           :invalid="!!errors.search"
           @clear="clearSearch"
@@ -32,7 +32,7 @@
           v-model="localDates"
           selectionMode="range"
           dateFormat="dd/mm/yy"
-          placeholder="Check In Date - Check Out Date"
+          :placeholder="t('Check In Date - Check Out Date')"
           showIcon
           inputClass="w-full h-[50px]"
           :class="{ 'p-invalid': !!errors.dates }"
@@ -55,7 +55,7 @@
           v-model="localRoomType"
           :options="rooms"
           optionLabel="name"
-          placeholder="Select Room Type"
+          :placeholder="t('Select Room Type')"
           class="h-[50px] w-full"
           checkmark
           :highlightOnSelect="true"
@@ -69,7 +69,7 @@
       <div class="border-2 border-[#FFB700] rounded-lg inline-flex">
         <Button
           type="submit"
-          label="Search"
+          :label="t('Search')"
           class="h-[50px] w-full px-8 text-white bg-[#07689F]! hover:bg-[#0A7FBF]! border-none!"
           severity="info"
           :loading="loading"
@@ -101,6 +101,9 @@ import Select from "primevue/select";
 import Button from "primevue/button";
 import { toDateOnly } from "#imports";
 import { useSearchStore } from "~/stores/searchStore";
+import { useI18n } from "#imports";
+
+const { t } = useI18n();
 
 interface Props {
   loading: boolean;
@@ -129,12 +132,12 @@ const errors = reactive({
   dates: "",
 });
 
-const rooms = ref([
-  { name: "King Bed", code: "kb" },
-  { name: "Two Single Beds", code: "tsb" },
-  { name: "Single Beds", code: "sb" },
-  { name: "Double Beds", code: "db" },
-  { name: "Family Suite", code: "fs" },
+const rooms = computed(() => [
+  { name: t("King Bed"), code: "kb" },
+  { name: t("Two Single Beds"), code: "tsb" },
+  { name: t("Single Beds"), code: "sb" },
+  { name: t("Double Beds"), code: "db" },
+  { name: t("Family Suite"), code: "fs" },
 ]);
 
 const validateForm = (): boolean => {
@@ -152,9 +155,8 @@ const validateForm = (): boolean => {
     errors.dates = "Please select check-in and check-out dates";
     isValid = false;
   } else {
-    const checkIn = searchStore.checkInDate!;
-    const checkOut = searchStore.checkOutDate!;
-
+    const checkIn = searchStore.checkInDateOnly!;
+    const checkOut = searchStore.checkOutDateOnly!;
     if (checkOut <= checkIn) {
       errors.dates = "Check-out date must be after check-in date";
       isValid = false;
@@ -174,8 +176,8 @@ const handleSearch = () => {
 
   emit("search", {
     cityName: searchStore.cityName,
-    checkIn: searchStore.checkIn,
-    checkOut: searchStore.checkOut,
+    checkIn: searchStore.checkInDateOnly,
+    checkOut: searchStore.checkOutDateOnly,
     bedType: localRoomType.value?.code ?? "",
   });
 

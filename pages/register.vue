@@ -217,6 +217,13 @@ import CustomPassword from "~/components/shared/CustomPassword.vue";
 import { useAuthStore } from "@/stores/auth";
 import { Dialog, InputOtp, Toast } from "primevue";
 import { useToast } from "primevue/usetoast";
+import { useI18n } from "#imports";
+
+const { t } = useI18n();
+
+useHead({
+  title: t("Register"),
+});
 
 let toast: ReturnType<typeof useToast> | null = null;
 

@@ -1,0 +1,18 @@
+<svg width="24" height="24" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+  <!-- Circle background -->
+  <circle cx="12" cy="12" r="12" fill="#DA251D"></circle>
+
+  <!-- Centered star -->
+  <polygon fill="#FFCD00" points="
+      12,6
+      13.76,10.24
+      18.36,10.24
+      14.6,12.96
+      16.36,17.2
+      12,14.48
+      7.64,17.2
+      9.4,12.96
+      5.64,10.24
+      10.24,10.24
+    "></polygon>
+</svg>
