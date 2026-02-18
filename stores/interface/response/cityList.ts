@@ -6,7 +6,7 @@ interface Facility {
 interface ImageHotel {
   isPrimary: boolean;
   displayOrder: number;
-  imgUrl: string;
+  imageUrl: string;
 }
 
 export interface HotelData {
@@ -14,6 +14,8 @@ export interface HotelData {
   name: string;
   location: string;
   description: string;
+  latitude: number;
+  longitude: number;
   minPricePerNight: number;
   maxPricePerNight: number;
   primaryImageUrl: string;

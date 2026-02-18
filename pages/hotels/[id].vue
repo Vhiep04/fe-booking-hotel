@@ -8,7 +8,9 @@
     <!-- Hotel Details -->
     <div v-else-if="hotel">
       <!-- Image Gallery -->
-      <HotelImageGallery :hotel="hotel" @image-click="handleImageClick" />
+      <HotelDetailHeader v-if="hotel" :hotel="hotel" @bookNow="scrollToRooms" />
+
+      <!-- <HotelImageGallery :hotel="hotel" @image-click="handleImageClick" /> -->
 
       <!-- Tabs Section -->
       <HotelDetailTabs :description="hotel.description" />
@@ -79,7 +81,28 @@
       <i class="pi pi-exclamation-triangle text-6xl text-red-500 mb-4"></i>
       <p class="text-xl text-gray-700">Hotel not found</p>
     </div>
+    <div v-if="hotel" class="flex items-center text-sm text-gray-600 mt-1">
+      <i class="pi pi-map-marker mr-1 text-blue-600"></i>
+
+      <span>{{ hotel.location }}</span>
+
+      <button
+        class="ml-2 text-blue-600 hover:underline"
+        @click="showMap = true"
+      >
+        Vị trí xuất sắc - hiển thị bản đồ
+      </button>
+    </div>
   </div>
+  <HotelMapModal
+    v-if="hotel"
+    :open="showMap"
+    :lat="lat"
+    :lng="lng"
+    
+    :name="hotel.name"
+    @close="showMap = false"
+  />
 </template>
 
 <script setup lang="ts">
@@ -93,6 +116,14 @@ import HotelDetailTabs from "~/components/HotelDetail/HotelDetailTabs.vue";
 import HotelAmenities from "~/components/HotelDetail/HotelAmenities.vue";
 import HotelBookingCard from "~/components/HotelDetail/HotelBookingCard.vue";
 import HotelRoomCard from "~/components/HotelDetail/HotelRoomCard.vue";
+import HotelMapModal from "~/components/HotelDetail/HotelMapModal.vue";
+
+// const props = defineProps<{ hotel: HotelData }>();
+
+const showMap = ref(false);
+
+const lat = computed(() => hotel.value?.latitude ?? 16.0544);
+const lng = computed(() => hotel.value?.longitude ?? 108.2022);
 
 const route = useRoute();
 const router = useRouter();
@@ -120,12 +151,10 @@ onMounted(async () => {
     }
 
     // If not found in store, fetch from API
-    if (!hotel.value) {
-      await cityStore.fetchHotels();
-      const foundHotel = cityStore.hotels?.find((h) => h.hotelId === hotelId);
-      if (foundHotel) {
-        hotel.value = foundHotel;
-      }
+    await cityStore.fetchHotels();
+    const foundHotel = cityStore.hotels?.find((h) => h.hotelId === hotelId);
+    if (foundHotel) {
+      hotel.value = foundHotel;
     }
 
     // Fetch rooms for this hotel

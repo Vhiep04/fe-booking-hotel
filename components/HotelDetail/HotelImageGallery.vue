@@ -11,7 +11,7 @@
       <img
         v-for="(image, index) in thumbnailImages"
         :key="index"
-        :src="image.imgUrl"
+        :src="image.imageUrl"
         :alt="image.description || `Image ${index + 1}`"
         class="w-full h-32 md:h-48 object-cover rounded-lg cursor-pointer hover:opacity-90 transition"
         @click="$emit('imageClick', index + 1)"
@@ -37,14 +37,14 @@ const DEFAULT_IMAGE =
 const mainImage = computed(() => {
   if (!props.hotel?.images?.length) return DEFAULT_IMAGE;
   const primary = props.hotel.images.find((img) => img.isPrimary);
-  return primary?.imgUrl || props.hotel.images[0]?.imgUrl || DEFAULT_IMAGE;
+  return primary?.imageUrl || props.hotel.images[0]?.imageUrl || DEFAULT_IMAGE;
 });
 
 // Get 4 thumbnail images
 const thumbnailImages = computed(() => {
   if (!props.hotel?.images?.length) {
     return Array(4).fill({
-      imgUrl: DEFAULT_IMAGE,
+      imageUrl: DEFAULT_IMAGE,
       description: "Default Image",
     });
   }
@@ -57,7 +57,7 @@ const thumbnailImages = computed(() => {
   // Fill with default images if less than 4
   while (thumbnails.length < 4) {
     thumbnails.push({
-      imgUrl: DEFAULT_IMAGE,
+      imageUrl: DEFAULT_IMAGE,
       isPrimary: false,
       displayOrder: thumbnails.length,
     });

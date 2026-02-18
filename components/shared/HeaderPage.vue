@@ -38,7 +38,7 @@
         </OverlayPanel>
       </div>
 
-      <div class="flex items-center">
+      <!-- <div class="flex items-center">
         <CustomInputText
           id="search_global"
           v-model="search"
@@ -53,7 +53,7 @@
             <i class="pi pi-search" style="font-size: 1rem"></i>
           </template>
         </CustomInputText>
-      </div>
+      </div> -->
 
       <div v-if="authStore.isAuthenticated" class="flex items-center space-x-5">
         <button
