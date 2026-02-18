@@ -99,7 +99,6 @@
     :open="showMap"
     :lat="lat"
     :lng="lng"
-    
     :name="hotel.name"
     @close="showMap = false"
   />
@@ -208,6 +207,29 @@ const formatPrice = (price: number): string => {
 const getOriginalPrice = (currentPrice: number): number => {
   return Math.round(currentPrice / 0.88);
 };
+
+onMounted(async () => {
+  try {
+    const hotelId = parseInt(route.params.id as string);
+
+    let foundHotel = cityStore.hotels?.find((h) => h.hotelId === hotelId);
+
+    if (!foundHotel) {
+      await hotelStore.getHotelById(hotelId);
+      hotel.value = hotelStore.currentHotel as HotelData;
+    }
+
+    hotel.value = foundHotel ?? null;
+
+    if (hotel.value) {
+      await hotelStore.getHotelRooms(hotelId);
+    }
+  } catch (error) {
+    console.error("Error loading hotel:", error);
+  } finally {
+    isLoading.value = false;
+  }
+});
 </script>
 
 <style scoped>

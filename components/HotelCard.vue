@@ -2,6 +2,7 @@
   <Card
     style="width: 18rem; overflow: hidden"
     class="relative group hover:cursor-pointer hover:bg-gray-100"
+    @click="goToHotel"
   >
     <template #header>
       <img
@@ -28,7 +29,10 @@
 <script setup lang="ts">
 import Card from "primevue/card";
 
+const router = useRouter();
+
 interface Props {
+  hotelId: number;
   cityName: string;
   country?: string;
   location: string;
@@ -37,4 +41,8 @@ interface Props {
 }
 
 const props = defineProps<Props>();
+
+const goToHotel = () => {
+  router.push(`/hotels/${props.hotelId}`);
+};
 </script>

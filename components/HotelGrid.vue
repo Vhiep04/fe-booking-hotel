@@ -7,6 +7,7 @@
       <HotelCard
         v-for="item in hotel"
         :key="item.hotelId"
+        :hotel-id="item.hotelId"
         :img-url="item.imgUrl"
         :city-name="item.cityName"
         :location="item.location"
