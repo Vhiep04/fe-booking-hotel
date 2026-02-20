@@ -116,11 +116,11 @@ export const useCityStore = defineStore(
     };
   },
   {
-    // config persist localStorage
+    // config persist sessionStorage
     persist: {
       key: "cityListStore",
-      storage: process.client ? localStorage : undefined,
+      storage: process.client ? sessionStorage : undefined,
       pick: ["cityCurrent", "filters", "hotels", "cities", "hotelTotal"],
     },
-  }
+  },
 );

@@ -84,7 +84,7 @@ type FilterParams = {
 
 const handleSearch = async (params: SearchParams) => {
   cityStore.updateFilters({
-    cityName: params.cityName,
+    cityName: params.cityName.trim(),
     checkIn: params.checkIn || undefined,
     checkOut: params.checkOut || undefined,
     bedType: params.bedType,
@@ -111,7 +111,7 @@ onMounted(async () => {
   const cityName = route.query.city as string;
 
   if (cityName && !cityStore.cityCurrent) {
-    await cityStore.getCity({ name: cityName });
+    await cityStore.getCity({ name: cityName.trim() });
   }
 });
 </script>

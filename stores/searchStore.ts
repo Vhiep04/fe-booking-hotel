@@ -102,8 +102,8 @@ export const useSearchStore = defineStore(
   {
     persist: {
       key: "hotel-search",
-      storage: process.client ? localStorage : undefined,
+      storage: process.client ? sessionStorage : undefined,
       pick: ["checkIn", "checkOut", "cityName", "bedType"],
     },
-  }
+  },
 );
