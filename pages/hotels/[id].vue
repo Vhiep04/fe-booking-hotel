@@ -8,7 +8,13 @@
     <!-- Hotel Details -->
     <div v-else-if="hotel">
       <!-- Image Gallery -->
-      <HotelDetailHeader v-if="hotel" :hotel="hotel" @bookNow="scrollToRooms" />
+      <HotelDetailHeader
+        v-if="hotel"
+        :hotel="hotel"
+        :is-map-open="showMap"
+        @bookNow="scrollToRooms"
+        @showMap="showMap = true"
+      />
 
       <!-- <HotelImageGallery :hotel="hotel" @image-click="handleImageClick" /> -->
 
@@ -81,7 +87,7 @@
       <i class="pi pi-exclamation-triangle text-6xl text-red-500 mb-4"></i>
       <p class="text-xl text-gray-700">Hotel not found</p>
     </div>
-    <div v-if="hotel" class="flex items-center text-sm text-gray-600 mt-1">
+    <!-- <div v-if="hotel" class="flex items-center text-sm text-gray-600 mt-1">
       <i class="pi pi-map-marker mr-1 text-blue-600"></i>
 
       <span>{{ hotel.location }}</span>
@@ -92,7 +98,7 @@
       >
         Vị trí xuất sắc - hiển thị bản đồ
       </button>
-    </div>
+    </div> -->
   </div>
   <HotelMapModal
     v-if="hotel"
@@ -100,7 +106,12 @@
     :lat="lat"
     :lng="lng"
     :name="hotel.name"
+    :hotel-image="hotel.images?.find((i) => i.isPrimary)?.imageUrl"
+    :total-reviews="hotel.totalReviews"
+    :address="hotel.location"
+    :location-score="9.0"
     @close="showMap = false"
+    @bookNow="scrollToRooms"
   />
 </template>
 
@@ -137,35 +148,35 @@ const roomsSection = ref<HTMLElement | null>(null);
 const rooms = computed(() => hotelStore.currentHotelRooms);
 const roomListData = computed(() => hotelStore.roomListData);
 
-onMounted(async () => {
-  try {
-    const hotelId = parseInt(route.params.id as string);
+// onMounted(async () => {
+//   try {
+//     const hotelId = parseInt(route.params.id as string);
 
-    // Check if hotel exists in store
-    if (cityStore.hotels && cityStore.hotels.length > 0) {
-      const foundHotel = cityStore.hotels.find((h) => h.hotelId === hotelId);
-      if (foundHotel) {
-        hotel.value = foundHotel;
-      }
-    }
+//     // Check if hotel exists in store
+//     if (cityStore.hotels && cityStore.hotels.length > 0) {
+//       const foundHotel = cityStore.hotels.find((h) => h.hotelId === hotelId);
+//       if (foundHotel) {
+//         hotel.value = foundHotel;
+//       }
+//     }
 
-    // If not found in store, fetch from API
-    await cityStore.fetchHotels();
-    const foundHotel = cityStore.hotels?.find((h) => h.hotelId === hotelId);
-    if (foundHotel) {
-      hotel.value = foundHotel;
-    }
+//     // If not found in store, fetch from API
+//     await cityStore.fetchHotels();
+//     const foundHotel = cityStore.hotels?.find((h) => h.hotelId === hotelId);
+//     if (foundHotel) {
+//       hotel.value = foundHotel;
+//     }
 
-    // Fetch rooms for this hotel
-    if (hotel.value) {
-      await hotelStore.getHotelRooms(hotelId);
-    }
-  } catch (error) {
-    console.error("Error loading hotel:", error);
-  } finally {
-    isLoading.value = false;
-  }
-});
+//     // Fetch rooms for this hotel
+//     if (hotel.value) {
+//       await hotelStore.getHotelRooms(hotelId);
+//     }
+//   } catch (error) {
+//     console.error("Error loading hotel:", error);
+//   } finally {
+//     isLoading.value = false;
+//   }
+// });
 
 // Clean up room data when leaving page
 onBeforeUnmount(() => {
@@ -215,12 +226,19 @@ onMounted(async () => {
     let foundHotel = cityStore.hotels?.find((h) => h.hotelId === hotelId);
 
     if (!foundHotel) {
-      await hotelStore.getHotelById(hotelId);
-      hotel.value = hotelStore.currentHotel as HotelData;
+      await cityStore.fetchHotels();
+      foundHotel = cityStore.hotels?.find((h) => h.hotelId === hotelId);
     }
 
-    hotel.value = foundHotel ?? null;
+    // Nếu vẫn không có thì gọi getHotelById
+    if (!foundHotel) {
+      await hotelStore.getHotelById(hotelId);
+      hotel.value = hotelStore.currentHotel as HotelData;
+    } else {
+      hotel.value = foundHotel;
+    }
 
+    // Fetch rooms
     if (hotel.value) {
       await hotelStore.getHotelRooms(hotelId);
     }
