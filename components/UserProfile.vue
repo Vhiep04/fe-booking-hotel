@@ -36,10 +36,11 @@
 
       <template #item="{ item }">
         <a
-          @click="handleMenuClick(item)"
+          @click="item.command?.({ originalEvent: $event, item })"
           class="flex items-center w-full px-4 py-3 hover:bg-gray-300 cursor-pointer transition-colors"
           :class="{
-            'bg-blue-600 text-white hover:!bg-blue-800': item.highlighted,
+            'bg-blue-600 text-white hover:!bg-blue-800':
+              route.path === '/user-info',
           }"
         >
           <i :class="item.icon" class="mr-3" style="font-size: 1.2rem"></i>
@@ -66,6 +67,7 @@
 <script setup lang="ts">
 import { ref, computed } from "vue";
 import Menu from "primevue/menu";
+import type { MenuItem } from "primevue/menuitem";
 
 interface Props {
   fullName: string;
@@ -73,13 +75,12 @@ interface Props {
   avatarUrl?: string;
 }
 
+const router = useRouter();
+const route = useRoute();
+
 const props = defineProps<Props>();
 
 const emit = defineEmits<{
-  myAccount: [];
-  payments: [];
-  settings: [];
-  support: [];
   signOut: [];
 }>();
 
@@ -92,42 +93,17 @@ const avatarImage = computed(() => {
   return "/assets/images/avt-df.jpg";
 });
 
-const menuItems = ref([
+const menuItems = ref<MenuItem[]>([
   {
     label: "My Account",
     icon: "pi pi-user",
     showArrow: true,
-    highlighted: true,
-    command: "myAccount",
-  },
-  {
-    label: "Payments",
-    icon: "pi pi-credit-card",
-    showArrow: true,
-    command: "payments",
-  },
-  {
-    label: "Settings",
-    icon: "pi pi-cog",
-    showArrow: true,
-    command: "settings",
-  },
-  {
-    label: "Support",
-    icon: "pi pi-question-circle",
-    showArrow: true,
-    command: "support",
+    command: () => router.push("/user-info"),
   },
 ]);
 
 const toggle = (event: Event) => {
   menu.value.toggle(event);
-};
-
-const handleMenuClick = (item: any) => {
-  if (item.command) {
-    emit(item.command as any);
-  }
 };
 
 const handleSignOut = () => {
@@ -138,7 +114,8 @@ const handleSignOut = () => {
 <style scoped>
 :deep(.p-menu) {
   border-radius: 8px;
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1),
+  box-shadow:
+    0 4px 6px -1px rgba(0, 0, 0, 0.1),
     0 2px 4px -1px rgba(0, 0, 0, 0.06);
   padding: 0;
 }

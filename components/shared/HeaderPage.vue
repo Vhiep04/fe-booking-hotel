@@ -136,13 +136,10 @@
 </template>
 
 <script setup lang="ts">
-import { ref, reactive, onMounted, watch } from "vue";
+import { ref, reactive, onMounted } from "vue";
 import { useRouter } from "vue-router";
-import CustomInputText from "./CustomInputText.vue";
 import UserProfile from "../UserProfile.vue";
-import { useApiStore } from "@/stores/api";
 import { useAuthStore } from "@/stores/auth";
-import { getCookie, deleteCookie } from "@/utils/storageHelper";
 import type { UserInfoResponse } from "~/stores/interface/response/getUserInfo";
 import { Button } from "primevue";
 import OverlayPanel from "primevue/overlaypanel";
@@ -182,11 +179,9 @@ const changeLanguage = async (code: LocaleCode) => {
 };
 
 const router = useRouter();
-const apiStore = useApiStore();
 const authStore = useAuthStore();
 
 const search = ref("");
-const namespace = "/Auth";
 
 const userData = reactive<UserInfoResponse>({
   fullName: "",
@@ -208,7 +203,6 @@ function register() {
   router.push({ name: "register" });
 }
 
-// Handle user menu actions
 const handleMyAccount = () => {
   router.push({ name: "my-account" });
 };
@@ -225,77 +219,18 @@ const handleSupport = () => {
   router.push({ name: "support" });
 };
 
-const handleSignOut = () => {
-  authStore.token = "";
-  authStore.isAuthenticated = false;
-
-  deleteCookie("token");
-
-  userData.fullName = "";
-  userData.avatarUrl = "";
-  userData.email = "";
-  userData.phoneNumber = "";
-  userData.birthDate = undefined;
-
+function handleSignOut() {
+  authStore.userLogout();
   router.push({ name: "login" });
-};
+}
 
-const getUserInfo = async () => {
-  try {
-    const res = await apiStore.apiRequest<{
-      success: boolean;
-      data: UserInfoResponse;
-    }>({
-      method: "GET",
-      endpoint: `${namespace}/me`,
-      auth: true,
-      proxy: false,
-    });
+onMounted(async () => {
+  authStore.initAuthFromCookie();
 
-    const payload = res.data;
-
-    userData.fullName = payload.fullName;
-    userData.avatarUrl = payload.avatarUrl ?? "";
-    userData.email = payload.email ?? "";
-    userData.phoneNumber = payload.phoneNumber ?? "";
-    userData.birthDate = payload.birthDate ?? undefined;
-
-    console.log("User info loaded:", userData);
-  } catch (e) {
-    console.error("getUserInfo error:", e);
-  }
-};
-
-// Check authentication trước khi gọi API
-onMounted(() => {
-  console.log(authStore.isAuthenticated);
-  const token = getCookie("token");
-
-  if (token) {
-    authStore.token = token;
-    authStore.isAuthenticated = true;
-    void getUserInfo();
-  } else {
-    // Explicitly set to false
-    authStore.isAuthenticated = false;
+  if (authStore.isAuthenticated) {
+    await authStore.fetchUserInfo();
   }
 });
-
-// Watch auth state để load user info khi login
-watch(
-  () => authStore.isAuthenticated,
-  (newVal) => {
-    if (newVal) {
-      void getUserInfo();
-    } else {
-      userData.fullName = "";
-      userData.avatarUrl = "";
-      userData.email = "";
-      userData.phoneNumber = "";
-      userData.birthDate = undefined;
-    }
-  }
-);
 </script>
 
 <style scoped>
