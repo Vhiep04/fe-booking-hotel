@@ -57,7 +57,6 @@
 
       <div v-if="authStore.isAuthenticated" class="flex items-center space-x-5">
         <button
-          v-if="!authStore.isAuthenticated"
           @click="toggleLangPanel"
           class="hover:opacity-80 transition-opacity"
         >
@@ -113,7 +112,10 @@
         />
       </div>
 
-      <div v-else class="flex items-center space-x-3">
+      <div
+        v-if="!authStore.isAuthenticated"
+        class="flex items-center space-x-3"
+      >
         <Button
           @click="login"
           :label="t('Sign in')"

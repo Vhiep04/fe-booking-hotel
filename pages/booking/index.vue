@@ -28,9 +28,8 @@
                   'text-sm font-medium hidden sm:block',
                   currentStep >= step.id ? 'text-gray-800' : 'text-gray-400',
                 ]"
+                >{{ step.label }}</span
               >
-                {{ step.label }}
-              </span>
             </div>
             <div
               v-if="index < steps.length - 1"
@@ -44,8 +43,25 @@
       </div>
     </div>
 
+    <!-- Loading -->
+    <div
+      v-if="roomStore.isLoading"
+      class="flex justify-center items-center py-32"
+    >
+      <i class="pi pi-spin pi-spinner text-4xl text-blue-600"></i>
+    </div>
+
+    <!-- Error -->
+    <div
+      v-else-if="roomStore.error"
+      class="flex flex-col justify-center items-center py-32"
+    >
+      <i class="pi pi-exclamation-triangle text-6xl text-red-500 mb-4"></i>
+      <p class="text-xl text-gray-700">{{ roomStore.error }}</p>
+    </div>
+
     <!-- Main Content -->
-    <div class="max-w-7xl mx-auto px-4 py-6">
+    <div v-else class="max-w-7xl mx-auto px-4 py-6">
       <div class="flex flex-col lg:flex-row gap-6">
         <CheckoutLeftPanel
           :hotel="hotel"
@@ -58,6 +74,8 @@
           v-model:special-request="specialRequest"
           v-model:arrival-time="arrivalTime"
           :booking="booking"
+          :is-paying="paymentStore.isLoading"
+          @submit="handleSubmit"
         />
       </div>
     </div>
@@ -65,10 +83,16 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from "vue";
+import { ref, computed, onMounted, onBeforeUnmount } from "vue";
+import { useRoute } from "vue-router";
 import CheckoutLeftPanel from "~/components/Booking/CheckoutLeftPanel.vue";
 import CheckoutCenterPanel from "~/components/Booking/CheckoutCenterPanel.vue";
+import { useGetRoomStore } from "~/stores/getRoom";
+import { usePaymentStore } from "~/stores/payments";
 
+const route = useRoute();
+const roomStore = useGetRoomStore();
+const paymentStore = usePaymentStore();
 const currentStep = ref(2);
 
 const steps = [
@@ -77,57 +101,101 @@ const steps = [
   { id: 3, label: "Finish booking" },
 ];
 
-const hotel = ref({
-  name: "SAM Hotel and Apartment Danang - 150m to the beach & 200m to An Thuong area",
-  address: "Lô 49 Trần Bạch Đằng, 550000 Danang, Vietnam",
-  rating: 7.7,
-  reviewCount: 41,
-  reviewLabel: "Good",
-  locationScore: 8.9,
-  stars: 3,
-  amenities: ["Free Wifi", "Airport shuttle"],
-  image: "https://via.placeholder.com/400x200?text=SAM+Hotel",
+const hotelId = computed(() => Number(route.query.hotelId));
+const roomId = computed(() => Number(route.query.roomId));
+const roomCount = computed(() => Number(route.query.rooms) || 1);
+
+const hotel = computed(() => {
+  const r = roomStore.room;
+  return {
+    name: `Hotel #${r?.hotelId ?? hotelId.value}`,
+    address: "",
+    rating: 0,
+    reviewCount: 0,
+    reviewLabel: "",
+    locationScore: 0,
+    stars: 0,
+    amenities:
+      r?.facilities?.filter((f) =>
+        ["WiFi", "Free Wifi", "Airport shuttle"].includes(f),
+      ) ?? [],
+    image: r?.imgUrl ?? "https://via.placeholder.com/400x200",
+  };
 });
 
-const booking = ref({
-  checkIn: { date: "Sat, Mar 7, 2026", time: "2:00 PM – 12:00 AM" },
-  checkOut: { date: "Sun, Mar 8, 2026", time: "12:00 AM – 12:00 PM" },
-  daysAway: 5,
-  nights: 1,
-  rooms: 1,
-  adults: 2,
-  room: {
-    name: "King Suite with Balcony",
-    guests: 2,
-    noSmoking: true,
-    freeCancellationBefore: "March 5, 2026",
-  },
+const booking = computed(() => {
+  const r = roomStore.room;
+  return {
+    checkIn: { date: "Sat, Mar 7, 2026", time: "2:00 PM – 12:00 AM" },
+    checkOut: { date: "Sun, Mar 8, 2026", time: "12:00 AM – 12:00 PM" },
+    daysAway: 5,
+    nights: 1,
+    rooms: roomCount.value,
+    adults: r?.capacity ?? 2,
+    room: {
+      name: r?.roomType ?? "",
+      guests: r?.capacity ?? 2,
+      noSmoking: false,
+      freeCancellationBefore: "March 5, 2026",
+    },
+  };
 });
 
-const price = ref({
-  original: 1100000,
-  discount: 440000,
-  discountLabel: "Early 2026 Deal",
-  total: 660000,
-  taxes: 48889,
-  vatPercent: 8,
-  currency: "VND",
+const VAT_RATE = 0.08;
+const DISCOUNT_RATE = 0.4;
+
+const price = computed(() => {
+  const r = roomStore.room;
+  const original = r ? Math.round(r.pricePerNight / (1 - DISCOUNT_RATE)) : 0;
+  const discount = original - (r?.pricePerNight ?? 0);
+  const total = r?.pricePerNight ?? 0;
+  const taxes = Math.round(total * VAT_RATE);
+  return {
+    original,
+    discount,
+    discountLabel: "Early 2026 Deal",
+    total,
+    taxes,
+    vatPercent: VAT_RATE * 100,
+    currency: "VND",
+  };
 });
 
-const cancellationPolicy = ref({
+const cancellationPolicy = computed(() => ({
   freeBeforeDate: "Mar 5",
-  penaltyAfter: 660000,
+  penaltyAfter: price.value.total,
   currency: "VND",
-});
+}));
 
 const guestDetails = ref({
-  firstName: "Ngo",
-  lastName: "Hiep",
-  email: "hiep.ngo@sotatek.com",
+  firstName: "",
+  lastName: "",
+  email: "",
   country: "Vietnam",
   phone: "",
 });
 
 const specialRequest = ref("");
 const arrivalTime = ref("");
+
+// ---- Payment handler ----
+async function handleSubmit() {
+  await paymentStore.createPayment({
+    orderType: "other",
+    amount: roomStore.room?.pricePerNight ?? 0,
+    orderDescription: roomStore.room?.roomType ?? "Room booking",
+    name: `${guestDetails.value.firstName} ${guestDetails.value.lastName}`,
+  });
+}
+
+onMounted(async () => {
+  if (hotelId.value && roomId.value) {
+    await roomStore.fetchRoom(hotelId.value, roomId.value);
+  }
+});
+
+onBeforeUnmount(() => {
+  roomStore.clearRoom();
+  paymentStore.clearPayment();
+});
 </script>

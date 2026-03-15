@@ -42,10 +42,12 @@
       <!-- Rooms Section -->
       <div class="bg-white rounded-lg shadow-sm p-6">
         <div class="flex items-center justify-between mb-6">
-          <h2 class="text-2xl font-bold text-gray-900">Chọn phòng của bạn</h2>
+          <h2 class="text-2xl font-bold text-gray-900">
+            {{ t("Choose Your Room") }}
+          </h2>
           <div v-if="roomListData" class="text-sm text-gray-600">
             <span class="font-semibold">{{ roomListData.availableRooms }}</span>
-            phòng trống
+            {{ t("Availability") }}
             <span class="mx-2">|</span>
             <span
               >{{ formatPrice(roomListData.minPrice) }} -
@@ -77,7 +79,9 @@
         <!-- No Rooms Available -->
         <div v-else class="text-center py-12">
           <i class="pi pi-inbox text-6xl text-gray-300 mb-4"></i>
-          <p class="text-gray-500 text-lg">Không có phòng nào khả dụng</p>
+          <p class="text-gray-500 text-lg">
+            {{ t("No Rooms Available") }}
+          </p>
         </div>
       </div>
     </div>
@@ -85,7 +89,9 @@
     <!-- Error State -->
     <div v-else class="flex flex-col justify-center items-center min-h-screen">
       <i class="pi pi-exclamation-triangle text-6xl text-red-500 mb-4"></i>
-      <p class="text-xl text-gray-700">Hotel not found</p>
+      <p class="text-xl text-gray-700">
+        {{ t("Hotel Not Found") }}
+      </p>
     </div>
     <!-- <div v-if="hotel" class="flex items-center text-sm text-gray-600 mt-1">
       <i class="pi pi-map-marker mr-1 text-blue-600"></i>
@@ -128,6 +134,7 @@ import HotelBookingCard from "~/components/HotelDetail/HotelBookingCard.vue";
 import HotelRoomCard from "~/components/HotelDetail/HotelRoomCard.vue";
 import HotelMapModal from "~/components/HotelDetail/HotelMapModal.vue";
 
+const { t } = useI18n();
 // const props = defineProps<{ hotel: HotelData }>();
 
 const showMap = ref(false);

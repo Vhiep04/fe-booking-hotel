@@ -222,11 +222,12 @@
         <i class="pi pi-tag" />
         We Price Match
       </span>
+      <!-- Button Pay via VNPAY -->
       <Button
         label="Pay via VNPAY"
         icon="pi pi-credit-card"
-        icon-pos="left"
-        class="bg-blue-700! border-blue-700!"
+        :loading="isPaying"
+        :disabled="isPaying"
         @click="emit('submit')"
       />
     </div>
@@ -295,6 +296,7 @@ const props = defineProps<{
     country: string;
     phone: string;
   };
+  isPaying: boolean;
   specialRequest: string;
   arrivalTime: string;
   booking: {
