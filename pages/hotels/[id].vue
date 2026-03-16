@@ -16,8 +16,6 @@
         @showMap="showMap = true"
       />
 
-      <!-- <HotelImageGallery :hotel="hotel" @image-click="handleImageClick" /> -->
-
       <!-- Tabs Section -->
       <HotelDetailTabs :description="hotel.description" />
 
@@ -40,7 +38,7 @@
       </div>
 
       <!-- Rooms Section -->
-      <div class="bg-white rounded-lg shadow-sm p-6">
+      <div class="bg-white rounded-lg shadow-sm p-6 mb-8">
         <div class="flex items-center justify-between mb-6">
           <h2 class="text-2xl font-bold text-gray-900">
             {{ t("Choose Your Room") }}
@@ -84,6 +82,9 @@
           </p>
         </div>
       </div>
+
+      <!-- Feedbacks Section -->
+      <HotelFeedbacks :hotel="hotel" />
     </div>
 
     <!-- Error State -->
@@ -93,19 +94,8 @@
         {{ t("Hotel Not Found") }}
       </p>
     </div>
-    <!-- <div v-if="hotel" class="flex items-center text-sm text-gray-600 mt-1">
-      <i class="pi pi-map-marker mr-1 text-blue-600"></i>
-
-      <span>{{ hotel.location }}</span>
-
-      <button
-        class="ml-2 text-blue-600 hover:underline"
-        @click="showMap = true"
-      >
-        Vị trí xuất sắc - hiển thị bản đồ
-      </button>
-    </div> -->
   </div>
+
   <HotelMapModal
     v-if="hotel"
     :open="showMap"
@@ -127,15 +117,14 @@ import { useRoute, useRouter } from "vue-router";
 import { useCityStore } from "~/stores/cityList";
 import { useHotelStore } from "~/stores/hotelList";
 import type { HotelData } from "~/stores/interface/response/cityList";
-import HotelImageGallery from "~/components/HotelDetail/HotelImageGallery.vue";
 import HotelDetailTabs from "~/components/HotelDetail/HotelDetailTabs.vue";
 import HotelAmenities from "~/components/HotelDetail/HotelAmenities.vue";
 import HotelBookingCard from "~/components/HotelDetail/HotelBookingCard.vue";
 import HotelRoomCard from "~/components/HotelDetail/HotelRoomCard.vue";
 import HotelMapModal from "~/components/HotelDetail/HotelMapModal.vue";
+import HotelFeedbacks from "~/components/HotelDetail/HotelFeedbacks.vue";
 
 const { t } = useI18n();
-// const props = defineProps<{ hotel: HotelData }>();
 
 const showMap = ref(false);
 
@@ -151,48 +140,15 @@ const hotel = ref<HotelData | null>(null);
 const isLoading = ref(true);
 const roomsSection = ref<HTMLElement | null>(null);
 
-// Computed properties
 const rooms = computed(() => hotelStore.currentHotelRooms);
 const roomListData = computed(() => hotelStore.roomListData);
 
-// onMounted(async () => {
-//   try {
-//     const hotelId = parseInt(route.params.id as string);
-
-//     // Check if hotel exists in store
-//     if (cityStore.hotels && cityStore.hotels.length > 0) {
-//       const foundHotel = cityStore.hotels.find((h) => h.hotelId === hotelId);
-//       if (foundHotel) {
-//         hotel.value = foundHotel;
-//       }
-//     }
-
-//     // If not found in store, fetch from API
-//     await cityStore.fetchHotels();
-//     const foundHotel = cityStore.hotels?.find((h) => h.hotelId === hotelId);
-//     if (foundHotel) {
-//       hotel.value = foundHotel;
-//     }
-
-//     // Fetch rooms for this hotel
-//     if (hotel.value) {
-//       await hotelStore.getHotelRooms(hotelId);
-//     }
-//   } catch (error) {
-//     console.error("Error loading hotel:", error);
-//   } finally {
-//     isLoading.value = false;
-//   }
-// });
-
-// Clean up room data when leaving page
 onBeforeUnmount(() => {
   hotelStore.clearRoomData();
 });
 
 const handleImageClick = (imageIndex: number) => {
   console.log("Image clicked:", imageIndex);
-  // Implement image modal/lightbox here
 };
 
 const scrollToRooms = () => {
@@ -203,7 +159,6 @@ const scrollToRooms = () => {
 
 const handleRoomReserve = (roomId: number, count: number) => {
   console.log("Reserve room:", roomId, "count:", count);
-  // Implement booking logic here
   router.push({
     path: "/booking",
     query: {
@@ -221,7 +176,6 @@ const formatPrice = (price: number): string => {
   }).format(price);
 };
 
-// Calculate original price (12% discount)
 const getOriginalPrice = (currentPrice: number): number => {
   return Math.round(currentPrice / 0.88);
 };
@@ -230,22 +184,9 @@ onMounted(async () => {
   try {
     const hotelId = parseInt(route.params.id as string);
 
-    let foundHotel = cityStore.hotels?.find((h) => h.hotelId === hotelId);
+    await hotelStore.getHotelById(hotelId);
+    hotel.value = hotelStore.currentHotel as HotelData;
 
-    if (!foundHotel) {
-      await cityStore.fetchHotels();
-      foundHotel = cityStore.hotels?.find((h) => h.hotelId === hotelId);
-    }
-
-    // Nếu vẫn không có thì gọi getHotelById
-    if (!foundHotel) {
-      await hotelStore.getHotelById(hotelId);
-      hotel.value = hotelStore.currentHotel as HotelData;
-    } else {
-      hotel.value = foundHotel;
-    }
-
-    // Fetch rooms
     if (hotel.value) {
       await hotelStore.getHotelRooms(hotelId);
     }

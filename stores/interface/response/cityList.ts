@@ -9,6 +9,22 @@ interface ImageHotel {
   imageUrl: string;
 }
 
+export interface Feedback {
+  feedbackId: number;
+  userName: string;
+  rating: number;
+  comment: string;
+  createdAt: string;
+}
+
+interface RatingDistribution {
+  fiveStar: number;
+  fourStar: number;
+  threeStar: number;
+  twoStar: number;
+  oneStar: number;
+}
+
 export interface HotelData {
   hotelId: number;
   name: string;
@@ -23,7 +39,9 @@ export interface HotelData {
   availableRoomTypes: string[];
   popularFacilities: Facility[];
   averageRating?: string;
+  recentFeedbacks: Feedback[];
   totalReviews: number;
+  ratingDistribution: RatingDistribution;
 }
 
 export interface CityData {
