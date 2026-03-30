@@ -11,121 +11,110 @@
       />
     </div>
     <div class="admin-card-body">
-      <Chart
-        type="line"
-        :data="chartData"
-        :options="chartOptions"
-        class="h-80"
-      />
+      <div v-if="hasData">
+        <Chart
+          type="line"
+          :data="chartData"
+          :options="chartOptions"
+          class="h-80"
+        />
+      </div>
+      <div v-else class="h-80 flex flex-col items-center justify-center gap-2">
+        <i class="pi pi-chart-line text-4xl text-[var(--admin-text-muted)]"></i>
+        <p class="text-[var(--admin-text-muted)] text-sm">
+          No revenue data available
+        </p>
+      </div>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import Chart from 'primevue/chart'
-import Dropdown from 'primevue/dropdown'
+import Chart from "primevue/chart";
+import Dropdown from "primevue/dropdown";
+import type { RevenueChart } from "~/stores/admin/interfaces/dashboard";
 
-const selectedPeriod = ref('12months')
+const props = defineProps<{
+  chartData: RevenueChart[];
+}>();
+
+const selectedPeriod = ref("12months");
 const periodOptions = [
-  { label: 'Last 7 days', value: '7days' },
-  { label: 'Last 30 days', value: '30days' },
-  { label: 'Last 12 months', value: '12months' }
-]
+  { label: "Last 7 days", value: "7days" },
+  { label: "Last 30 days", value: "30days" },
+  { label: "Last 12 months", value: "12months" },
+];
 
-// Mock data - replace with real API data
-const monthlyData = {
-  labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
-  revenue: [45000, 52000, 48000, 61000, 55000, 67000, 72000, 69000, 78000, 85000, 92000, 98000],
-  bookings: [320, 380, 340, 420, 390, 460, 510, 480, 540, 590, 640, 680]
-}
+const hasData = computed(() => props.chartData && props.chartData.length > 0);
 
-const chartData = computed(() => ({
-  labels: monthlyData.labels,
-  datasets: [
-    {
-      label: 'Revenue ($)',
-      data: monthlyData.revenue,
-      fill: true,
-      borderColor: '#3b82f6',
-      backgroundColor: 'rgba(59, 130, 246, 0.1)',
-      tension: 0.4,
-      pointRadius: 4,
-      pointHoverRadius: 6
-    },
-    {
-      label: 'Bookings',
-      data: monthlyData.bookings,
-      fill: false,
-      borderColor: '#22c55e',
-      backgroundColor: '#22c55e',
-      tension: 0.4,
-      pointRadius: 4,
-      pointHoverRadius: 6,
-      yAxisID: 'y1'
-    }
-  ]
-}))
+const chartData = computed(() => {
+  const items = props.chartData ?? [];
+  return {
+    labels: items.map((i) => i.monthName || `${i.month}/${i.year}`),
+    datasets: [
+      {
+        label: "Revenue ($)",
+        data: items.map((i) => i.revenue),
+        fill: true,
+        borderColor: "#3b82f6",
+        backgroundColor: "rgba(59, 130, 246, 0.1)",
+        tension: 0.4,
+        pointRadius: 4,
+        pointHoverRadius: 6,
+      },
+      {
+        label: "Bookings",
+        data: items.map((i) => i.reservationCount),
+        fill: false,
+        borderColor: "#22c55e",
+        backgroundColor: "#22c55e",
+        tension: 0.4,
+        pointRadius: 4,
+        pointHoverRadius: 6,
+        yAxisID: "y1",
+      },
+    ],
+  };
+});
 
 const chartOptions = computed(() => ({
   maintainAspectRatio: false,
   responsive: true,
-  interaction: {
-    intersect: false,
-    mode: 'index'
-  },
+  interaction: { intersect: false, mode: "index" },
   plugins: {
     legend: {
       display: true,
-      position: 'top',
-      labels: {
-        usePointStyle: true,
-        padding: 20
-      }
+      position: "top",
+      labels: { usePointStyle: true, padding: 20 },
     },
     tooltip: {
-      backgroundColor: 'rgba(0, 0, 0, 0.8)',
+      backgroundColor: "rgba(0, 0, 0, 0.8)",
       padding: 12,
-      titleFont: {
-        size: 14
-      },
-      bodyFont: {
-        size: 13
-      },
-      cornerRadius: 8
-    }
+      cornerRadius: 8,
+    },
   },
   scales: {
     x: {
-      grid: {
-        display: false
-      },
-      ticks: {
-        color: '#64748b'
-      }
+      grid: { display: false },
+      ticks: { color: "#64748b" },
     },
     y: {
-      type: 'linear',
+      type: "linear",
       display: true,
-      position: 'left',
-      grid: {
-        color: 'rgba(0, 0, 0, 0.05)'
-      },
+      position: "left",
+      grid: { color: "rgba(0, 0, 0, 0.05)" },
       ticks: {
-        color: '#64748b',
-        callback: (value: number) => '$' + value.toLocaleString()
-      }
+        color: "#64748b",
+        callback: (value: number) => "$" + value.toLocaleString(),
+      },
     },
     y1: {
-      type: 'linear',
+      type: "linear",
       display: true,
-      position: 'right',
-      grid: {
-        drawOnChartArea: false
-      },
-      ticks: {
-        color: '#64748b'
-      }
-    }
-  }
-}))
+      position: "right",
+      grid: { drawOnChartArea: false },
+      ticks: { color: "#64748b" },
+    },
+  },
+}));
 </script>

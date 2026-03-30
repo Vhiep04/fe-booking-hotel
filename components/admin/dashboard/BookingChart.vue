@@ -46,80 +46,79 @@
 </template>
 
 <script setup lang="ts">
-import Chart from 'primevue/chart'
+import Chart from "primevue/chart";
 
-// Mock data - replace with real API data
-const bookingStats = {
-  confirmed: 450,
-  pending: 85,
-  cancelled: 32,
-  completed: 628
-}
+const props = defineProps<{
+  confirmed: number;
+  pending: number;
+  cancelled: number;
+  completed: number;
+}>();
 
-const total = computed(() =>
-  Object.values(bookingStats).reduce((a, b) => a + b, 0)
-)
+const total = computed(
+  () => props.confirmed + props.pending + props.cancelled + props.completed,
+);
+
+const pct = (val: number) =>
+  total.value === 0 ? "0.0" : ((val / total.value) * 100).toFixed(1);
 
 const statusItems = computed(() => [
   {
-    label: 'Completed',
-    count: bookingStats.completed,
-    percentage: ((bookingStats.completed / total.value) * 100).toFixed(1),
-    color: '#22c55e'
+    label: "Completed",
+    count: props.completed,
+    percentage: pct(props.completed),
+    color: "#22c55e",
   },
   {
-    label: 'Confirmed',
-    count: bookingStats.confirmed,
-    percentage: ((bookingStats.confirmed / total.value) * 100).toFixed(1),
-    color: '#3b82f6'
+    label: "Confirmed",
+    count: props.confirmed,
+    percentage: pct(props.confirmed),
+    color: "#3b82f6",
   },
   {
-    label: 'Pending',
-    count: bookingStats.pending,
-    percentage: ((bookingStats.pending / total.value) * 100).toFixed(1),
-    color: '#f59e0b'
+    label: "Pending",
+    count: props.pending,
+    percentage: pct(props.pending),
+    color: "#f59e0b",
   },
   {
-    label: 'Cancelled',
-    count: bookingStats.cancelled,
-    percentage: ((bookingStats.cancelled / total.value) * 100).toFixed(1),
-    color: '#ef4444'
-  }
-])
+    label: "Cancelled",
+    count: props.cancelled,
+    percentage: pct(props.cancelled),
+    color: "#ef4444",
+  },
+]);
 
 const chartData = computed(() => ({
-  labels: statusItems.value.map(item => item.label),
+  labels: statusItems.value.map((i) => i.label),
   datasets: [
     {
-      data: statusItems.value.map(item => item.count),
-      backgroundColor: statusItems.value.map(item => item.color),
+      data: statusItems.value.map((i) => i.count),
+      backgroundColor: statusItems.value.map((i) => i.color),
       borderWidth: 0,
-      hoverOffset: 4
-    }
-  ]
-}))
+      hoverOffset: 4,
+    },
+  ],
+}));
 
 const chartOptions = computed(() => ({
   maintainAspectRatio: false,
   responsive: true,
-  cutout: '70%',
+  cutout: "70%",
   plugins: {
-    legend: {
-      display: false
-    },
+    legend: { display: false },
     tooltip: {
-      backgroundColor: 'rgba(0, 0, 0, 0.8)',
+      backgroundColor: "rgba(0, 0, 0, 0.8)",
       padding: 12,
       cornerRadius: 8,
       callbacks: {
         label: (context: any) => {
-          const label = context.label || ''
-          const value = context.raw || 0
-          const percentage = ((value / total.value) * 100).toFixed(1)
-          return `${label}: ${value} (${percentage}%)`
-        }
-      }
-    }
-  }
-}))
+          const value = context.raw || 0;
+          const percentage = pct(value);
+          return `${context.label}: ${value} (${percentage}%)`;
+        },
+      },
+    },
+  },
+}));
 </script>

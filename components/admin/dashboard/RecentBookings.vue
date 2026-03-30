@@ -11,61 +11,91 @@
     </div>
     <div class="overflow-x-auto">
       <DataTable
-        :value="recentBookings"
+        :value="bookings"
         :rows="5"
         responsiveLayout="scroll"
         class="p-datatable-sm"
       >
-        <Column field="id" header="Booking ID" style="min-width: 120px">
+        <!-- Empty state -->
+        <template #empty>
+          <div class="flex flex-col items-center justify-center py-10 gap-2">
+            <i
+              class="pi pi-calendar text-3xl text-[var(--admin-text-muted)]"
+            ></i>
+            <p class="text-[var(--admin-text-muted)] text-sm">
+              No recent bookings
+            </p>
+          </div>
+        </template>
+
+        <Column
+          field="bookingCode"
+          header="Booking ID"
+          style="min-width: 120px"
+        >
           <template #body="{ data }">
             <span class="font-medium text-[var(--admin-primary)]">
-              #{{ data.id }}
+              #{{ data.bookingCode }}
             </span>
           </template>
         </Column>
 
-        <Column field="hotel" header="Hotel" style="min-width: 200px">
+        <Column field="hotelName" header="Hotel" style="min-width: 200px">
           <template #body="{ data }">
             <div class="flex items-center gap-3">
               <img
+                v-if="data.hotelImage"
                 :src="data.hotelImage"
-                :alt="data.hotel"
+                :alt="data.hotelName"
                 class="w-10 h-10 rounded-lg object-cover"
               />
+              <div
+                v-else
+                class="w-10 h-10 rounded-lg bg-[var(--admin-surface-hover)] flex items-center justify-center"
+              >
+                <i class="pi pi-building text-[var(--admin-text-muted)]"></i>
+              </div>
               <div>
                 <p class="font-medium text-[var(--admin-text-color)]">
-                  {{ data.hotel }}
+                  {{ data.hotelName }}
                 </p>
                 <p class="text-xs text-[var(--admin-text-muted)]">
-                  {{ data.city }}
+                  {{ data.cityName }}
                 </p>
               </div>
             </div>
           </template>
         </Column>
 
-        <Column field="guest" header="Guest" style="min-width: 150px">
+        <Column field="guestName" header="Guest" style="min-width: 150px">
           <template #body="{ data }">
             <div class="flex items-center gap-2">
               <Avatar
-                :label="data.guest.charAt(0)"
+                :image="data.guestAvatar ?? undefined"
+                :label="
+                  !data.guestAvatar ? data.guestName.charAt(0) : undefined
+                "
                 shape="circle"
                 size="small"
               />
-              <span>{{ data.guest }}</span>
+              <span>{{ data.guestName }}</span>
             </div>
           </template>
         </Column>
 
-        <Column field="checkIn" header="Check-in" style="min-width: 120px">
+        <Column field="checkInDate" header="Check-in" style="min-width: 120px">
           <template #body="{ data }">
-            <span>{{ formatDate(data.checkIn) }}</span>
+            <span>{{ formatDate(data.checkInDate) }}</span>
           </template>
         </Column>
 
-        <Column field="checkOut" header="Check-out" style="min-width: 120px">
+        <Column
+          field="checkOutDate"
+          header="Check-out"
+          style="min-width: 120px"
+        >
           <template #body="{ data }">
-            <span>{{ formatDate(data.checkOut) }}</span>
+            <span>{{ formatDate(data.checkOutDate) }}</span>
           </template>
         </Column>
 
@@ -115,128 +145,77 @@
 </template>
 
 <script setup lang="ts">
-import DataTable from 'primevue/datatable'
-import Column from 'primevue/column'
-import Tag from 'primevue/tag'
-import Avatar from 'primevue/avatar'
-import Button from 'primevue/button'
-import Menu from 'primevue/menu'
+import DataTable from "primevue/datatable";
+import Column from "primevue/column";
+import Tag from "primevue/tag";
+import Avatar from "primevue/avatar";
+import Button from "primevue/button";
+import Menu from "primevue/menu";
+import type { RecentBooking } from "~/stores/admin/interfaces/dashboard";
 
-const menu = ref()
-const selectedBooking = ref<any>(null)
+defineProps<{
+  bookings: RecentBooking[];
+}>();
 
-// Mock data - replace with real API data
-const recentBookings = ref([
-  {
-    id: 'BK-2024-001',
-    hotel: 'Grand Plaza Hotel',
-    hotelImage: 'https://images.unsplash.com/photo-1566073771259-6a8506099945?w=100&h=100&fit=crop',
-    city: 'New York',
-    guest: 'John Smith',
-    checkIn: '2024-03-15',
-    checkOut: '2024-03-18',
-    amount: 450,
-    status: 'Confirmed'
-  },
-  {
-    id: 'BK-2024-002',
-    hotel: 'Seaside Resort',
-    hotelImage: 'https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?w=100&h=100&fit=crop',
-    city: 'Miami',
-    guest: 'Sarah Johnson',
-    checkIn: '2024-03-16',
-    checkOut: '2024-03-20',
-    amount: 820,
-    status: 'Pending'
-  },
-  {
-    id: 'BK-2024-003',
-    hotel: 'Mountain Lodge',
-    hotelImage: 'https://images.unsplash.com/photo-1571896349842-33c89424de2d?w=100&h=100&fit=crop',
-    city: 'Denver',
-    guest: 'Mike Wilson',
-    checkIn: '2024-03-14',
-    checkOut: '2024-03-16',
-    amount: 280,
-    status: 'Completed'
-  },
-  {
-    id: 'BK-2024-004',
-    hotel: 'City Center Inn',
-    hotelImage: 'https://images.unsplash.com/photo-1564501049412-61c2a3083791?w=100&h=100&fit=crop',
-    city: 'Chicago',
-    guest: 'Emily Brown',
-    checkIn: '2024-03-17',
-    checkOut: '2024-03-19',
-    amount: 340,
-    status: 'Confirmed'
-  },
-  {
-    id: 'BK-2024-005',
-    hotel: 'Beachfront Villa',
-    hotelImage: 'https://images.unsplash.com/photo-1520250497591-112f2f40a3f4?w=100&h=100&fit=crop',
-    city: 'Los Angeles',
-    guest: 'David Lee',
-    checkIn: '2024-03-18',
-    checkOut: '2024-03-22',
-    amount: 1200,
-    status: 'Cancelled'
-  }
-])
+const menu = ref();
+const selectedBooking = ref<RecentBooking | null>(null);
 
 const menuItems = [
   {
-    label: 'View Details',
-    icon: 'pi pi-eye',
-    command: () => viewBooking(selectedBooking.value)
+    label: "View Details",
+    icon: "pi pi-eye",
+    command: () => viewBooking(selectedBooking.value!),
   },
   {
-    label: 'Edit',
-    icon: 'pi pi-pencil',
-    command: () => editBooking(selectedBooking.value)
+    label: "Edit",
+    icon: "pi pi-pencil",
+    command: () => editBooking(selectedBooking.value!),
   },
   { separator: true },
   {
-    label: 'Cancel Booking',
-    icon: 'pi pi-times',
-    command: () => cancelBooking(selectedBooking.value)
-  }
-]
+    label: "Cancel Booking",
+    icon: "pi pi-times",
+    command: () => cancelBooking(selectedBooking.value!),
+  },
+];
 
 function formatDate(dateString: string) {
-  return new Date(dateString).toLocaleDateString('en-US', {
-    month: 'short',
-    day: 'numeric',
-    year: 'numeric'
-  })
+  return new Date(dateString).toLocaleDateString("en-US", {
+    month: "short",
+    day: "numeric",
+    year: "numeric",
+  });
 }
 
 function getStatusSeverity(status: string) {
-  const severityMap: Record<string, string> = {
-    Confirmed: 'info',
-    Pending: 'warn',
-    Completed: 'success',
-    Cancelled: 'danger'
-  }
-  return severityMap[status] || 'secondary'
+  const map: Record<string, string> = {
+    Confirmed: "info",
+    confirmed: "info",
+    Pending: "warn",
+    pending: "warn",
+    Completed: "success",
+    completed: "success",
+    Cancelled: "danger",
+    cancelled: "danger",
+  };
+  return map[status] ?? "secondary";
 }
 
-function viewBooking(booking: any) {
-  navigateTo(`/admin/bookings/${booking.id}`)
+function viewBooking(booking: RecentBooking) {
+  navigateTo(`/admin/bookings/${booking.reservationId}`);
 }
 
-function editBooking(booking: any) {
-  navigateTo(`/admin/bookings/${booking.id}/edit`)
+function editBooking(booking: RecentBooking) {
+  navigateTo(`/admin/bookings/${booking.reservationId}/edit`);
 }
 
-function cancelBooking(booking: any) {
-  // TODO: Implement cancel booking logic
-  console.log('Cancel booking:', booking.id)
+function cancelBooking(booking: RecentBooking) {
+  console.log("Cancel booking:", booking.bookingCode);
 }
 
-function toggleMenu(event: Event, booking: any) {
-  selectedBooking.value = booking
-  menu.value.toggle(event)
+function toggleMenu(event: Event, booking: RecentBooking) {
+  selectedBooking.value = booking;
+  menu.value.toggle(event);
 }
 </script>
 
@@ -244,7 +223,6 @@ function toggleMenu(event: Event, booking: any) {
 :deep(.p-datatable) {
   background: transparent;
 }
-
 :deep(.p-datatable .p-datatable-thead > tr > th) {
   background: var(--admin-table-header-bg);
   border-color: var(--admin-table-border);
@@ -254,16 +232,13 @@ function toggleMenu(event: Event, booking: any) {
   text-transform: uppercase;
   letter-spacing: 0.05em;
 }
-
 :deep(.p-datatable .p-datatable-tbody > tr) {
   background: transparent;
   border-color: var(--admin-table-border);
 }
-
 :deep(.p-datatable .p-datatable-tbody > tr:hover) {
   background: var(--admin-table-row-hover);
 }
-
 :deep(.p-datatable .p-datatable-tbody > tr > td) {
   border-color: var(--admin-table-border);
   color: var(--admin-text-color);

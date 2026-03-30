@@ -8,268 +8,289 @@
       </p>
     </div>
 
-    <!-- KPI Cards -->
-    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
-      <KpiCard
-        title="Total Revenue"
-        :value="kpiData.revenue"
-        :change="12.5"
-        icon="pi pi-dollar"
-        color="blue"
-        format="currency"
-        period="month"
-      />
-      <KpiCard
-        title="Total Bookings"
-        :value="kpiData.bookings"
-        :change="8.2"
-        icon="pi pi-calendar"
-        color="purple"
-        period="month"
-      />
-      <KpiCard
-        title="Active Hotels"
-        :value="kpiData.hotels"
-        :change="3.1"
-        icon="pi pi-building"
-        color="orange"
-        period="month"
-      />
-      <KpiCard
-        title="Total Users"
-        :value="kpiData.users"
-        :change="15.3"
-        icon="pi pi-users"
-        color="pink"
-        period="month"
+    <!-- Loading -->
+    <div
+      v-if="dashboardStore.isLoading"
+      class="flex items-center justify-center py-20"
+    >
+      <ProgressSpinner />
+    </div>
+
+    <!-- Error -->
+    <div v-else-if="dashboardStore.error" class="admin-card p-6 text-center">
+      <p class="text-[var(--admin-danger)] mb-4">{{ dashboardStore.error }}</p>
+      <Button
+        label="Retry"
+        icon="pi pi-refresh"
+        @click="dashboardStore.fetchDashboard()"
       />
     </div>
 
-    <!-- Charts Row -->
-    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
-      <div class="lg:col-span-2">
-        <RevenueChart />
+    <template v-else-if="data">
+      <!-- KPI Cards -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
+        <KpiCard
+          title="Total Revenue"
+          :value="data.totalRevenue"
+          :change="12.5"
+          icon="pi pi-dollar"
+          color="blue"
+          format="currency"
+          period="month"
+        />
+        <KpiCard
+          title="Total Bookings"
+          :value="data.totalReservations"
+          :change="8.2"
+          icon="pi pi-calendar"
+          color="purple"
+          period="month"
+        />
+        <KpiCard
+          title="Active Hotels"
+          :value="data.totalHotels"
+          :change="3.1"
+          icon="pi pi-building"
+          color="orange"
+          period="month"
+        />
+        <KpiCard
+          title="Total Users"
+          :value="data.totalUsers"
+          :change="15.3"
+          icon="pi pi-users"
+          color="pink"
+          period="month"
+        />
       </div>
-      <div>
-        <BookingChart />
-      </div>
-    </div>
 
-    <!-- Quick Stats Row -->
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
-      <!-- Top Hotels -->
-      <div class="admin-card">
-        <div class="admin-card-header">
-          <h3 class="admin-card-title">Top Hotels</h3>
+      <!-- Charts Row -->
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
+        <div class="lg:col-span-2">
+          <RevenueChart :chart-data="data.revenueChart" />
         </div>
-        <div class="admin-card-body">
-          <div class="space-y-4">
-            <div
-              v-for="hotel in topHotels"
-              :key="hotel.id"
-              class="flex items-center gap-3"
-            >
-              <img
-                :src="hotel.image"
-                :alt="hotel.name"
-                class="w-12 h-12 rounded-lg object-cover"
-              />
-              <div class="flex-1 min-w-0">
-                <p class="font-medium text-[var(--admin-text-color)] truncate">
-                  {{ hotel.name }}
-                </p>
-                <p class="text-sm text-[var(--admin-text-muted)]">
-                  {{ hotel.bookings }} bookings
-                </p>
-              </div>
-              <div class="text-right">
-                <p class="font-semibold text-[var(--admin-text-color)]">
-                  ${{ hotel.revenue.toLocaleString() }}
-                </p>
-              </div>
-            </div>
+        <div>
+          <BookingChart
+            :confirmed="data.confirmedReservations"
+            :pending="data.pendingReservations"
+            :cancelled="data.cancelledReservations"
+            :completed="data.completedReservations"
+          />
+        </div>
+      </div>
+
+      <!-- Quick Stats Row -->
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+        <!-- Top Hotels -->
+        <div class="admin-card">
+          <div class="admin-card-header">
+            <h3 class="admin-card-title">Top Hotels</h3>
           </div>
-        </div>
-      </div>
-
-      <!-- Recent Activities -->
-      <div class="admin-card">
-        <div class="admin-card-header">
-          <h3 class="admin-card-title">Recent Activities</h3>
-        </div>
-        <div class="admin-card-body">
-          <div class="space-y-4">
-            <div
-              v-for="activity in recentActivities"
-              :key="activity.id"
-              class="flex items-start gap-3"
-            >
+          <div class="admin-card-body">
+            <div class="space-y-4">
               <div
-                class="w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0"
-                :class="activity.iconBg"
+                v-for="hotel in data.topHotels"
+                :key="hotel.hotelId"
+                class="flex items-center gap-3"
               >
-                <i :class="[activity.icon, 'text-sm', activity.iconColor]"></i>
-              </div>
-              <div class="flex-1 min-w-0">
-                <p class="text-sm text-[var(--admin-text-color)]">
-                  {{ activity.message }}
-                </p>
-                <p class="text-xs text-[var(--admin-text-muted)] mt-1">
-                  {{ activity.time }}
-                </p>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Popular Cities -->
-      <div class="admin-card">
-        <div class="admin-card-header">
-          <h3 class="admin-card-title">Popular Cities</h3>
-        </div>
-        <div class="admin-card-body">
-          <div class="space-y-3">
-            <div
-              v-for="city in popularCities"
-              :key="city.name"
-              class="flex items-center gap-3"
-            >
-              <div class="flex-1">
-                <div class="flex items-center justify-between mb-1">
-                  <span
-                    class="text-sm font-medium text-[var(--admin-text-color)]"
-                  >
-                    {{ city.name }}
-                  </span>
-                  <span class="text-sm text-[var(--admin-text-muted)]">
-                    {{ city.percentage }}%
-                  </span>
-                </div>
-                <ProgressBar
-                  :value="city.percentage"
-                  :showValue="false"
-                  class="h-2"
+                <img
+                  v-if="hotel.imgUrl"
+                  :src="hotel.imgUrl"
+                  :alt="hotel.name"
+                  class="w-12 h-12 rounded-lg object-cover"
                 />
+                <div
+                  v-else
+                  class="w-12 h-12 rounded-lg bg-[var(--admin-surface-hover)] flex items-center justify-center"
+                >
+                  <i class="pi pi-building text-[var(--admin-text-muted)]"></i>
+                </div>
+                <div class="flex-1 min-w-0">
+                  <p
+                    class="font-medium text-[var(--admin-text-color)] truncate"
+                  >
+                    {{ hotel.name }}
+                  </p>
+                  <p class="text-sm text-[var(--admin-text-muted)]">
+                    {{ hotel.reservationCount }} bookings · ⭐
+                    {{ hotel.averageRating.toFixed(1) }}
+                  </p>
+                </div>
+                <div class="text-right">
+                  <p class="font-semibold text-[var(--admin-text-color)]">
+                    {{ formatCurrency(hotel.revenue) }}
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Recent Activities -->
+        <div class="admin-card">
+          <div class="admin-card-header">
+            <h3 class="admin-card-title">Recent Activities</h3>
+          </div>
+          <div class="admin-card-body">
+            <div v-if="data.recentActivities.length" class="space-y-4">
+              <div
+                v-for="(activity, index) in data.recentActivities"
+                :key="index"
+                class="flex items-start gap-3"
+              >
+                <template
+                  v-for="actStyle in [
+                    getActivityStyle(activity?.type ?? 'booking'),
+                  ]"
+                >
+                  <div
+                    class="w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0"
+                    :class="actStyle.bg"
+                  >
+                    <i :class="[actStyle.icon, 'text-sm', actStyle.color]"></i>
+                  </div>
+                </template>
+                <div class="flex-1 min-w-0">
+                  <p class="text-sm text-[var(--admin-text-color)]">
+                    {{ activity.message }}
+                  </p>
+                  <p class="text-xs text-[var(--admin-text-muted)] mt-1">
+                    {{ formatTimeAgo(activity.time) }}
+                  </p>
+                </div>
+              </div>
+            </div>
+            <p
+              v-else
+              class="text-sm text-[var(--admin-text-muted)] text-center py-4"
+            >
+              No recent activities
+            </p>
+          </div>
+        </div>
+
+        <!-- Popular Cities -->
+        <div class="admin-card">
+          <div class="admin-card-header">
+            <h3 class="admin-card-title">Popular Cities</h3>
+          </div>
+          <div class="admin-card-body">
+            <div class="space-y-3">
+              <div
+                v-for="city in data.popularCities"
+                :key="city.cityId"
+                class="flex items-center gap-3"
+              >
+                <div class="flex-1">
+                  <div class="flex items-center justify-between mb-1">
+                    <span
+                      class="text-sm font-medium text-[var(--admin-text-color)]"
+                    >
+                      {{ city.name }}
+                    </span>
+                    <span class="text-sm text-[var(--admin-text-muted)]">
+                      {{ city.hotelCount }} hotels
+                    </span>
+                  </div>
+                  <ProgressBar
+                    :value="city.percentage || city.hotelCount"
+                    :showValue="false"
+                    class="h-2"
+                  />
+                </div>
               </div>
             </div>
           </div>
         </div>
       </div>
-    </div>
 
-    <!-- Recent Bookings Table -->
-    <RecentBookings />
+      <!-- Recent Bookings Table -->
+      <RecentBookings :bookings="data.recentBookings" />
+    </template>
   </div>
 </template>
 
 <script setup lang="ts">
 import ProgressBar from "primevue/progressbar";
+import ProgressSpinner from "primevue/progressspinner";
+import Button from "primevue/button";
 import KpiCard from "~/components/admin/dashboard/KpiCard.vue";
 import RevenueChart from "~/components/admin/dashboard/RevenueChart.vue";
 import BookingChart from "~/components/admin/dashboard/BookingChart.vue";
 import RecentBookings from "~/components/admin/dashboard/RecentBookings.vue";
+import { useDashboardStore } from "~/stores/admin/dashboard";
 
-// Define page meta
 definePageMeta({
   layout: "admin",
   middleware: ["admin"],
 });
 
-// Mock KPI data - replace with real API data
-const kpiData = ref({
-  revenue: 125840,
-  bookings: 1195,
-  hotels: 248,
-  users: 15420,
+const dashboardStore = useDashboardStore();
+const data = computed(
+  () =>
+    dashboardStore.dashboardData as NonNullable<
+      typeof dashboardStore.dashboardData
+    >,
+);
+
+onMounted(() => {
+  dashboardStore.fetchDashboard();
 });
 
-// Top Hotels mock data
-const topHotels = ref([
-  {
-    id: 1,
-    name: "Grand Plaza Hotel",
-    image:
-      "https://images.unsplash.com/photo-1566073771259-6a8506099945?w=100&h=100&fit=crop",
-    bookings: 142,
-    revenue: 28500,
-  },
-  {
-    id: 2,
-    name: "Seaside Resort & Spa",
-    image:
-      "https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?w=100&h=100&fit=crop",
-    bookings: 128,
-    revenue: 24200,
-  },
-  {
-    id: 3,
-    name: "Mountain View Lodge",
-    image:
-      "https://images.unsplash.com/photo-1571896349842-33c89424de2d?w=100&h=100&fit=crop",
-    bookings: 98,
-    revenue: 18600,
-  },
-  {
-    id: 4,
-    name: "City Center Boutique",
-    image:
-      "https://images.unsplash.com/photo-1564501049412-61c2a3083791?w=100&h=100&fit=crop",
-    bookings: 87,
-    revenue: 15400,
-  },
-]);
+function formatCurrency(value: number): string {
+  if (value === 0) return "$0";
+  return new Intl.NumberFormat("en-US", {
+    style: "currency",
+    currency: "USD",
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 0,
+  }).format(value);
+}
 
-// Recent Activities mock data
-const recentActivities = ref([
-  {
-    id: 1,
-    message: "New booking at Grand Plaza Hotel",
-    time: "2 minutes ago",
-    icon: "pi pi-calendar-plus",
-    iconBg: "bg-blue-100 dark:bg-blue-900/30",
-    iconColor: "text-blue-600",
-  },
-  {
-    id: 2,
-    message: "Payment received - $450",
-    time: "15 minutes ago",
-    icon: "pi pi-credit-card",
-    iconBg: "bg-green-100 dark:bg-green-900/30",
-    iconColor: "text-green-600",
-  },
-  {
-    id: 3,
-    message: "New user registered",
-    time: "1 hour ago",
-    icon: "pi pi-user-plus",
-    iconBg: "bg-purple-100 dark:bg-purple-900/30",
-    iconColor: "text-purple-600",
-  },
-  {
-    id: 4,
-    message: "Booking cancelled - BK-2024-005",
-    time: "2 hours ago",
-    icon: "pi pi-times-circle",
-    iconBg: "bg-red-100 dark:bg-red-900/30",
-    iconColor: "text-red-600",
-  },
-  {
-    id: 5,
-    message: "New hotel added - Beach Resort",
-    time: "3 hours ago",
-    icon: "pi pi-building",
-    iconBg: "bg-orange-100 dark:bg-orange-900/30",
-    iconColor: "text-orange-600",
-  },
-]);
+function formatTimeAgo(dateString: string): string {
+  const date = new Date(dateString);
+  const now = new Date();
+  const diffMs = now.getTime() - date.getTime();
+  const diffMins = Math.floor(diffMs / 60000);
+  if (diffMins < 1) return "just now";
+  if (diffMins < 60) return `${diffMins} minutes ago`;
+  const diffHours = Math.floor(diffMins / 60);
+  if (diffHours < 24) return `${diffHours} hours ago`;
+  return `${Math.floor(diffHours / 24)} days ago`;
+}
 
-// Popular Cities mock data
-const popularCities = ref([
-  { name: "New York", percentage: 85 },
-  { name: "Miami", percentage: 72 },
-  { name: "Los Angeles", percentage: 65 },
-  { name: "Chicago", percentage: 58 },
-  { name: "Las Vegas", percentage: 45 },
-]);
+function getActivityStyle(type: string | undefined): {
+  bg: string;
+  icon: string;
+  color: string;
+} {
+  const styles: Record<string, { bg: string; icon: string; color: string }> = {
+    booking: {
+      bg: "bg-blue-100 dark:bg-blue-900/30",
+      icon: "pi pi-calendar-plus",
+      color: "text-blue-600",
+    },
+    payment: {
+      bg: "bg-green-100 dark:bg-green-900/30",
+      icon: "pi pi-credit-card",
+      color: "text-green-600",
+    },
+    user: {
+      bg: "bg-purple-100 dark:bg-purple-900/30",
+      icon: "pi pi-user-plus",
+      color: "text-purple-600",
+    },
+    cancellation: {
+      bg: "bg-red-100 dark:bg-red-900/30",
+      icon: "pi pi-times-circle",
+      color: "text-red-600",
+    },
+    hotel: {
+      bg: "bg-orange-100 dark:bg-orange-900/30",
+      icon: "pi pi-building",
+      color: "text-orange-600",
+    },
+  };
+  return styles[type ?? ""] ?? styles["booking"]!;
+}
 </script>
