@@ -11,12 +11,14 @@ import type {
   RequestResendOtpVerify,
 } from "./interface/request/auth";
 import type {
+  LoginData,
   LoginResponseData,
   RegisterResponseData,
   SendOtpResponseData,
 } from "./interface/response/auth";
 import type { UserInfoResponse } from "./interface/response/getUserInfo";
 import { ref } from "vue";
+import { ROLE_CLAIM } from "~/constants/auth";
 
 const namespace = "/Auth";
 
@@ -33,7 +35,19 @@ export const useAuthStore = defineStore("auth", () => {
   const userSendOtpCode = ref(false);
   const reSendOtpCode = ref(false);
 
-  /* ================= INIT FROM COOKIE ================= */
+  const isAdmin = computed(() => {
+    const role = jwtPayload.value?.[ROLE_CLAIM];
+    if (!role) return false;
+    return Array.isArray(role) ? role.includes("Admin") : role === "Admin";
+  });
+
+  const isManager = computed(() => {
+    const role = jwtPayload.value?.[ROLE_CLAIM];
+    if (!role) return false;
+    return Array.isArray(role) ? role.includes("Manager") : role === "Manager";
+  });
+
+  const isAdminOrManager = computed(() => isAdmin.value || isManager.value);
 
   function initAuthFromCookie() {
     const savedToken = getCookie("token");
@@ -57,8 +71,6 @@ export const useAuthStore = defineStore("auth", () => {
     }
   }
 
-  /* ================= FETCH USER INFO ================= */
-
   async function fetchUserInfo() {
     try {
       const res = await apiStore.apiRequest<{
@@ -77,9 +89,7 @@ export const useAuthStore = defineStore("auth", () => {
     }
   }
 
-  /* ================= LOGIN ================= */
-
-  function userLoginSuccess(data: LoginResponseData) {
+  function userLoginSuccess(data: LoginData) {
     token.value = data.token;
     jwtPayload.value = new authResponse.AuthToken(data.token).deserialize();
     isAuthenticated.value = true;
@@ -100,7 +110,7 @@ export const useAuthStore = defineStore("auth", () => {
       const response = await apiStore.apiRequest<{
         success: boolean;
         message: string;
-        data: LoginResponseData;
+        data: LoginData;
       }>({
         method: "POST",
         endpoint: `${namespace}/login`,
@@ -124,8 +134,6 @@ export const useAuthStore = defineStore("auth", () => {
     }
   }
 
-  /* ================= REGISTER ================= */
-
   async function userRegister(payload: RequestRegisterPayload) {
     try {
       userRegisterRequesting.value = true;
@@ -145,8 +153,6 @@ export const useAuthStore = defineStore("auth", () => {
       userRegisterRequesting.value = false;
     }
   }
-
-  /* ================= OTP ================= */
 
   async function sendOtpVerify({ email, otpCode }: RequestOtpVerify) {
     try {
@@ -180,8 +186,6 @@ export const useAuthStore = defineStore("auth", () => {
     }
   }
 
-  /* ================= LOGOUT ================= */
-
   function userLogout() {
     token.value = "";
     jwtPayload.value = null;
@@ -194,6 +198,9 @@ export const useAuthStore = defineStore("auth", () => {
     token,
     isAuthenticated,
     userInfo,
+    isAdmin,
+    isManager,
+    isAdminOrManager,
     userLoginRequesting,
     userRegisterRequesting,
     initAuthFromCookie,

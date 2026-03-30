@@ -116,7 +116,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from "vue"; // Thêm onMounted vào import
+import { ref, onMounted } from "vue";
 import Card from "primevue/card";
 import Button from "primevue/button";
 import CustomInputText from "~/components/shared/CustomInputText.vue";
@@ -139,7 +139,6 @@ definePageMeta({
 const router = useRouter();
 const authStore = useAuthStore();
 
-// Form data
 const form = ref({
   email: "",
   password: "",
@@ -147,11 +146,9 @@ const form = ref({
 const rememberMe = ref(false);
 const isLoading = ref(false);
 
-// Validation errors
 const emailError = ref("");
 const passwordError = ref("");
 
-// Form validation
 const validateForm = () => {
   emailError.value = "";
   passwordError.value = "";
@@ -179,7 +176,6 @@ const validateForm = () => {
   return true;
 };
 
-// Handle login
 const handleLogin = async () => {
   if (!validateForm()) return;
 
@@ -200,8 +196,13 @@ const handleLogin = async () => {
         life: 3000,
       });
 
+      // Sau (login.vue)
       if (authStore.isAuthenticated) {
-        router.push({ path: "/" });
+        if (authStore.isAdmin) {
+          router.push({ path: "/admin" });
+        } else {
+          router.push({ path: "/" });
+        }
       }
     }
   } catch (error: any) {
@@ -242,14 +243,12 @@ const clearPassword = () => {
   passwordError.value = "";
 };
 
-// Khởi tạo toast
 onMounted(() => {
   toast = useToast();
 });
 </script>
 
 <style scoped>
-/* Custom styles for PrimeVue components */
 :deep(.p-card) {
   border-radius: 12px;
   border: none;

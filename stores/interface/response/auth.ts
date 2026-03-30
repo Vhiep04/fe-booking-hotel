@@ -1,4 +1,4 @@
-interface loginData {
+export interface LoginData {
   token: string;
   firstName: string;
   lastName: string;
@@ -15,7 +15,7 @@ interface registerData {
 export interface LoginResponseData {
   success: boolean;
   message: string;
-  data: loginData;
+  data: LoginData;
 }
 export interface RegisterResponseData {
   success: boolean;

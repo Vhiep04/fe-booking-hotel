@@ -1,0 +1,415 @@
+/* Admin Layout CSS - Ultima-inspired */
+
+/* Base Layout */
+.layout-admin-wrapper {
+  min-height: 100vh;
+  background-color: var(--admin-bg);
+  color: var(--admin-text-color);
+  transition: var(--admin-transition);
+}
+
+/* Sidebar */
+.layout-sidebar {
+  position: fixed;
+  left: 0;
+  top: 0;
+  height: 100vh;
+  width: var(--admin-sidebar-width);
+  background-color: var(--admin-sidebar-bg);
+  border-right: 1px solid var(--admin-sidebar-border);
+  z-index: 999;
+  transition: transform 0.3s ease-in-out, width 0.3s ease-in-out;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.layout-sidebar-logo {
+  height: var(--admin-topbar-height);
+  display: flex;
+  align-items: center;
+  padding: 0 1.5rem;
+  border-bottom: 1px solid var(--admin-sidebar-border);
+}
+
+.layout-sidebar-logo a {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  text-decoration: none;
+  color: var(--admin-sidebar-text);
+  font-weight: 700;
+  font-size: 1.25rem;
+}
+
+.layout-sidebar-logo img {
+  height: 36px;
+  width: auto;
+}
+
+.layout-menu-container {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: 1rem 0;
+}
+
+/* Scrollbar for sidebar */
+.layout-menu-container::-webkit-scrollbar {
+  width: 4px;
+}
+
+.layout-menu-container::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.layout-menu-container::-webkit-scrollbar-thumb {
+  background-color: var(--admin-sidebar-text-muted);
+  border-radius: 4px;
+}
+
+/* Main Content Area */
+.layout-main-container {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  margin-left: var(--admin-sidebar-width);
+  transition: margin-left 0.3s ease-in-out;
+}
+
+/* Topbar */
+.layout-topbar {
+  height: var(--admin-topbar-height);
+  background-color: var(--admin-topbar-bg);
+  border-bottom: 1px solid var(--admin-topbar-border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 1.5rem;
+  position: sticky;
+  top: 0;
+  z-index: 997;
+  transition: var(--admin-transition);
+}
+
+.layout-topbar-left {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.layout-topbar-right {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.layout-topbar-button {
+  width: 40px;
+  height: 40px;
+  border-radius: var(--admin-radius);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--admin-text-secondary);
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  transition: var(--admin-transition);
+}
+
+.layout-topbar-button:hover {
+  background-color: var(--admin-surface-hover);
+  color: var(--admin-text-color);
+}
+
+/* Main Content */
+.layout-main {
+  flex: 1;
+  padding: 1.5rem;
+}
+
+/* Footer */
+.layout-footer {
+  padding: 1rem 1.5rem;
+  border-top: 1px solid var(--admin-surface-border);
+  background-color: var(--admin-surface);
+  text-align: center;
+  color: var(--admin-text-secondary);
+  font-size: 0.875rem;
+}
+
+/* Static Menu Inactive (Desktop) */
+.layout-static-inactive .layout-sidebar {
+  transform: translateX(-100%);
+}
+
+.layout-static-inactive .layout-main-container {
+  margin-left: 0;
+}
+
+/* Mobile Menu */
+.layout-mobile-active .layout-sidebar {
+  transform: translateX(0);
+}
+
+/* Overlay for mobile menu */
+.layout-mask {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: 998;
+  animation: fadein 0.2s;
+}
+
+.layout-mobile-active .layout-mask {
+  display: block;
+}
+
+@keyframes fadein {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* Responsive */
+@media screen and (max-width: 991px) {
+  .layout-sidebar {
+    transform: translateX(-100%);
+  }
+
+  .layout-main-container {
+    margin-left: 0;
+  }
+
+  .layout-mobile-active .layout-sidebar {
+    transform: translateX(0);
+  }
+}
+
+/* Menu Styles */
+.layout-menu {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.layout-menu-item {
+  margin-bottom: 0.25rem;
+}
+
+.layout-menu-item > a,
+.layout-menuitem-link {
+  display: flex;
+  align-items: center;
+  padding: 0.75rem 1.5rem;
+  color: var(--admin-sidebar-text);
+  text-decoration: none;
+  transition: var(--admin-transition);
+  cursor: pointer;
+  gap: 0.75rem;
+  font-size: 0.9375rem;
+  border-left: 3px solid transparent;
+}
+
+.layout-menu-item > a:hover,
+.layout-menuitem-link:hover {
+  background-color: var(--admin-sidebar-hover-bg);
+}
+
+.layout-menu-item.active-menuitem > a,
+.layout-menuitem-link.router-link-active {
+  background-color: var(--admin-sidebar-active-bg);
+  border-left-color: var(--admin-primary);
+  color: var(--admin-primary);
+}
+
+.layout-menuitem-icon {
+  font-size: 1.125rem;
+  width: 1.5rem;
+  text-align: center;
+}
+
+.layout-menuitem-text {
+  flex: 1;
+}
+
+.layout-submenu-toggler {
+  transition: transform 0.2s;
+}
+
+.layout-menu-item.active-menuitem > a .layout-submenu-toggler {
+  transform: rotate(-180deg);
+}
+
+/* Submenu */
+.layout-submenu {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  overflow: hidden;
+  max-height: 0;
+  transition: max-height 0.3s ease-in-out;
+}
+
+.layout-menu-item.active-menuitem > .layout-submenu {
+  max-height: 1000px;
+}
+
+.layout-submenu .layout-menuitem-link {
+  padding-left: 3.5rem;
+  font-size: 0.875rem;
+}
+
+/* Breadcrumb */
+.layout-breadcrumb {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: var(--admin-text-secondary);
+  font-size: 0.875rem;
+}
+
+.layout-breadcrumb a {
+  color: var(--admin-text-secondary);
+  text-decoration: none;
+  transition: var(--admin-transition);
+}
+
+.layout-breadcrumb a:hover {
+  color: var(--admin-primary);
+}
+
+.layout-breadcrumb-separator {
+  color: var(--admin-text-muted);
+}
+
+.layout-breadcrumb-current {
+  color: var(--admin-text-color);
+  font-weight: 500;
+}
+
+/* Profile Menu */
+.layout-profile-menu {
+  position: relative;
+}
+
+.layout-profile-button {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.5rem;
+  border-radius: var(--admin-radius);
+  cursor: pointer;
+  transition: var(--admin-transition);
+  border: none;
+  background: transparent;
+}
+
+.layout-profile-button:hover {
+  background-color: var(--admin-surface-hover);
+}
+
+.layout-profile-avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.layout-profile-info {
+  text-align: left;
+}
+
+.layout-profile-name {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--admin-text-color);
+}
+
+.layout-profile-role {
+  font-size: 0.75rem;
+  color: var(--admin-text-secondary);
+}
+
+/* Cards */
+.admin-card {
+  background-color: var(--admin-card-bg);
+  border: 1px solid var(--admin-card-border);
+  border-radius: var(--admin-radius-lg);
+  box-shadow: var(--admin-card-shadow);
+  transition: var(--admin-transition);
+}
+
+.admin-card-header {
+  padding: 1.25rem 1.5rem;
+  border-bottom: 1px solid var(--admin-card-border);
+}
+
+.admin-card-title {
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: var(--admin-text-color);
+  margin: 0;
+}
+
+.admin-card-body {
+  padding: 1.5rem;
+}
+
+/* Page Header */
+.admin-page-header {
+  margin-bottom: 1.5rem;
+}
+
+.admin-page-title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--admin-text-color);
+  margin: 0 0 0.25rem 0;
+}
+
+.admin-page-subtitle {
+  color: var(--admin-text-secondary);
+  margin: 0;
+}
+
+/* Utilities */
+.admin-text-primary {
+  color: var(--admin-primary) !important;
+}
+
+.admin-text-success {
+  color: var(--admin-success) !important;
+}
+
+.admin-text-warning {
+  color: var(--admin-warning) !important;
+}
+
+.admin-text-danger {
+  color: var(--admin-danger) !important;
+}
+
+.admin-bg-primary-light {
+  background-color: var(--admin-primary-light) !important;
+}
+
+.admin-bg-success-light {
+  background-color: var(--admin-success-light) !important;
+}
+
+.admin-bg-warning-light {
+  background-color: var(--admin-warning-light) !important;
+}
+
+.admin-bg-danger-light {
+  background-color: var(--admin-danger-light) !important;
+}
