@@ -45,7 +45,7 @@
 
     <!-- Loading -->
     <div
-      v-if="roomStore.isLoading"
+      v-if="roomStore.isLoading || paymentStore.isLoading"
       class="flex justify-center items-center py-32"
     >
       <i class="pi pi-spin pi-spinner text-4xl text-blue-600"></i>
@@ -85,14 +85,19 @@
 <script setup lang="ts">
 import { ref, computed, onMounted, onBeforeUnmount } from "vue";
 import { useRoute } from "vue-router";
+import { useToast } from "primevue/usetoast";
 import CheckoutLeftPanel from "~/components/Booking/CheckoutLeftPanel.vue";
 import CheckoutCenterPanel from "~/components/Booking/CheckoutCenterPanel.vue";
 import { useGetRoomStore } from "~/stores/getRoom";
 import { usePaymentStore } from "~/stores/payments";
+import { useAuthStore } from "~/stores/auth";
 
 const route = useRoute();
 const roomStore = useGetRoomStore();
 const paymentStore = usePaymentStore();
+const authStore = useAuthStore();
+const toast = useToast();
+
 const currentStep = ref(2);
 
 const steps = [
@@ -128,6 +133,9 @@ const booking = computed(() => {
   return {
     checkIn: { date: "Sat, Mar 7, 2026", time: "2:00 PM – 12:00 AM" },
     checkOut: { date: "Sun, Mar 8, 2026", time: "12:00 AM – 12:00 PM" },
+    // Raw ISO dates dùng cho API
+    checkInDate: "2026-03-07",
+    checkOutDate: "2026-03-08",
     daysAway: 5,
     nights: 1,
     rooms: roomCount.value,
@@ -178,8 +186,73 @@ const guestDetails = ref({
 const specialRequest = ref("");
 const arrivalTime = ref("");
 
-// ---- Payment handler ----
+// ── Xử lý redirect từ VNPAY ────────────────────────────────────────────────
+async function handleVnpayReturn() {
+  const {
+    vnp_ResponseCode,
+    vnp_TxnRef,
+    vnp_TransactionNo,
+    vnp_OrderInfo,
+    vnp_Amount,
+  } = route.query as Record<string, string>;
+
+  if (!vnp_ResponseCode) return;
+
+  if (vnp_ResponseCode === "00") {
+    const result = await paymentStore.sendReceipt({
+      email: guestDetails.value.email,
+      name: `${guestDetails.value.firstName} ${guestDetails.value.lastName}`,
+      userId: authStore.userInfo?.userId ?? "",
+      roomId: roomId.value,
+      checkInDate: booking.value.checkInDate,
+      checkOutDate: booking.value.checkOutDate,
+      transactionId: vnp_TransactionNo ?? "",
+      orderId: vnp_TxnRef ?? "",
+      amount: Number(vnp_Amount ?? 0) / 100,
+      paymentMethod: "VNPAY",
+      orderDescription:
+        vnp_OrderInfo ?? roomStore.room?.roomType ?? "Room booking",
+    });
+
+    if (result?.success) {
+      currentStep.value = 3;
+      toast.add({
+        severity: "success",
+        summary: "Đặt phòng thành công!",
+        detail: result.message,
+        life: 5000,
+      });
+    } else {
+      toast.add({
+        severity: "warn",
+        summary: "Thanh toán thành công",
+        detail: "Nhưng không thể gửi email xác nhận. Vui lòng liên hệ hỗ trợ.",
+        life: 6000,
+      });
+    }
+  } else {
+    toast.add({
+      severity: "error",
+      summary: "Thanh toán thất bại",
+      detail: `Mã lỗi VNPAY: ${vnp_ResponseCode}`,
+      life: 5000,
+    });
+  }
+}
+
 async function handleSubmit() {
+  sessionStorage.setItem(
+    "pendingBookingGuest",
+    JSON.stringify({
+      email: guestDetails.value.email,
+      name: `${guestDetails.value.firstName} ${guestDetails.value.lastName}`,
+      userId: authStore.userInfo?.userId ?? "",
+      roomId: roomId.value,
+      checkInDate: booking.value.checkInDate,
+      checkOutDate: booking.value.checkOutDate,
+    }),
+  );
+
   await paymentStore.createPayment({
     orderType: "other",
     amount: roomStore.room?.pricePerNight ?? 0,
@@ -192,6 +265,7 @@ onMounted(async () => {
   if (hotelId.value && roomId.value) {
     await roomStore.fetchRoom(hotelId.value, roomId.value);
   }
+  await handleVnpayReturn();
 });
 
 onBeforeUnmount(() => {

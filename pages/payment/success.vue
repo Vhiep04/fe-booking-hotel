@@ -6,7 +6,7 @@
       <Card class="shadow-lg">
         <template #header>
           <div
-            class="flex flex-col items-center pt-6 sm:pt-8 pb-3 sm:pb-4 bg-gradient-to-b from-green-50 to-transparent dark:from-green-950/20 px-4"
+            class="flex flex-col items-center pt-6 sm:pt-8 pb-3 sm:pb-4 bg-linear-to-b from-green-50 to-transparent dark:from-green-950/20 px-4"
           >
             <div
               class="w-16 h-16 sm:w-20 sm:h-20 rounded-full bg-green-100 dark:bg-green-900/30 flex items-center justify-center mb-3 sm:mb-4 ring-4 ring-green-200 dark:ring-green-800/50"
@@ -206,7 +206,6 @@ definePageMeta({
   layout: false,
 });
 
-const route = useRoute();
 const router = useRouter();
 
 const showToken = ref(false);
@@ -215,61 +214,60 @@ const isExporting = ref(false);
 const receiptRef = ref<HTMLElement | null>(null);
 
 const paymentData = computed(() => {
-  const q = route.query;
-
-  if (q.vnp_Amount) {
-    return {
-      orderDescription: (q.vnp_OrderInfo as string) || "",
-      transactionId:
-        (q.vnp_TransactionNo as string) || (q.vnp_TxnRef as string) || "",
-      orderId: (q.vnp_TxnRef as string) || "",
-      paymentMethod: (q.vnp_CardType as string) || "VnPay",
-      paymentId: (q.vnp_TransactionNo as string) || "",
-      success: q.vnp_ResponseCode === "00",
-      token: (q.vnp_SecureHash as string) || "",
-      amount: q.vnp_Amount ? Number(q.vnp_Amount) / 100 : 0,
-      vnPayResponseCode: (q.vnp_ResponseCode as string) || "00",
-    };
-  }
-
-  // Case 2: Backend returns PaymentResponseModel saved in sessionStorage
   if (import.meta.client) {
     const stored = sessionStorage.getItem("paymentResponse");
     if (stored) {
       const parsed = JSON.parse(stored);
       return {
-        ...parsed,
-        amount:
-          parsed.amount ??
-          extractAmountFromDescription(parsed.orderDescription),
+        orderDescription: parsed.orderDescription ?? "",
+        transactionId: parsed.transactionId ?? "",
+        orderId: parsed.orderId ?? "",
+        paymentMethod: parsed.paymentMethod ?? "VnPay",
+        paymentId: parsed.transactionId ?? "",
+        token: parsed.token ?? "",
+        amount: parsed.amount ?? 0,
+        success: parsed.success ?? true,
+        emailSent: parsed.emailSent ?? false,
+        message: parsed.message ?? "",
       };
     }
   }
 
-  // Fallback demo data
+  // Fallback demo
   return {
-    orderDescription: "Hiep Ngo Two Single Beds 1000000",
+    orderDescription: "Demo Room Booking",
     transactionId: "15476426",
     orderId: "63910569713879585",
     paymentMethod: "VnPay",
     paymentId: "15476426",
-    success: true,
     token:
       "30ea3e5fcb83fb90b54aedf6f42bf6d94b38711c4720ec181e07fe025744f4f65904ff5b01f003c0c36576a3659e7eac44907fb05af3ddf2f74be075b0d3a725",
     amount: 1000000,
-    vnPayResponseCode: "00",
+    success: true,
+    emailSent: false,
+    message: "",
   };
 });
-
-function extractAmountFromDescription(desc: string): number {
-  if (!desc) return 0;
-  const match = desc.match(/(\d+)\s*$/);
-  return match ? Number(match[1]) : 0;
-}
 
 const formattedAmount = computed(() =>
   new Intl.NumberFormat("vi-VN").format(paymentData.value.amount),
 );
+
+onMounted(() => {
+  sessionStorage.removeItem("paymentResponse");
+
+  history.replaceState(null, "", "/payment/success");
+
+  window.addEventListener("popstate", handlePopState);
+});
+
+onUnmounted(() => {
+  window.removeEventListener("popstate", handlePopState);
+});
+
+function handlePopState() {
+  router.replace("/");
+}
 
 async function copyToken() {
   try {

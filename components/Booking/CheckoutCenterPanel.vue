@@ -228,7 +228,7 @@
         icon="pi pi-credit-card"
         :loading="isPaying"
         :disabled="isPaying"
-        @click="emit('submit')"
+        @click="validateAndSubmit"
       />
     </div>
     <div class="text-center pb-4">
@@ -280,14 +280,49 @@
       </template>
     </Dialog>
   </div>
+  <Toast position="top-right" />
 </template>
 
 <script setup lang="ts">
-import { Button, InputText, Select, Dialog, Textarea } from "primevue";
+import { Button, InputText, Select, Dialog, Textarea, Toast } from "primevue";
 import { ref, computed, onMounted } from "vue";
 import { useAuthStore } from "#imports";
 import { COUNTRIES } from "@/data/countries";
+import { useToast } from "primevue/usetoast";
 
+const toast = useToast();
+
+function validateAndSubmit() {
+  const errors: string[] = [];
+
+  if (!props.guestDetails.firstName.trim()) errors.push("First name");
+  if (!props.guestDetails.lastName.trim()) errors.push("Last name");
+  if (!props.guestDetails.email.trim()) {
+    errors.push("Email address");
+  } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(props.guestDetails.email)) {
+    toast.add({
+      severity: "warn",
+      summary: "Email không hợp lệ",
+      detail: "Vui lòng nhập đúng định dạng email.",
+      life: 4000,
+    });
+    return;
+  }
+  if (!props.guestDetails.country.trim()) errors.push("Country/Region");
+  if (!props.guestDetails.phone.trim()) errors.push("Phone number");
+
+  if (errors.length > 0) {
+    toast.add({
+      severity: "error",
+      summary: "Vui lòng điền đầy đủ thông tin",
+      detail: `Các trường bắt buộc còn thiếu: ${errors.join(", ")}`,
+      life: 5000,
+    });
+    return;
+  }
+
+  emit("submit");
+}
 const props = defineProps<{
   guestDetails: {
     firstName: string;
