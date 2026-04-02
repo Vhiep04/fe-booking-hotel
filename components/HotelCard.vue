@@ -1,19 +1,21 @@
 <template>
   <Card
-    style="width: 18rem; overflow: hidden"
-    class="relative group hover:cursor-pointer hover:bg-gray-100"
+    style="width: 18rem"
+    class="relative group hover:cursor-pointer overflow-hidden transition-all duration-300 hover:shadow-[0_20px_40px_rgba(0,0,0,0.2)] hover:-translate-y-2 border border-transparent hover:border-gray-200"
     @click="goToHotel"
   >
     <template #header>
-      <img
-        :src="props.imgUrl"
-        alt="Hotel Image"
-        class="w-full h-50 object-cover rounded"
-      />
+      <div class="overflow-hidden">
+        <img
+          :src="props.imgUrl"
+          alt="Hotel Image"
+          class="w-full h-50 object-cover rounded transition-transform duration-300 group-hover:scale-110"
+        />
+      </div>
       <img
         src="../assets/icons/Heart.svg"
         alt="heart"
-        class="absolute top-3 left-3 opacity-0 transition-opacity duration-300 group-hover:opacity-100 hover:text-white"
+        class="absolute top-3 left-3 opacity-0 transition-opacity duration-300 group-hover:opacity-100"
       />
     </template>
     <template #title class="font-bold">{{ props.cityName }}</template>
