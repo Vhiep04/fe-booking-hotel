@@ -23,7 +23,7 @@ export const useCitiesStore = defineStore("cities", () => {
 
     const response = await apiStore.apiRequest<ApiResponse<PaginatedCities>>({
       method: "GET",
-      endpoint: "/api/admin/cities",
+      endpoint: "/admin/cities",
       params: queryParams,
       auth: true,
     });
@@ -36,7 +36,7 @@ export const useCitiesStore = defineStore("cities", () => {
   ): Promise<ApiResponse<CityDto>> {
     const response = await apiStore.apiRequest<ApiResponse<CityDto>>({
       method: "POST",
-      endpoint: "/api/admin/cities",
+      endpoint: "/admin/cities",
       data: payload,
       auth: true,
     });
@@ -47,7 +47,7 @@ export const useCitiesStore = defineStore("cities", () => {
   async function getCityById(id: number): Promise<ApiResponse<CityDto>> {
     const response = await apiStore.apiRequest<ApiResponse<CityDto>>({
       method: "GET",
-      endpoint: `/api/admin/cities/${id}`,
+      endpoint: `/admin/cities/${id}`,
       auth: true,
     });
 
@@ -60,7 +60,7 @@ export const useCitiesStore = defineStore("cities", () => {
   ): Promise<ApiResponse<CityDto>> {
     const response = await apiStore.apiRequest<ApiResponse<CityDto>>({
       method: "PUT",
-      endpoint: `/api/admin/cities/${id}`,
+      endpoint: `/admin/cities/${id}`,
       data: payload,
       auth: true,
     });
@@ -71,7 +71,7 @@ export const useCitiesStore = defineStore("cities", () => {
   async function deleteCity(id: number): Promise<ApiResponse<boolean>> {
     const response = await apiStore.apiRequest<ApiResponse<boolean>>({
       method: "DELETE",
-      endpoint: `/api/admin/cities/${id}`,
+      endpoint: `/admin/cities/${id}`,
       auth: true,
     });
 

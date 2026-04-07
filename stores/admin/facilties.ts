@@ -1,78 +1,58 @@
 import { defineStore } from "pinia";
-import { useApiStore } from "@/stores/api";
+import { useApiStore } from "#imports";
 import type {
-  AdminFacilityResponse,
-  AdminFacilityRequest,
-  AdminPagedResult,
-  AdminApiResponse,
-} from "@/types/admin";
+  CreateFacilityPayload,
+  FacilityDto,
+  UpdateFacilityPayload,
+} from "./interfaces/facility";
+import type { ApiResponse } from "./interfaces/cities";
 
-export const useFacilityStore = defineStore("facility", () => {
+export const useFacilitiesStore = defineStore("facilities", () => {
   const apiStore = useApiStore();
 
-  const getFacilities = (params?: {
-    page?: number;
-    pageSize?: number;
-    search?: string;
-  }) => {
-    const query = new URLSearchParams();
-    if (params?.page) query.append("page", params.page.toString());
-    if (params?.pageSize) query.append("pageSize", params.pageSize.toString());
-    if (params?.search) query.append("search", params.search);
-
-    return apiStore.apiRequest<
-      AdminApiResponse<AdminPagedResult<AdminFacilityResponse>>
-    >({
-      endpoint: `/api/admin/facilities?${query.toString()}`,
+  async function getAllFacilities() {
+    return apiStore.apiRequest<ApiResponse<FacilityDto[]>>({
       method: "GET",
+      endpoint: "/admin/facilities/all",
       auth: true,
     });
-  };
+  }
 
-  const getAllFacilities = () => {
-    return apiStore.apiRequest<AdminApiResponse<AdminFacilityResponse[]>>({
-      endpoint: "/api/admin/facilities/all",
+  async function getFacilityById(id: number) {
+    return apiStore.apiRequest<ApiResponse<FacilityDto>>({
       method: "GET",
+      endpoint: `/admin/facilities/${id}`,
       auth: true,
     });
-  };
+  }
 
-  const getFacilityById = (id: number) => {
-    return apiStore.apiRequest<AdminApiResponse<AdminFacilityResponse>>({
-      endpoint: `/api/admin/facilities/${id}`,
-      method: "GET",
-      auth: true,
-    });
-  };
-
-  const createFacility = (data: AdminFacilityRequest) => {
-    return apiStore.apiRequest<AdminApiResponse<AdminFacilityResponse>>({
-      endpoint: "/api/admin/facilities",
+  async function createFacility(payload: CreateFacilityPayload) {
+    return apiStore.apiRequest<ApiResponse<FacilityDto>>({
       method: "POST",
-      data: data,
+      endpoint: "/admin/facilities",
+      data: payload,
       auth: true,
     });
-  };
+  }
 
-  const updateFacility = (id: number, data: AdminFacilityRequest) => {
-    return apiStore.apiRequest<AdminApiResponse<AdminFacilityResponse>>({
-      endpoint: `/api/admin/facilities/${id}`,
+  async function updateFacility(id: number, payload: UpdateFacilityPayload) {
+    return apiStore.apiRequest<ApiResponse<FacilityDto>>({
       method: "PUT",
-      data: data,
+      endpoint: `/admin/facilities/${id}`,
+      data: payload,
       auth: true,
     });
-  };
+  }
 
-  const deleteFacility = (id: number) => {
-    return apiStore.apiRequest<AdminApiResponse<void>>({
-      endpoint: `/api/admin/facilities/${id}`,
+  async function deleteFacility(id: number) {
+    return apiStore.apiRequest<ApiResponse<boolean>>({
       method: "DELETE",
+      endpoint: `/admin/facilities/${id}`,
       auth: true,
     });
-  };
+  }
 
   return {
-    getFacilities,
     getAllFacilities,
     getFacilityById,
     createFacility,
@@ -80,3 +60,5 @@ export const useFacilityStore = defineStore("facility", () => {
     deleteFacility,
   };
 });
+
+export default null;

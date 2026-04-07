@@ -23,7 +23,7 @@ export const useUsersStore = defineStore("users", () => {
 
     const response = await apiStore.apiRequest<ApiResponse<PaginatedUsers>>({
       method: "GET",
-      endpoint: "/api/admin/users",
+      endpoint: "/admin/users",
       params: queryParams,
       auth: true,
     });
@@ -36,7 +36,7 @@ export const useUsersStore = defineStore("users", () => {
   ): Promise<ApiResponse<UserDto>> {
     const response = await apiStore.apiRequest<ApiResponse<UserDto>>({
       method: "POST",
-      endpoint: "/api/admin/users",
+      endpoint: "/admin/users",
       data: payload,
       auth: true,
     });
@@ -47,7 +47,7 @@ export const useUsersStore = defineStore("users", () => {
   async function getUserById(id: string): Promise<ApiResponse<UserDto>> {
     const response = await apiStore.apiRequest<ApiResponse<UserDto>>({
       method: "GET",
-      endpoint: `/api/admin/users/${id}`,
+      endpoint: `/admin/users/${id}`,
       auth: true,
     });
 
@@ -60,7 +60,7 @@ export const useUsersStore = defineStore("users", () => {
   ): Promise<ApiResponse<UserDto>> {
     const response = await apiStore.apiRequest<ApiResponse<UserDto>>({
       method: "PUT",
-      endpoint: `/api/admin/users/${id}`,
+      endpoint: `/admin/users/${id}`,
       data: payload,
       auth: true,
     });
@@ -71,7 +71,7 @@ export const useUsersStore = defineStore("users", () => {
   async function deleteUser(id: string): Promise<ApiResponse<boolean>> {
     const response = await apiStore.apiRequest<ApiResponse<boolean>>({
       method: "DELETE",
-      endpoint: `/api/admin/users/${id}`,
+      endpoint: `/admin/users/${id}`,
       auth: true,
     });
 
