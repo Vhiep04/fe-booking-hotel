@@ -11,3 +11,13 @@ export interface CityListRequest {
   bedType?: string;
   facilities?: number[];
 }
+
+export interface RoomType {
+  typeName: string;
+}
+export interface RoomTypesResponse {
+  success: boolean;
+  message: string;
+  data: RoomType[];
+  totalCount: number;
+}

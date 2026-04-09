@@ -116,10 +116,9 @@ const emit = defineEmits<{
   getCity: [params: any];
 }>();
 
-// Store
 const searchStore = useSearchStore();
+const cityStore = useCityStore();
 
-// Two-way computed cho Calendar
 const localDates = computed({
   get: () => searchStore.dateRange,
   set: (val) => searchStore.setDateRange(val),
@@ -132,13 +131,12 @@ const errors = reactive({
   dates: "",
 });
 
-const rooms = computed(() => [
-  { name: t("King Bed"), code: "kb" },
-  { name: t("Two Single Beds"), code: "tsb" },
-  { name: t("Single Beds"), code: "sb" },
-  { name: t("Double Beds"), code: "db" },
-  { name: t("Family Suite"), code: "fs" },
-]);
+const rooms = computed(() =>
+  cityStore.roomTypes.map((rt) => ({
+    name: t(rt.typeName),
+    code: rt.typeName,
+  })),
+);
 
 const validateForm = (): boolean => {
   let isValid = true;
@@ -169,7 +167,6 @@ const validateForm = (): boolean => {
 const handleSearch = () => {
   if (!validateForm()) return;
 
-  // Save bed type to store
   if (localRoomType.value?.code) {
     searchStore.setBedType(localRoomType.value.code);
   }
@@ -190,6 +187,10 @@ const clearSearch = () => {
   searchStore.setCityName("");
   errors.search = "";
 };
+
+onMounted(() => {
+  cityStore.fetchRoomTypes();
+});
 </script>
 
 <style scoped>
