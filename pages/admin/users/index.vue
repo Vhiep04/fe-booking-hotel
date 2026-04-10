@@ -1,6 +1,5 @@
 <template>
   <div>
-    <!-- Page Header -->
     <div
       class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6"
     >
@@ -20,13 +19,10 @@
       </div>
     </div>
 
-    <!-- Stats Cards -->
     <UserStatsCard :stats="stats" />
 
-    <!-- Filters -->
     <UserFilter v-model="filters" />
 
-    <!-- Table -->
     <UserTable
       :users="users"
       :totalCount="pagination.totalCount"
@@ -39,7 +35,6 @@
       @page="onPageChange"
     />
 
-    <!-- Create / Edit Dialog -->
     <UserFormDialog
       v-model="userDialog"
       :isEditing="isEditing"
@@ -50,7 +45,6 @@
       @save-update="handleUpdate"
     />
 
-    <!-- Delete Dialog -->
     <DeleteConfirmDialog
       v-model="deleteDialog"
       :user="userToDelete"
@@ -79,6 +73,10 @@ import { useDebounceFn } from "@vueuse/core";
 definePageMeta({
   layout: "admin",
   middleware: ["admin"],
+});
+
+useHead({
+  title: "User Management",
 });
 
 const toast = useToast();

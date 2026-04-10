@@ -1,7 +1,6 @@
 <template>
   <div class="layout-topbar">
     <div class="layout-topbar-left">
-      <!-- Menu Toggle Button -->
       <button
         type="button"
         class="layout-topbar-button"
@@ -11,7 +10,6 @@
         <i class="pi pi-bars"></i>
       </button>
 
-      <!-- Breadcrumb -->
       <nav class="layout-breadcrumb hidden md:flex">
         <NuxtLink to="/admin" class="flex items-center">
           <i class="pi pi-home"></i>
@@ -67,34 +65,12 @@
         </span>
       </button>
 
-      <!-- User Profile Menu -->
-      <div class="layout-profile-menu relative">
-        <button
-          type="button"
-          class="layout-profile-button"
-          @click="toggleProfileMenu"
-          aria-label="User Menu"
-        >
-          <img
-            :src="adminAvatar"
-            :alt="adminName"
-            class="layout-profile-avatar"
-          />
-          <div class="layout-profile-info hidden lg:block">
-            <div class="layout-profile-name">{{ adminName }}</div>
-            <div class="layout-profile-role">{{ adminRoleLabel }}</div>
-          </div>
-          <i class="pi pi-chevron-down text-sm hidden lg:block"></i>
-        </button>
-
-        <!-- Profile Dropdown -->
-        <Menu
-          ref="profileMenu"
-          :model="profileMenuItems"
-          :popup="true"
-          class="w-48"
-        />
-      </div>
+      <UserProfile
+        :full-name="userData.fullName"
+        :email="userData.email"
+        :avatar-url="userData.avatarUrl"
+        @sign-out="handleSignOut"
+      />
     </div>
 
     <!-- Search Dialog -->
@@ -120,7 +96,6 @@
       </div>
     </Dialog>
 
-    <!-- Notifications Panel -->
     <OverlayPanel ref="notificationsPanel" class="w-80">
       <div class="p-2">
         <div class="flex items-center justify-between mb-3">
@@ -173,36 +148,26 @@ import InputIcon from "primevue/inputicon";
 import Button from "primevue/button";
 import { useAdminLayoutStore } from "~/stores/admin/layout";
 import { useAdminAuthStore } from "~/stores/admin/auth";
+import type { UserInfoResponse } from "~/stores/interface/response/getUserInfo";
+import UserProfile from "../UserProfile.vue";
 
 const layoutStore = useAdminLayoutStore();
 const authStore = useAdminAuthStore();
+const userStore = useAuthStore();
 const route = useRoute();
+const router = useRouter();
 
-// Refs
 const profileMenu = ref();
 const notificationsPanel = ref();
 const searchVisible = ref(false);
 const searchQuery = ref("");
 
-// Computed
 const isDarkMode = computed(() => layoutStore.isDarkMode);
-const adminName = computed(() => authStore.adminName);
-const adminAvatar = computed(() => authStore.adminAvatar);
-const adminRoleLabel = computed(() => {
-  const roleMap: Record<string, string> = {
-    super_admin: "Super Admin",
-    admin: "Administrator",
-    moderator: "Moderator",
-  };
-  return roleMap[authStore.adminRole] || "Admin";
-});
 
-// Breadcrumbs based on route
 const breadcrumbs = computed(() => {
   const items: Array<{ label: string; to?: string }> = [];
   const paths = route.path.split("/").filter(Boolean);
 
-  // Skip 'admin' from breadcrumb
   if (paths[0] === "admin") {
     paths.shift();
   }
@@ -223,7 +188,17 @@ const breadcrumbs = computed(() => {
   return items;
 });
 
-// Notifications mock data
+const userData = reactive<UserInfoResponse>({
+  fullName: "",
+  avatarUrl: "",
+  email: "",
+  phoneNumber: "",
+  birthDate: undefined,
+  firstName: "",
+  lastName: "",
+  userId: "",
+});
+
 const notifications = ref([
   {
     id: 1,
@@ -307,4 +282,24 @@ function toggleNotifications(event: Event) {
 function markAllRead() {
   notifications.value = notifications.value.map((n) => ({ ...n, read: true }));
 }
+
+function handleSignOut() {
+  userStore.userLogout();
+  router.push({ name: "login" });
+}
+
+onMounted(async () => {
+  await userStore.fetchUserInfo();
+
+  const user = userStore.userInfo;
+  if (user) {
+    userData.fullName = user.fullName;
+    userData.email = user.email;
+    userData.avatarUrl = user.avatarUrl ?? "";
+    userData.phoneNumber = user.phoneNumber ?? "";
+    userData.firstName = user.firstName ?? "";
+    userData.lastName = user.lastName ?? "";
+    userData.userId = user.userId ?? "";
+  }
+});
 </script>

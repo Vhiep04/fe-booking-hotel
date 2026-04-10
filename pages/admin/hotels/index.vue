@@ -408,9 +408,12 @@ definePageMeta({
   middleware: ["admin"],
 });
 
+useHead({
+  title: "Hotel Management",
+});
+
 const toast = useToast();
 
-// State
 const loading = ref(false);
 const hotelDialog = ref(false);
 const deleteDialog = ref(false);
@@ -419,7 +422,6 @@ const isEditing = ref(false);
 const selectedHotels = ref<any[]>([]);
 const hotelToDelete = ref<any>(null);
 
-// Filters
 const filters = ref({
   search: "",
   city: null,
@@ -427,7 +429,6 @@ const filters = ref({
   rating: null,
 });
 
-// Form
 const defaultForm = {
   name: "",
   description: "",

@@ -320,6 +320,10 @@ definePageMeta({
   middleware: ["admin"],
 });
 
+useHead({
+  title: "Room Management",
+});
+
 interface Facility {
   facilityId: number;
   name: string;

@@ -9,8 +9,13 @@
 
 <script setup lang="ts">
 import { usePaymentStore } from "~/stores/payments";
+const { t } = useI18n();
 
 definePageMeta({ layout: false });
+
+useHead({
+  title: t("Payment Processing"),
+});
 
 const route = useRoute();
 const router = useRouter();

@@ -125,6 +125,11 @@ import HotelMapModal from "~/components/HotelDetail/HotelMapModal.vue";
 import HotelFeedbacks from "~/components/HotelDetail/HotelFeedbacks.vue";
 
 const { t } = useI18n();
+const hotel = ref<HotelData | null>(null);
+
+useHead({
+  title: computed(() => (hotel.value ? hotel.value.name : t("Loading..."))),
+});
 
 const showMap = ref(false);
 
@@ -136,7 +141,6 @@ const router = useRouter();
 const cityStore = useCityStore();
 const hotelStore = useHotelStore();
 
-const hotel = ref<HotelData | null>(null);
 const isLoading = ref(true);
 const roomsSection = ref<HTMLElement | null>(null);
 

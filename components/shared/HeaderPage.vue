@@ -1,7 +1,6 @@
 <template>
   <header class="bg-gray-100 px-10 py-2">
     <div class="flex items-center justify-between">
-      <!-- Logo Section -->
       <div class="flex items-center space-x-6">
         <img src="../../assets/images/logo_easyset24.svg" alt="" />
         <i
@@ -64,7 +63,7 @@
         </button>
 
         <OverlayPanel ref="langPanel" class="p-0">
-          <ul class="min-w-[160px]">
+          <ul class="min-w-40">
             <li
               v-for="lang in languages"
               :key="lang.code"
@@ -191,6 +190,9 @@ const userData = reactive<UserInfoResponse>({
   email: "",
   phoneNumber: "",
   birthDate: undefined,
+  firstName: "",
+  lastName: "",
+  userId: "",
 });
 
 const clearSearch = () => {
@@ -231,6 +233,13 @@ onMounted(async () => {
 
   if (authStore.isAuthenticated) {
     await authStore.fetchUserInfo();
+    const user = authStore.userInfo;
+    if (user) {
+      userData.fullName = user.fullName;
+      userData.email = user.email;
+      userData.avatarUrl = user.avatarUrl;
+      userData.phoneNumber = user.phoneNumber;
+    }
   }
 });
 </script>

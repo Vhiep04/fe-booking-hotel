@@ -1,6 +1,5 @@
 <template>
   <div>
-    <!-- Header -->
     <div class="flex items-center justify-between mb-6">
       <div>
         <h2 class="admin-page-title">Facilities</h2>
@@ -9,7 +8,6 @@
       <Button label="Add Facility" icon="pi pi-plus" @click="openCreateModal" />
     </div>
 
-    <!-- Filters -->
     <div class="admin-card mb-6">
       <div class="admin-card-body">
         <div class="flex items-center gap-4">
@@ -100,7 +98,6 @@
       </DataTable>
     </div>
 
-    <!-- Create / Edit Dialog -->
     <Dialog
       v-model:visible="isModalOpen"
       :header="isEditing ? 'Edit Facility' : 'Add Facility'"
@@ -186,6 +183,10 @@ import { useFacilitiesStore } from "~/stores/admin/facilties";
 definePageMeta({
   layout: "admin",
   middleware: ["admin"],
+});
+
+useHead({
+  title: "Facility Management",
 });
 
 const toast = useToast();

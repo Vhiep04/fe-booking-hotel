@@ -1,6 +1,5 @@
 <template>
   <div>
-    <!-- Page Header -->
     <div class="admin-page-header">
       <h1 class="admin-page-title">Dashboard</h1>
       <p class="admin-page-subtitle">
@@ -8,7 +7,6 @@
       </p>
     </div>
 
-    <!-- Loading -->
     <div
       v-if="dashboardStore.isLoading"
       class="flex items-center justify-center py-20"
@@ -16,9 +14,8 @@
       <ProgressSpinner />
     </div>
 
-    <!-- Error -->
     <div v-else-if="dashboardStore.error" class="admin-card p-6 text-center">
-      <p class="text-[var(--admin-danger)] mb-4">{{ dashboardStore.error }}</p>
+      <p class="text-(--admin-danger) mb-4">{{ dashboardStore.error }}</p>
       <Button
         label="Retry"
         icon="pi pi-refresh"
@@ -27,7 +24,6 @@
     </div>
 
     <template v-else-if="data">
-      <!-- KPI Cards -->
       <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
         <KpiCard
           title="Total Revenue"
@@ -64,7 +60,6 @@
         />
       </div>
 
-      <!-- Charts Row -->
       <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
         <div class="lg:col-span-2">
           <RevenueChart :chart-data="data.revenueChart" />
@@ -79,7 +74,6 @@
         </div>
       </div>
 
-      <!-- Quick Stats Row -->
       <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
         <!-- Top Hotels -->
         <div class="admin-card">
@@ -101,23 +95,21 @@
                 />
                 <div
                   v-else
-                  class="w-12 h-12 rounded-lg bg-[var(--admin-surface-hover)] flex items-center justify-center"
+                  class="w-12 h-12 rounded-lg bg-(--admin-surface-hover) flex items-center justify-center"
                 >
-                  <i class="pi pi-building text-[var(--admin-text-muted)]"></i>
+                  <i class="pi pi-building text-(--admin-text-muted)"></i>
                 </div>
                 <div class="flex-1 min-w-0">
-                  <p
-                    class="font-medium text-[var(--admin-text-color)] truncate"
-                  >
+                  <p class="font-medium text-(--admin-text-color) truncate">
                     {{ hotel.name }}
                   </p>
-                  <p class="text-sm text-[var(--admin-text-muted)]">
+                  <p class="text-sm text-(--admin-text-muted)">
                     {{ hotel.reservationCount }} bookings · ⭐
                     {{ hotel.averageRating.toFixed(1) }}
                   </p>
                 </div>
                 <div class="text-right">
-                  <p class="font-semibold text-[var(--admin-text-color)]">
+                  <p class="font-semibold text-(--admin-text-color)">
                     {{ formatCurrency(hotel.revenue) }}
                   </p>
                 </div>
@@ -126,12 +118,11 @@
           </div>
         </div>
 
-        <!-- Recent Activities -->
-        <div class="admin-card">
+        <div class="admin-card flex flex-col">
           <div class="admin-card-header">
             <h3 class="admin-card-title">Recent Activities</h3>
           </div>
-          <div class="admin-card-body">
+          <div class="admin-card-body flex-1 overflow-y-auto max-h-72">
             <div v-if="data.recentActivities.length" class="space-y-4">
               <div
                 v-for="(activity, index) in data.recentActivities"
@@ -144,17 +135,17 @@
                   ]"
                 >
                   <div
-                    class="w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0"
+                    class="w-8 h-8 rounded-full flex items-center justify-center shrink-0"
                     :class="actStyle.bg"
                   >
                     <i :class="[actStyle.icon, 'text-sm', actStyle.color]"></i>
                   </div>
                 </template>
                 <div class="flex-1 min-w-0">
-                  <p class="text-sm text-[var(--admin-text-color)]">
+                  <p class="text-sm text-(--admin-text-color)">
                     {{ activity.message }}
                   </p>
-                  <p class="text-xs text-[var(--admin-text-muted)] mt-1">
+                  <p class="text-xs text-(--admin-text-muted) mt-1">
                     {{ formatTimeAgo(activity.time) }}
                   </p>
                 </div>
@@ -162,7 +153,7 @@
             </div>
             <p
               v-else
-              class="text-sm text-[var(--admin-text-muted)] text-center py-4"
+              class="text-sm text-(--admin-text-muted) text-center py-4"
             >
               No recent activities
             </p>
@@ -183,12 +174,10 @@
               >
                 <div class="flex-1">
                   <div class="flex items-center justify-between mb-1">
-                    <span
-                      class="text-sm font-medium text-[var(--admin-text-color)]"
-                    >
+                    <span class="text-sm font-medium text-(--admin-text-color)">
                       {{ city.name }}
                     </span>
-                    <span class="text-sm text-[var(--admin-text-muted)]">
+                    <span class="text-sm text-(--admin-text-muted)">
                       {{ city.hotelCount }} hotels
                     </span>
                   </div>
@@ -204,7 +193,6 @@
         </div>
       </div>
 
-      <!-- Recent Bookings Table -->
       <RecentBookings :bookings="data.recentBookings" />
     </template>
   </div>
@@ -223,6 +211,10 @@ import { useDashboardStore } from "~/stores/admin/dashboard";
 definePageMeta({
   layout: "admin",
   middleware: ["admin"],
+});
+
+useHead({
+  title: "Admin",
 });
 
 const dashboardStore = useDashboardStore();

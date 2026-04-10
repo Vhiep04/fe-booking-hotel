@@ -57,6 +57,12 @@ import HotelCardDetail from "~/components/HotelCardDetail.vue";
 import HotelCardSkeleton from "~/components/shared/HotelCardSkeleton.vue";
 import FacilityHotel from "~/components/FacilityHotel.vue";
 
+const { t } = useI18n();
+
+useHead({
+  title: t("Hotel Search Results"),
+});
+
 const cityStore = useCityStore();
 const route = useRoute();
 

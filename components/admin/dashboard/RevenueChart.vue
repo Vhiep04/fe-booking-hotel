@@ -20,8 +20,8 @@
         />
       </div>
       <div v-else class="h-80 flex flex-col items-center justify-center gap-2">
-        <i class="pi pi-chart-line text-4xl text-[var(--admin-text-muted)]"></i>
-        <p class="text-[var(--admin-text-muted)] text-sm">
+        <i class="pi pi-chart-line text-4xl text-(--admin-text-muted)"></i>
+        <p class="text-(--admin-text-muted) text-sm">
           No revenue data available
         </p>
       </div>
@@ -45,37 +45,55 @@ const periodOptions = [
   { label: "Last 12 months", value: "12months" },
 ];
 
+const filledChartData = computed(() => {
+  const now = new Date();
+  return Array.from({ length: 12 }, (_, i) => {
+    const d = new Date(now.getFullYear(), now.getMonth() - 11 + i, 1);
+    const year = d.getFullYear();
+    const month = d.getMonth() + 1;
+    const monthName = d.toLocaleString("en-US", {
+      month: "short",
+      year: "numeric",
+    });
+    const found = (props.chartData ?? []).find(
+      (item) => item.year === year && item.month === month,
+    );
+    return {
+      monthName,
+      revenue: found?.revenue ?? 0,
+      reservationCount: found?.reservationCount ?? 0,
+    };
+  });
+});
+
 const hasData = computed(() => props.chartData && props.chartData.length > 0);
 
-const chartData = computed(() => {
-  const items = props.chartData ?? [];
-  return {
-    labels: items.map((i) => i.monthName || `${i.month}/${i.year}`),
-    datasets: [
-      {
-        label: "Revenue ($)",
-        data: items.map((i) => i.revenue),
-        fill: true,
-        borderColor: "#3b82f6",
-        backgroundColor: "rgba(59, 130, 246, 0.1)",
-        tension: 0.4,
-        pointRadius: 4,
-        pointHoverRadius: 6,
-      },
-      {
-        label: "Bookings",
-        data: items.map((i) => i.reservationCount),
-        fill: false,
-        borderColor: "#22c55e",
-        backgroundColor: "#22c55e",
-        tension: 0.4,
-        pointRadius: 4,
-        pointHoverRadius: 6,
-        yAxisID: "y1",
-      },
-    ],
-  };
-});
+const chartData = computed(() => ({
+  labels: filledChartData.value.map((i) => i.monthName),
+  datasets: [
+    {
+      label: "Revenue ($)",
+      data: filledChartData.value.map((i) => i.revenue),
+      fill: true,
+      borderColor: "#3b82f6",
+      backgroundColor: "rgba(59, 130, 246, 0.1)",
+      tension: 0.4,
+      pointRadius: 4,
+      pointHoverRadius: 6,
+    },
+    {
+      label: "Bookings",
+      data: filledChartData.value.map((i) => i.reservationCount),
+      fill: false,
+      borderColor: "#22c55e",
+      backgroundColor: "#22c55e",
+      tension: 0.4,
+      pointRadius: 4,
+      pointHoverRadius: 6,
+      yAxisID: "y1",
+    },
+  ],
+}));
 
 const chartOptions = computed(() => ({
   maintainAspectRatio: false,

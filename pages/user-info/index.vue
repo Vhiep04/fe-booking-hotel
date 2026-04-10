@@ -8,7 +8,6 @@
         @select="activeSection = $event"
       />
 
-      <!-- Main content -->
       <div class="flex-1">
         <!-- Header -->
         <div class="flex items-start justify-between mb-6">
@@ -25,7 +24,6 @@
           />
         </div>
 
-        <!-- Fields -->
         <div class="divide-y divide-gray-200 border-t border-gray-200">
           <!-- Name -->
           <ProfileField
@@ -64,7 +62,6 @@
             </template>
           </ProfileField>
 
-          <!-- Email -->
           <ProfileField
             ref="emailFieldRef"
             label="Email address"
@@ -108,7 +105,6 @@
             </template>
           </ProfileField>
 
-          <!-- Phone -->
           <ProfileField
             ref="phoneFieldRef"
             label="Phone number"
@@ -143,7 +139,6 @@
             </template>
           </ProfileField>
 
-          <!-- Date of birth -->
           <ProfileField
             ref="dobFieldRef"
             label="Date of birth"
@@ -165,7 +160,6 @@
             </template>
           </ProfileField>
 
-          <!-- Gender -->
           <ProfileField
             ref="genderFieldRef"
             label="Gender"
@@ -188,7 +182,6 @@
             </template>
           </ProfileField>
 
-          <!-- Address -->
           <ProfileField
             ref="addressFieldRef"
             label="Address"
@@ -222,11 +215,13 @@ import ProfileField from "@/components/user-info/ProfileField.vue";
 import SidebarNav from "@/components/user-info/SidebarNav.vue";
 import AvatarUpload from "@/components/user-info/AvatarUpload.vue";
 import { useEditUserStore, toLocalDateString } from "@/stores/editUser";
+const { t } = useI18n();
 
-// ─── Store ───────────────────────────────────────────────────────────────────
+useHead({
+  title: t("User Information"),
+});
 const editUserStore = useEditUserStore();
 
-// ─── Nav ────────────────────────────────────────────────────────────────────
 const activeSection = ref("personal");
 
 const navItems = [
@@ -242,7 +237,6 @@ const navItems = [
   },
 ];
 
-// ─── Form state ─────────────────────────────────────────────────────────────
 const form = ref({
   firstName: "",
   lastName: "",
@@ -254,7 +248,6 @@ const form = ref({
   address: "",
 });
 
-// ─── Map store profile → form ─────────────────────────────────────────────
 function mapProfileToForm() {
   const p = editUserStore.profile;
   if (!p) return;
@@ -266,13 +259,11 @@ function mapProfileToForm() {
   form.value.dob = p.birthDate ? new Date(p.birthDate) : null;
 }
 
-// ─── onMounted: fetch profile then map ───────────────────────────────────────
 onMounted(async () => {
   await editUserStore.fetchProfile();
   mapProfileToForm();
 });
 
-// ─── Computed display values ─────────────────────────────────────────────────
 const fullName = computed(() =>
   [form.value.firstName, form.value.lastName].filter(Boolean).join(" "),
 );
@@ -284,7 +275,6 @@ const formattedDob = computed(() => {
   return new Date(form.value.dob).toLocaleDateString("en-GB");
 });
 
-// ─── Options ─────────────────────────────────────────────────────────────────
 const genderOptions = [
   { label: "Male", value: "Male" },
   { label: "Female", value: "Female" },
@@ -301,7 +291,6 @@ const phoneCodeOptions = [
   { label: "🇸🇬 +65", dialCode: "+65" },
 ];
 
-// ─── Field refs (to call closeEdit on non-active fields) ─────────────────────
 const nameFieldRef = ref();
 const emailFieldRef = ref();
 const phoneFieldRef = ref();
@@ -318,7 +307,6 @@ const allFieldRefs: Record<string, ReturnType<typeof ref>> = {
   address: addressFieldRef,
 };
 
-// ─── Active field management ─────────────────────────────────────────────────
 const activeField = ref<string | null>(null);
 
 const openField = (field: string) => {
@@ -334,7 +322,6 @@ const closeField = () => {
   activeField.value = null;
 };
 
-// ─── Save handlers ────────────────────────────────────────────────────────────
 const saveName = async () => {
   await editUserStore.updateProfile({
     firstName: form.value.firstName,
@@ -365,7 +352,6 @@ const saveAddress = async () => {
   closeField();
 };
 
-// ─── Avatar ───────────────────────────────────────────────────────────────────
 const handleAvatarUpload = async (file: File, _previewUrl: string) => {
   await editUserStore.updateAvatar(file);
 };

@@ -198,8 +198,10 @@ import Button from "primevue/button";
 import Panel from "primevue/panel";
 import jsPDF from "jspdf";
 
+const { t } = useI18n();
+
 useHead({
-  title: "Thanh toan thanh cong",
+  title: t("Success"),
 });
 
 definePageMeta({

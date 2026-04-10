@@ -64,7 +64,7 @@ definePageMeta({
 });
 
 useHead({
-  title: "Dashboard",
+  title: t("Home"),
 });
 
 const router = useRouter();

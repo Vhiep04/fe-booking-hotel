@@ -1,30 +1,37 @@
 <template>
   <div class="relative">
-    <!-- User Profile Button -->
     <button
       @click="toggle"
-      class="flex items-center space-x-2 hover:opacity-80 transition-opacity"
+      class="flex items-center bg-white gap-2 px-2.5 py-1 pl-1 border border-gray-200 rounded-full hover:bg-gray-50 transition-all max-h-10"
     >
       <img
         :src="avatarImage"
         alt="User Avatar"
-        class="w-12 h-12 rounded-full border-2 border-gray-200 object-cover"
+        class="w-10 h-10 rounded-full border-2 border-gray-200 object-cover"
       />
-      <div class="text-left">
-        <div class="text-sm font-semibold text-blue-600">Your Account</div>
-        <div class="text-xs text-gray-600">{{ fullName }}</div>
-      </div>
+      <div class="text-xs text-gray-600">{{ fullName }}</div>
+      <svg
+        class="w-3.5 h-3.5 text-gray-400 transition-transform duration-200"
+        :class="{ '-rotate-180': open }"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      >
+        <polyline points="6 9 12 15 18 9" />
+      </svg>
     </button>
 
-    <!-- Dropdown Menu -->
-    <Menu ref="menu" :model="menuItems" :popup="true" class="w-[350px]">
+    <Menu ref="menu" :model="menuItems" :popup="true" class="w-[250px]">
       <template #start>
         <div class="px-4 py-3 border-b border-gray-200">
-          <div class="flex items-center space-x-3">
+          <div class="flex items-center space-x-2">
             <img
               :src="avatarImage"
               alt="User Avatar"
-              class="w-16 h-16 rounded-full border-2 border-gray-200 object-cover"
+              class="w-12 h-12 rounded-full border-2 border-gray-200 object-cover"
             />
             <div>
               <div class="font-semibold text-gray-800">{{ fullName }}</div>
@@ -37,15 +44,15 @@
       <template #item="{ item }">
         <a
           @click="item.command?.({ originalEvent: $event, item })"
-          class="flex items-center w-full px-4 py-3 hover:bg-gray-300 cursor-pointer transition-colors"
+          class="flex items-center w-full px-6 py-3 hover:bg-gray-300 cursor-pointer transition-colors"
           :class="{
             'bg-blue-600 text-white hover:!bg-blue-800':
               route.path === '/user-info',
           }"
         >
-          <i :class="item.icon" class="mr-3" style="font-size: 1.2rem"></i>
+          <i :class="item.icon" class="mr-3" style="font-size: 1rem"></i>
           <span class="flex-1 font-medium">{{ item.label }}</span>
-          <i v-if="item.showArrow" class="pi pi-chevron-right text-xs"></i>
+          <i v-if="item.showArrow" class="pi pi-chevron-right text-base"></i>
         </a>
       </template>
 
@@ -53,9 +60,9 @@
         <div class="border-t border-gray-200">
           <a
             @click="handleSignOut"
-            class="flex items-center w-full px-4 py-3 hover:bg-gray-300 cursor-pointer transition-colors text-blue-600"
+            class="flex items-center w-full px-6 py-3 hover:bg-gray-300 cursor-pointer transition-colors text-blue-600"
           >
-            <i class="pi pi-sign-out mr-3" style="font-size: 1.2rem"></i>
+            <i class="pi pi-sign-out mr-3" style="font-size: 1rem"></i>
             <span class="font-medium">Sign Out</span>
           </a>
         </div>
@@ -74,6 +81,12 @@ interface Props {
   email: string;
   avatarUrl?: string;
 }
+const open = ref(false);
+
+const toggle = (event: Event) => {
+  open.value = !open.value;
+  menu.value.toggle(event);
+};
 
 const router = useRouter();
 const route = useRoute();
@@ -102,10 +115,6 @@ const menuItems = ref<MenuItem[]>([
   },
 ]);
 
-const toggle = (event: Event) => {
-  menu.value.toggle(event);
-};
-
 const handleSignOut = () => {
   emit("signOut");
 };
@@ -123,6 +132,10 @@ const handleSignOut = () => {
 :deep(.p-menu .p-menuitem-link) {
   padding: 0;
   border-radius: 0;
+}
+
+:deep(.p-menu-list) {
+  max-width: 100px !important;
 }
 
 :deep(.p-menu .p-menuitem-link:hover) {

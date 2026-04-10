@@ -1,6 +1,5 @@
 <template>
   <div>
-    <!-- Page Header -->
     <div
       class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6"
     >
@@ -11,7 +10,6 @@
       <Button label="Add City" icon="pi pi-plus" @click="openCreateDialog" />
     </div>
 
-    <!-- Filters -->
     <div class="admin-card mb-6">
       <div class="admin-card-body">
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -32,7 +30,6 @@
       </div>
     </div>
 
-    <!-- Cities Grid -->
     <div
       v-if="loading"
       class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6"
@@ -42,10 +39,10 @@
         :key="n"
         class="admin-card overflow-hidden animate-pulse"
       >
-        <div class="h-48 bg-[var(--admin-surface-hover)]" />
+        <div class="h-48 bg-(--admin-surface-hover)" />
         <div class="p-4 space-y-3">
-          <div class="h-4 bg-[var(--admin-surface-hover)] rounded w-3/4" />
-          <div class="h-4 bg-[var(--admin-surface-hover)] rounded w-1/2" />
+          <div class="h-4 bg-(--admin-surface-hover) rounded w-3/4" />
+          <div class="h-4 bg-(--admin-surface-hover) rounded w-1/2" />
         </div>
       </div>
     </div>
@@ -64,19 +61,17 @@
 
       <!-- Add City Card -->
       <div
-        class="admin-card overflow-hidden border-2 border-dashed border-[var(--admin-surface-border)] hover:border-[var(--admin-primary)] cursor-pointer transition-colors flex items-center justify-center min-h-[280px]"
+        class="admin-card overflow-hidden border-2 border-dashed border-(--admin-surface-border) hover:border-(--admin-primary) cursor-pointer transition-colors flex items-center justify-center min-h-[280px]"
         @click="openCreateDialog"
       >
         <div class="text-center p-6">
           <div
-            class="w-16 h-16 rounded-full bg-[var(--admin-primary-light)] flex items-center justify-center mx-auto mb-4"
+            class="w-16 h-16 rounded-full bg-(--admin-primary-light) flex items-center justify-center mx-auto mb-4"
           >
-            <i class="pi pi-plus text-2xl text-[var(--admin-primary)]"></i>
+            <i class="pi pi-plus text-2xl text-(--admin-primary)"></i>
           </div>
-          <p class="font-semibold text-[var(--admin-text-color)]">
-            Add New City
-          </p>
-          <p class="text-sm text-[var(--admin-text-muted)]">
+          <p class="font-semibold text-(--admin-text-color)">Add New City</p>
+          <p class="text-sm text-(--admin-text-muted)">
             Click to add a new destination
           </p>
         </div>
@@ -85,11 +80,11 @@
 
     <!-- Empty State -->
     <div v-else class="admin-card p-12 text-center">
-      <i class="pi pi-map text-5xl text-[var(--admin-text-muted)] mb-4"></i>
-      <h3 class="text-xl font-semibold text-[var(--admin-text-color)] mb-2">
+      <i class="pi pi-map text-5xl text-(--admin-text-muted) mb-4"></i>
+      <h3 class="text-xl font-semibold text-(--admin-text-color) mb-2">
         No cities found
       </h3>
-      <p class="text-[var(--admin-text-muted)]">
+      <p class="text-(--admin-text-muted)]">
         Try adjusting your search or add a new city
       </p>
     </div>
@@ -108,7 +103,6 @@
       />
     </div>
 
-    <!-- Dialogs -->
     <CityFormDialog
       v-model="cityDialog"
       :isEditing="isEditing"
@@ -149,6 +143,10 @@ import type {
 definePageMeta({
   layout: "admin",
   middleware: ["admin"],
+});
+
+useHead({
+  title: "City Management",
 });
 
 const toast = useToast();

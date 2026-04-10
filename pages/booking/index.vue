@@ -92,6 +92,12 @@ import { useGetRoomStore } from "~/stores/getRoom";
 import { usePaymentStore } from "~/stores/payments";
 import { useAuthStore } from "~/stores/auth";
 
+const { t } = useI18n();
+
+useHead({
+  title: t("Detail Booking"),
+});
+
 const route = useRoute();
 const roomStore = useGetRoomStore();
 const paymentStore = usePaymentStore();
@@ -133,7 +139,6 @@ const booking = computed(() => {
   return {
     checkIn: { date: "Sat, Mar 7, 2026", time: "2:00 PM – 12:00 AM" },
     checkOut: { date: "Sun, Mar 8, 2026", time: "12:00 AM – 12:00 PM" },
-    // Raw ISO dates dùng cho API
     checkInDate: "2026-03-07",
     checkOutDate: "2026-03-08",
     daysAway: 5,
@@ -186,7 +191,6 @@ const guestDetails = ref({
 const specialRequest = ref("");
 const arrivalTime = ref("");
 
-// ── Xử lý redirect từ VNPAY ────────────────────────────────────────────────
 async function handleVnpayReturn() {
   const {
     vnp_ResponseCode,

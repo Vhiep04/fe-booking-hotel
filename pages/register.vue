@@ -236,7 +236,6 @@ const visible = ref(false);
 const otpCode = ref();
 const router = useRouter();
 
-// Form data - Single reactive object
 const form = reactive({
   firstName: "",
   lastName: "",
@@ -246,7 +245,6 @@ const form = reactive({
   confirmPassword: "",
 });
 
-// Form errors - Single reactive object
 const formErrors = reactive({
   firstName: "",
   lastName: "",
@@ -258,14 +256,12 @@ const formErrors = reactive({
 
 const isLoading = ref(false);
 
-// Reset all errors
 const resetErrors = () => {
   Object.keys(formErrors).forEach((key) => {
     formErrors[key as keyof typeof formErrors] = "";
   });
 };
 
-// Form validation
 const validateForm = (): boolean => {
   resetErrors();
   let isValid = true;
@@ -315,36 +311,29 @@ const validateForm = (): boolean => {
   return isValid;
 };
 
-// Clear individual field
 const clearField = (fieldName: keyof typeof form) => {
   form[fieldName] = "";
   formErrors[fieldName] = "";
 };
 
-// Navigation function
 const login = () => {
   router.push({ name: "login" });
 };
 
-// Handle registration
 const handleRegister = async () => {
-  // if (!validateForm()) return;
+  if (!validateForm()) return;
 
   isLoading.value = true;
 
   try {
-    // const response = await authStore.userRegister({
-    //   firstName: form.firstName.trim(),
-    //   lastName: form.lastName.trim(),
-    //   email: form.email.trim().toLowerCase(),
-    //   phoneNumber: form.phoneNumber.trim(),
-    //   password: form.password,
-    //   confirmPassword: form.confirmPassword,
-    // });
-    const response = {
-      success: true,
-      message: "Success",
-    };
+    const response = await authStore.userRegister({
+      firstName: form.firstName.trim(),
+      lastName: form.lastName.trim(),
+      email: form.email.trim().toLowerCase(),
+      phoneNumber: form.phoneNumber.trim(),
+      password: form.password,
+      confirmPassword: form.confirmPassword,
+    });
 
     if (response?.success) {
       toast?.add({
@@ -395,7 +384,6 @@ const sendOtpCode = async () => {
     }
   } catch (error) {
     console.error("Send otp error:", error);
-    // Xử lý error từ store nếu vẫn throw
     let errorMessage = "An unexpected error occurred";
     if (error) {
       errorMessage = res?.message || errorMessage;
@@ -445,7 +433,6 @@ onMounted(() => {
 </script>
 
 <style scoped>
-/* Custom styles for PrimeVue components */
 :deep(.p-card) {
   border-radius: 12px;
   border: none;
