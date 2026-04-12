@@ -47,7 +47,7 @@
           class="flex items-center w-full px-6 py-3 hover:bg-gray-300 cursor-pointer transition-colors"
           :class="{
             'bg-blue-600 text-white hover:bg-blue-800!':
-              route.path === '/user-info',
+              item.route && route.path === item.route,
           }"
         >
           <i :class="item.icon" class="mr-3" style="font-size: 1rem"></i>
@@ -110,6 +110,7 @@ const menuItems = computed<MenuItem[]>(() => [
     label: "My Account",
     icon: "pi pi-user",
     showArrow: true,
+    route: "/user-info",
     command: () => router.push("/user-info"),
   },
   ...(!props.isAdmin
@@ -118,6 +119,7 @@ const menuItems = computed<MenuItem[]>(() => [
           label: "My Reservations",
           icon: "pi pi-calendar",
           showArrow: true,
+          route: "/reservation",
           command: () => router.push("/reservation"),
         },
       ]

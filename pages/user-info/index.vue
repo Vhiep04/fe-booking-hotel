@@ -1,7 +1,6 @@
 <template>
   <div class="min-h-screen bg-white">
     <div class="max-w-5xl mx-auto px-6 py-10 flex gap-10">
-      <!-- Sidebar -->
       <SidebarNav
         :items="navItems"
         :active="activeSection"
@@ -9,7 +8,6 @@
       />
 
       <div class="flex-1">
-        <!-- Header -->
         <div class="flex items-start justify-between mb-6">
           <div>
             <h1 class="text-3xl font-bold text-gray-900">Personal details</h1>
@@ -25,7 +23,6 @@
         </div>
 
         <div class="divide-y divide-gray-200 border-t border-gray-200">
-          <!-- Name -->
           <ProfileField
             ref="nameFieldRef"
             label="Name"
@@ -215,11 +212,17 @@ import ProfileField from "@/components/user-info/ProfileField.vue";
 import SidebarNav from "@/components/user-info/SidebarNav.vue";
 import AvatarUpload from "@/components/user-info/AvatarUpload.vue";
 import { useEditUserStore, toLocalDateString } from "@/stores/editUser";
-const { t } = useI18n();
+import { useUploadStore } from "~/stores/admin/uploadImage";
 
+const { t } = useI18n();
 useHead({
   title: t("User Information"),
 });
+
+type ProfileFieldInstance = InstanceType<typeof ProfileField>;
+
+const uploadStore = useUploadStore();
+const authStore = useAuthStore();
 const editUserStore = useEditUserStore();
 
 const activeSection = ref("personal");
@@ -248,6 +251,13 @@ const form = ref({
   address: "",
 });
 
+const nameFieldRef = ref<ProfileFieldInstance>();
+const emailFieldRef = ref<ProfileFieldInstance>();
+const phoneFieldRef = ref<ProfileFieldInstance>();
+const dobFieldRef = ref<ProfileFieldInstance>();
+const genderFieldRef = ref<ProfileFieldInstance>();
+const addressFieldRef = ref<ProfileFieldInstance>();
+
 function mapProfileToForm() {
   const p = editUserStore.profile;
   if (!p) return;
@@ -258,11 +268,6 @@ function mapProfileToForm() {
   form.value.phone = p.phoneNumber ?? "";
   form.value.dob = p.birthDate ? new Date(p.birthDate) : null;
 }
-
-onMounted(async () => {
-  await editUserStore.fetchProfile();
-  mapProfileToForm();
-});
 
 const fullName = computed(() =>
   [form.value.firstName, form.value.lastName].filter(Boolean).join(" "),
@@ -291,14 +296,7 @@ const phoneCodeOptions = [
   { label: "🇸🇬 +65", dialCode: "+65" },
 ];
 
-const nameFieldRef = ref();
-const emailFieldRef = ref();
-const phoneFieldRef = ref();
-const dobFieldRef = ref();
-const genderFieldRef = ref();
-const addressFieldRef = ref();
-
-const allFieldRefs: Record<string, ReturnType<typeof ref>> = {
+const allFieldRefs: Record<string, Ref<ProfileFieldInstance | undefined>> = {
   name: nameFieldRef,
   email: emailFieldRef,
   phone: phoneFieldRef,
@@ -352,7 +350,28 @@ const saveAddress = async () => {
   closeField();
 };
 
-const handleAvatarUpload = async (file: File, _previewUrl: string) => {
-  await editUserStore.updateAvatar(file);
+const saveField = async (field: string) => {
+  if (field === "email") {
+    await editUserStore.updateProfile({ email: form.value.email });
+  }
+  closeField();
 };
+
+const handleAvatarUpload = async (file: File, _previewUrl: string) => {
+  const res = await uploadStore.uploadImage(file, "avatars");
+
+  if (res?.success && res.data?.url) {
+    await editUserStore.updateProfile({ avatarUrl: res.data.url });
+  }
+
+  await editUserStore.fetchProfile();
+  mapProfileToForm();
+
+  await authStore.fetchUserInfo();
+};
+
+onMounted(async () => {
+  await editUserStore.fetchProfile();
+  mapProfileToForm();
+});
 </script>

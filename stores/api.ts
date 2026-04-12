@@ -5,8 +5,19 @@ import { $fetch } from "ofetch";
 
 export const useApiStore = defineStore("api", () => {
   const authStore = useAuthStore();
+
   async function apiRequest<ResponseDataType>(payload: Payload) {
     let { headers } = payload;
+
+    // ✅ Nếu data là FormData thì xóa Content-Type, để browser tự set kèm boundary
+    if (payload.data instanceof FormData) {
+      const { "Content-Type": _, ...rest } = (headers ?? {}) as Record<
+        string,
+        string
+      >;
+      headers = rest;
+    }
+
     if (payload.auth) {
       headers = {
         ...headers,
@@ -19,10 +30,7 @@ export const useApiStore = defineStore("api", () => {
       if (payload?.proxy) {
         response = await $fetch<ResponseDataType>("/api/call", {
           method: "POST",
-          body: {
-            ...payload,
-            headers,
-          },
+          body: { ...payload, headers },
           credentials: "include",
         });
       } else {

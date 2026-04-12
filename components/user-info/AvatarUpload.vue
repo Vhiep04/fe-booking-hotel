@@ -158,10 +158,10 @@ const validateAndPreview = (file: File) => {
 
   img.onload = () => {
     URL.revokeObjectURL(url);
-    if (img.width !== REQUIRED_SIZE || img.height !== REQUIRED_SIZE) {
-      errorMsg.value = `Image must be exactly ${REQUIRED_SIZE}×${REQUIRED_SIZE}px. Yours is ${img.width}×${img.height}px.`;
-      return;
-    }
+    // if (img.width !== REQUIRED_SIZE || img.height !== REQUIRED_SIZE) {
+    //   errorMsg.value = `Image must be exactly ${REQUIRED_SIZE}×${REQUIRED_SIZE}px. Yours is ${img.width}×${img.height}px.`;
+    //   return;
+    // }
     // Valid — set preview
     const reader = new FileReader();
     reader.onload = (e) => {

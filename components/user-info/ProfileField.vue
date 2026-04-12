@@ -1,21 +1,17 @@
 <template>
   <div class="py-4 border-b border-gray-200">
     <div class="flex items-start gap-6">
-      <!-- Label -->
       <div class="w-40 shrink-0 text-gray-700 font-medium pt-1">
         {{ label }}
       </div>
 
-      <!-- Content -->
       <div class="flex-1">
-        <!-- View mode -->
         <template v-if="!isEditing">
           <span class="text-gray-600">
             {{ displayValue || placeholder }}
           </span>
         </template>
 
-        <!-- Edit mode -->
         <template v-else>
           <slot name="edit" />
           <div class="flex gap-3 mt-4">
@@ -35,7 +31,6 @@
         </template>
       </div>
 
-      <!-- Edit button -->
       <div class="shrink-0">
         <button
           v-if="!isEditing"
@@ -93,7 +88,6 @@ const handleCancel = () => {
   emit("cancel");
 };
 
-// Allow parent to close edit mode (e.g. when another field opens)
 const closeEdit = () => {
   isEditing.value = false;
 };

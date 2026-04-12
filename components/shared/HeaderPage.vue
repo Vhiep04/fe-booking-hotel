@@ -242,16 +242,11 @@ function formatTimeAgo(dateString: string): string {
   return `${Math.floor(hours / 24)} ngày trước`;
 }
 
-const userData = reactive<UserInfoResponse>({
-  fullName: "",
-  avatarUrl: "",
-  email: "",
-  phoneNumber: "",
-  birthDate: undefined,
-  firstName: "",
-  lastName: "",
-  userId: "",
-});
+const userData = computed(() => ({
+  fullName: authStore.userInfo?.fullName ?? "",
+  email: authStore.userInfo?.email ?? "",
+  avatarUrl: authStore.userInfo?.avatarUrl ?? "",
+}));
 
 const login = () => router.push({ name: "login" });
 const register = () => router.push({ name: "register" });
@@ -272,15 +267,6 @@ onMounted(async () => {
   if (authStore.isAuthenticated) {
     await authStore.fetchUserInfo();
     const user = authStore.userInfo;
-    if (user) {
-      userData.fullName = user.fullName;
-      userData.email = user.email;
-      userData.avatarUrl = user.avatarUrl ?? "";
-      userData.phoneNumber = user.phoneNumber ?? "";
-      userData.firstName = user.firstName ?? "";
-      userData.lastName = user.lastName ?? "";
-      userData.userId = user.userId ?? "";
-    }
 
     await initHub();
   }
