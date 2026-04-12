@@ -47,7 +47,7 @@
 import Button from "primevue/button";
 import { useToast } from "primevue/usetoast";
 import type { Reservation } from "~/stores/admin/interfaces/reservations";
-import { useReservationsStore } from "~/stores/reservations";
+import { useReservationsStore } from "~/stores/admin/reservations";
 import type { BookingFiltersModel } from "./BookingFilter.vue";
 import BookingDetailDialog from "./BookingDetailDialog.vue";
 import BookingTable from "./BookingTable.vue";

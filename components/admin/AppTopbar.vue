@@ -69,6 +69,7 @@
         :full-name="userData.fullName"
         :email="userData.email"
         :avatar-url="userData.avatarUrl"
+        :is-admin="true"
         @sign-out="handleSignOut"
       />
     </div>

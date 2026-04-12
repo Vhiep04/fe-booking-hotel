@@ -121,6 +121,7 @@
             :full-name="userData.fullName"
             :email="userData.email"
             :avatar-url="userData.avatarUrl"
+            :is-admin="false"
             @my-account="handleMyAccount"
             @payments="handlePayments"
             @settings="handleSettings"

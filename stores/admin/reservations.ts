@@ -1,52 +1,18 @@
 import { defineStore } from "pinia";
 import { ref } from "vue";
 import { useApiStore } from "@/stores/api";
+import type {
+  GetReservationsParams,
+  PaginatedReservations,
+  Reservation,
+} from "./interfaces/reservations";
+import type { ApiResponse } from "./interfaces/cities";
 
-export interface UserReservation {
-  reservationId: number;
-  bookingCode: string;
-  roomId: number;
-  roomNumber: string;
-  roomTypeName: string;
-  pricePerNight: number;
-  capacity: number;
-  hotelName: string;
-  hotelLocation: string;
-  hotelImage: string;
-  cityName: string;
-  checkInDate: string;
-  checkOutDate: string;
-  nights: number;
-  totalPrice: number;
-  paymentStatus: string;
-  createdAt: string;
-  paymentMethod: string;
-  paymentDate: string;
-  hasFeedback: boolean;
-  feedbackId: number | null;
-  rating: number | null;
-  comment: string | null;
-}
-
-export interface GetReservationsParams {
-  status?: string;
-  sort?: string;
-}
-
-interface ApiResponse<T> {
-  success: boolean;
-  message: string | null;
-  data: T;
-  errors?: string[] | null;
-  totalCount?: number;
-}
-
-export const useReservationStore = defineStore("reservation", () => {
+export const useReservationsStore = defineStore("reservations", () => {
   const apiStore = useApiStore();
 
-  const reservations = ref<UserReservation[]>([]);
-  const selectedReservation = ref<UserReservation | null>(null);
-  const totalCount = ref(0);
+  const reservations = ref<PaginatedReservations | null>(null);
+  const selectedReservation = ref<Reservation | null>(null);
   const isLoading = ref(false);
   const error = ref<string | null>(null);
 
@@ -56,20 +22,24 @@ export const useReservationStore = defineStore("reservation", () => {
 
     try {
       const response = await apiStore.apiRequest<
-        ApiResponse<UserReservation[]>
+        ApiResponse<PaginatedReservations>
       >({
-        endpoint: "/reservations",
+        endpoint: "/admin/reservations",
         method: "GET",
         auth: true,
         params: {
+          page: params.page ?? 1,
+          pageSize: params.pageSize ?? 10,
+          ...(params.search && { search: params.search }),
           ...(params.status && { status: params.status }),
-          ...(params.sort && { sort: params.sort }),
+          ...(params.hotelId !== undefined && { hotelId: params.hotelId }),
+          ...(params.fromDate && { fromDate: params.fromDate }),
+          ...(params.toDate && { toDate: params.toDate }),
         },
       });
 
       if (response?.success) {
         reservations.value = response.data;
-        totalCount.value = response.totalCount ?? response.data.length;
       } else {
         error.value = response?.message ?? "Failed to fetch reservations";
       }
@@ -88,8 +58,8 @@ export const useReservationStore = defineStore("reservation", () => {
     error.value = null;
 
     try {
-      const response = await apiStore.apiRequest<ApiResponse<UserReservation>>({
-        endpoint: `/reservations/${id}`,
+      const response = await apiStore.apiRequest<ApiResponse<Reservation>>({
+        endpoint: `/admin/reservations/${id}`,
         method: "GET",
         auth: true,
       });
@@ -109,32 +79,34 @@ export const useReservationStore = defineStore("reservation", () => {
     }
   }
 
-  async function cancelReservation(id: number) {
+  async function updateReservationStatus(id: number, paymentStatus: string) {
     isLoading.value = true;
     error.value = null;
 
     try {
-      const response = await apiStore.apiRequest<ApiResponse<null>>({
-        endpoint: `/reservations/${id}/cancel`,
+      const response = await apiStore.apiRequest<ApiResponse<boolean>>({
+        endpoint: `/admin/reservations/${id}/status`,
         method: "PATCH",
         auth: true,
+        data: { paymentStatus },
       });
 
       if (response?.success) {
-        // Sync local state
         if (selectedReservation.value?.reservationId === id) {
           selectedReservation.value = {
             ...selectedReservation.value,
-            paymentStatus: "Cancelled",
+            paymentStatus,
           };
         }
 
-        const item = reservations.value.find((r) => r.reservationId === id);
+        const item = reservations.value?.items.find(
+          (r) => r.reservationId === id,
+        );
         if (item) {
-          item.paymentStatus = "Cancelled";
+          item.paymentStatus = paymentStatus;
         }
       } else {
-        error.value = response?.message ?? "Failed to cancel reservation";
+        error.value = response?.message ?? "Failed to update status";
       }
 
       return response;
@@ -157,13 +129,12 @@ export const useReservationStore = defineStore("reservation", () => {
   return {
     reservations,
     selectedReservation,
-    totalCount,
     isLoading,
     error,
 
     fetchReservations,
     fetchReservationById,
-    cancelReservation,
+    updateReservationStatus,
     clearSelectedReservation,
     clearError,
   };

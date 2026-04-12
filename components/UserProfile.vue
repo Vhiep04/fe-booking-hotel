@@ -80,6 +80,7 @@ interface Props {
   fullName: string;
   email: string;
   avatarUrl?: string;
+  isAdmin?: boolean;
 }
 const open = ref(false);
 
@@ -100,19 +101,27 @@ const emit = defineEmits<{
 const menu = ref();
 
 const avatarImage = computed(() => {
-  if (props.avatarUrl) {
-    return props.avatarUrl;
-  }
+  if (props.avatarUrl) return props.avatarUrl;
   return "/assets/images/avt-df.jpg";
 });
 
-const menuItems = ref<MenuItem[]>([
+const menuItems = computed<MenuItem[]>(() => [
   {
     label: "My Account",
     icon: "pi pi-user",
     showArrow: true,
     command: () => router.push("/user-info"),
   },
+  ...(!props.isAdmin
+    ? [
+        {
+          label: "My Reservations",
+          icon: "pi pi-calendar",
+          showArrow: true,
+          command: () => router.push("/reservation"),
+        },
+      ]
+    : []),
 ]);
 
 const handleSignOut = () => {
