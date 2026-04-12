@@ -111,19 +111,25 @@
           <div
             v-for="notification in notifications"
             :key="notification.id"
-            class="p-3 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer transition-colors"
-            :class="{ 'bg-blue-50 dark:bg-blue-900/20': !notification.read }"
+            @click="onClickNotification(notification.id)"
+            class="p-3 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer"
+            :class="{ 'bg-blue-50 dark:bg-blue-900/20': !notification.isRead }"
           >
             <div class="flex items-start gap-3">
-              <i
-                :class="['text-lg', notification.icon, notification.iconColor]"
-              ></i>
               <div class="flex-1">
                 <p class="font-medium text-sm m-0">{{ notification.title }}</p>
                 <p class="text-xs text-gray-500 m-0 mt-1">
-                  {{ notification.time }}
+                  {{ notification.message }}
+                </p>
+                <p class="text-xs text-gray-400 m-0 mt-1">
+                  {{ new Date(notification.createdAt).toLocaleString("vi-VN") }}
                 </p>
               </div>
+              <!-- Chấm xanh nếu chưa đọc -->
+              <span
+                v-if="!notification.isRead"
+                class="w-2 h-2 rounded-full bg-blue-500 mt-1 shrink-0"
+              />
             </div>
           </div>
           <div
@@ -139,7 +145,6 @@
 </template>
 
 <script setup lang="ts">
-import Menu from "primevue/menu";
 import Dialog from "primevue/dialog";
 import OverlayPanel from "primevue/overlaypanel";
 import InputText from "primevue/inputtext";
@@ -150,6 +155,8 @@ import { useAdminLayoutStore } from "~/stores/admin/layout";
 import { useAdminAuthStore } from "~/stores/admin/auth";
 import type { UserInfoResponse } from "~/stores/interface/response/getUserInfo";
 import UserProfile from "../UserProfile.vue";
+import { useNotificationStore } from "~/stores/notification";
+import { useNotificationHub } from "~/composables/useNotificationHub";
 
 const layoutStore = useAdminLayoutStore();
 const authStore = useAdminAuthStore();
@@ -199,57 +206,19 @@ const userData = reactive<UserInfoResponse>({
   userId: "",
 });
 
-const notifications = ref([
-  {
-    id: 1,
-    title: "New booking received",
-    time: "5 minutes ago",
-    icon: "pi pi-calendar",
-    iconColor: "text-blue-500",
-    read: false,
-  },
-  {
-    id: 2,
-    title: "Payment confirmed",
-    time: "1 hour ago",
-    icon: "pi pi-check-circle",
-    iconColor: "text-green-500",
-    read: false,
-  },
-  {
-    id: 3,
-    title: "New user registered",
-    time: "3 hours ago",
-    icon: "pi pi-user-plus",
-    iconColor: "text-purple-500",
-    read: true,
-  },
-]);
+const notificationStore = useNotificationStore();
+const { init: initHub, stop: stopHub } = useNotificationHub();
 
-const notificationCount = computed(
-  () => notifications.value.filter((n) => !n.read).length,
-);
+const notifications = computed(() => notificationStore.notifications);
+const notificationCount = computed(() => notificationStore.unreadCount);
 
-// Profile Menu Items
-const profileMenuItems = ref([
-  {
-    label: "Profile",
-    icon: "pi pi-user",
-    command: () => navigateTo("/admin/profile"),
-  },
-  {
-    label: "Settings",
-    icon: "pi pi-cog",
-    command: () => navigateTo("/admin/settings"),
-  },
-  { separator: true },
-  {
-    label: "Logout",
-    icon: "pi pi-sign-out",
-    command: () => authStore.logout(),
-  },
-]);
+async function markAllRead() {
+  await notificationStore.markAllRead();
+}
 
+async function onClickNotification(id: number) {
+  await notificationStore.markOneRead(id);
+}
 // Methods
 function onMenuToggle() {
   layoutStore.onMenuToggle();
@@ -271,16 +240,8 @@ function performSearch() {
   }
 }
 
-function toggleProfileMenu(event: Event) {
-  profileMenu.value.toggle(event);
-}
-
 function toggleNotifications(event: Event) {
   notificationsPanel.value.toggle(event);
-}
-
-function markAllRead() {
-  notifications.value = notifications.value.map((n) => ({ ...n, read: true }));
 }
 
 function handleSignOut() {
@@ -301,5 +262,11 @@ onMounted(async () => {
     userData.lastName = user.lastName ?? "";
     userData.userId = user.userId ?? "";
   }
+
+  await initHub();
+});
+
+onUnmounted(() => {
+  stopHub();
 });
 </script>

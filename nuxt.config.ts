@@ -9,6 +9,7 @@ export default defineNuxtConfig({
   runtimeConfig: {
     public: {
       apiHost: process.env.NUXT_PUBLIC_API_HOST || "http://localhost:5000",
+      apiBase: process.env.NUXT_PUBLIC_API_BASE || "https://localhost:44329",
     },
   },
 
@@ -54,7 +55,6 @@ export default defineNuxtConfig({
     transpile: ["primevue"],
   },
 
-  // Config cho ofetch global
   app: {
     head: {
       // title: "Booking.com",
@@ -63,7 +63,6 @@ export default defineNuxtConfig({
     },
   },
 
-  // Nitro config cho proxy (development only)
   nitro: {
     devProxy: {
       "/api": {

@@ -9,17 +9,13 @@
       <!-- IDs -->
       <div class="grid grid-cols-2 gap-4">
         <div>
-          <label class="text-sm text-[var(--admin-text-muted)]"
-            >Booking ID</label
-          >
-          <p class="font-semibold text-[var(--admin-primary)]">
+          <label class="text-sm text-(--admin-text-muted)"> Booking ID </label>
+          <p class="font-semibold text-(--admin-primary)">
             #{{ booking.reservationId }}
           </p>
         </div>
         <div>
-          <label class="text-sm text-[var(--admin-text-muted)]"
-            >Created At</label
-          >
+          <label class="text-sm text-(--admin-text-muted)"> Created At </label>
           <p class="font-medium">{{ formatDate(booking.createdAt) }}</p>
         </div>
       </div>
@@ -30,8 +26,8 @@
       <div>
         <h4 class="font-semibold mb-3">Hotel Information</h4>
         <p class="font-semibold text-lg">{{ booking.hotelName }}</p>
-        <p class="text-[var(--admin-text-muted)]">{{ booking.roomType }}</p>
-        <p class="text-sm text-[var(--admin-text-muted)] mt-1">
+        <p class="text-(--admin-text-muted)">{{ booking.roomType }}</p>
+        <p class="text-sm text-(--admin-text-muted) mt-1">
           <i class="pi pi-map-marker mr-1"></i>{{ booking.cityName }}
         </p>
       </div>
@@ -43,11 +39,11 @@
         <h4 class="font-semibold mb-3">Guest Information</h4>
         <div class="grid grid-cols-2 gap-4">
           <div>
-            <label class="text-sm text-[var(--admin-text-muted)]">Name</label>
+            <label class="text-sm text-(--admin-text-muted)">Name</label>
             <p class="font-medium">{{ booking.userName }}</p>
           </div>
           <div>
-            <label class="text-sm text-[var(--admin-text-muted)]">Email</label>
+            <label class="text-sm text-(--admin-text-muted)">Email</label>
             <p class="font-medium">{{ booking.userEmail }}</p>
           </div>
         </div>
@@ -60,21 +56,15 @@
         <h4 class="font-semibold mb-3">Stay Information</h4>
         <div class="grid grid-cols-3 gap-4">
           <div>
-            <label class="text-sm text-[var(--admin-text-muted)]"
-              >Check-in</label
-            >
+            <label class="text-sm text-(--admin-text-muted)">Check-in</label>
             <p class="font-medium">{{ formatDate(booking.checkInDate) }}</p>
           </div>
           <div>
-            <label class="text-sm text-[var(--admin-text-muted)]"
-              >Check-out</label
-            >
+            <label class="text-sm text-(--admin-text-muted)">Check-out</label>
             <p class="font-medium">{{ formatDate(booking.checkOutDate) }}</p>
           </div>
           <div>
-            <label class="text-sm text-[var(--admin-text-muted)]"
-              >Duration</label
-            >
+            <label class="text-sm text-(--admin-text-muted)">Duration</label>
             <p class="font-medium">{{ booking.nights }} nights</p>
           </div>
         </div>
@@ -87,17 +77,17 @@
         <h4 class="font-semibold mb-3">Payment Information</h4>
         <div class="grid grid-cols-2 gap-4 mb-4">
           <div>
-            <label class="text-sm text-[var(--admin-text-muted)]"
-              >Total Amount</label
-            >
+            <label class="text-sm text-(--admin-text-muted)">
+              Total Amount
+            </label>
             <p class="font-bold text-xl">
               ${{ booking.totalPrice.toLocaleString() }}
             </p>
           </div>
           <div>
-            <label class="text-sm text-[var(--admin-text-muted)]"
-              >Payment Status</label
-            >
+            <label class="text-sm text-(--admin-text-muted)">
+              Payment Status
+            </label>
             <div class="mt-1">
               <Tag
                 :value="booking.paymentStatus"
@@ -109,18 +99,18 @@
 
         <!-- Payment history -->
         <div v-if="booking.payments?.length > 0">
-          <label class="text-sm text-[var(--admin-text-muted)] mb-2 block"
-            >Payment History</label
-          >
+          <label class="text-sm text-(--admin-text-muted) mb-2 block">
+            Payment History
+          </label>
           <div class="space-y-2">
             <div
               v-for="payment in booking.payments"
               :key="payment.paymentId"
-              class="flex items-center justify-between p-3 rounded-lg bg-[var(--admin-surface-hover)]"
+              class="flex items-center justify-between p-3 rounded-lg bg-(--admin-surface-hover)"
             >
               <div>
                 <p class="font-medium text-sm">{{ payment.paymentMethod }}</p>
-                <p class="text-xs text-[var(--admin-text-muted)]">
+                <p class="text-xs text-(--admin-text-muted)">
                   {{ formatDate(payment.paymentDate) }}
                 </p>
               </div>
@@ -188,8 +178,8 @@ function formatDate(dateString: string) {
 
 function getPaymentSeverity(status: string) {
   const map: Record<string, string> = {
-    Paid: "success",
     Pending: "warn",
+    Confirmed: "success",
     Completed: "success",
     Cancelled: "danger",
     Refunded: "secondary",

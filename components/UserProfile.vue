@@ -46,7 +46,7 @@
           @click="item.command?.({ originalEvent: $event, item })"
           class="flex items-center w-full px-6 py-3 hover:bg-gray-300 cursor-pointer transition-colors"
           :class="{
-            'bg-blue-600 text-white hover:!bg-blue-800':
+            'bg-blue-600 text-white hover:bg-blue-800!':
               route.path === '/user-info',
           }"
         >

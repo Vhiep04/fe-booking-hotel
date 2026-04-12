@@ -198,7 +198,7 @@ const emit = defineEmits<{
 
 const statusOptions = [
   { label: "Pending", value: "Pending" },
-  { label: "Paid", value: "Paid" },
+  { label: "Confirmed", value: "Confirmed" },
   { label: "Completed", value: "Completed" },
   { label: "Cancelled", value: "Cancelled" },
   { label: "Refunded", value: "Refunded" },
@@ -218,11 +218,10 @@ function formatDate(dateString: string) {
 
 function getPaymentSeverity(status: string) {
   const map: Record<string, string> = {
-    Paid: "success",
     Pending: "warn",
     Completed: "success",
     Cancelled: "danger",
-    Refunded: "secondary",
+    Confirmed: "secondary",
   };
   return map[status] ?? "secondary";
 }

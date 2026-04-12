@@ -48,8 +48,9 @@ const cards = computed(() => [
     iconColor: "text-yellow-600",
   },
   {
-    label: "Paid",
-    value: props.reservations.filter((r) => r.paymentStatus === "Paid").length,
+    label: "Confirmed",
+    value: props.reservations.filter((r) => r.paymentStatus === "Confirmed")
+      .length,
     icon: "pi pi-check-circle",
     bg: "bg-green-100 dark:bg-green-900/30",
     iconColor: "text-green-600",
