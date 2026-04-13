@@ -10,6 +10,7 @@ export interface UserReservation {
   roomTypeName: string;
   pricePerNight: number;
   capacity: number;
+  hotelId: number;
   hotelName: string;
   hotelLocation: string;
   hotelImage: string;

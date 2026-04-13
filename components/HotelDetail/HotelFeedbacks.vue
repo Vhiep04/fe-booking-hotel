@@ -86,7 +86,7 @@
             <div
               v-for="fb in feedbacks"
               :key="fb.feedbackId"
-              class="feedback-card flex-shrink-0"
+              class="feedback-card shrink-0"
               :style="{
                 width: `calc(${100 / visibleCards}% - ${(20 * (visibleCards - 1)) / visibleCards}px)`,
               }"
@@ -159,7 +159,6 @@
         </div>
       </div>
 
-      <!-- Empty State -->
       <div
         v-if="feedbacks.length === 0"
         class="text-center py-16 text-gray-400"

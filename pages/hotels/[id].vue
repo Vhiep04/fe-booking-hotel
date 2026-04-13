@@ -1,13 +1,11 @@
 <template>
   <div class="max-w-7xl mx-auto p-4 md:p-6 bg-gray-50">
-    <!-- Loading State -->
     <div v-if="isLoading" class="flex justify-center items-center min-h-screen">
       <i class="pi pi-spin pi-spinner text-4xl text-blue-600"></i>
     </div>
 
     <!-- Hotel Details -->
     <div v-else-if="hotel">
-      <!-- Image Gallery -->
       <HotelDetailHeader
         v-if="hotel"
         :hotel="hotel"
@@ -16,18 +14,14 @@
         @showMap="showMap = true"
       />
 
-      <!-- Tabs Section -->
       <HotelDetailTabs :description="hotel.description" />
 
-      <!-- Amenities & Booking Section -->
       <div class="grid md:grid-cols-3 gap-6 mb-8">
-        <!-- Amenities Section -->
         <HotelAmenities
           :facilities="hotel.popularFacilities"
           class="md:col-span-2"
         />
 
-        <!-- Booking Card -->
         <HotelBookingCard
           :location="hotel.location"
           :min-price="hotel.minPricePerNight"
@@ -37,7 +31,6 @@
         />
       </div>
 
-      <!-- Rooms Section -->
       <div class="bg-white rounded-lg shadow-sm p-6 mb-8">
         <div class="flex items-center justify-between mb-6">
           <h2 class="text-2xl font-bold text-gray-900">
@@ -54,12 +47,10 @@
           </div>
         </div>
 
-        <!-- Loading Rooms -->
         <div v-if="hotelStore.isLoadingRooms" class="flex justify-center py-12">
           <i class="pi pi-spin pi-spinner text-3xl text-blue-600"></i>
         </div>
 
-        <!-- Rooms List -->
         <div
           v-else-if="rooms && rooms.length > 0"
           class="space-y-4"
@@ -74,7 +65,6 @@
           />
         </div>
 
-        <!-- No Rooms Available -->
         <div v-else class="text-center py-12">
           <i class="pi pi-inbox text-6xl text-gray-300 mb-4"></i>
           <p class="text-gray-500 text-lg">
@@ -85,6 +75,16 @@
 
       <!-- Feedbacks Section -->
       <HotelFeedbacks :hotel="hotel" />
+
+      <HotelFeedbackForm
+        v-if="hotel"
+        :hotel-id="hotel.hotelId"
+        :existing-feedback="myHotelFeedback"
+        :can-leave-feedback="canLeaveFeedback"
+        :reservation-id="completedReservation?.reservationId"
+        @feedback-submitted="handleFeedbackChange"
+        @feedback-deleted="handleFeedbackChange"
+      />
     </div>
 
     <!-- Error State -->
@@ -123,6 +123,7 @@ import HotelBookingCard from "~/components/HotelDetail/HotelBookingCard.vue";
 import HotelRoomCard from "~/components/HotelDetail/HotelRoomCard.vue";
 import HotelMapModal from "~/components/HotelDetail/HotelMapModal.vue";
 import HotelFeedbacks from "~/components/HotelDetail/HotelFeedbacks.vue";
+import HotelFeedbackForm from "~/components/HotelDetail/HotelFeedbackForm.vue";
 
 const { t } = useI18n();
 const hotel = ref<HotelData | null>(null);
@@ -140,6 +141,23 @@ const route = useRoute();
 const router = useRouter();
 const cityStore = useCityStore();
 const hotelStore = useHotelStore();
+const feedbackStore = useFeedbackStore();
+const bookingStore = useReservationStore();
+
+const myHotelFeedback = computed(
+  () =>
+    feedbackStore.myFeedbacks.find((f) => f.hotelId === hotel.value?.hotelId) ??
+    null,
+);
+
+const handleFeedbackChange = async () => {
+  const hotelId = parseInt(route.params.id as string);
+  await Promise.all([
+    hotelStore.getHotelById(hotelId),
+    feedbackStore.fetchMyFeedbacks(),
+  ]);
+  hotel.value = hotelStore.currentHotel as HotelData;
+};
 
 const isLoading = ref(true);
 const roomsSection = ref<HTMLElement | null>(null);
@@ -147,9 +165,21 @@ const roomsSection = ref<HTMLElement | null>(null);
 const rooms = computed(() => hotelStore.currentHotelRooms);
 const roomListData = computed(() => hotelStore.roomListData);
 
-onBeforeUnmount(() => {
-  hotelStore.clearRoomData();
+const canLeaveFeedback = computed(() => {
+  if (!hotel.value) return false;
+  return bookingStore.reservations.some(
+    (r) =>
+      r.hotelId === hotel.value!.hotelId && r.paymentStatus === "Completed",
+  );
 });
+
+// tìm reservation completed của hotel này
+const completedReservation = computed(() =>
+  bookingStore.reservations.find(
+    (r) =>
+      r.hotelId === hotel.value?.hotelId && r.paymentStatus === "Completed",
+  ),
+);
 
 const handleImageClick = (imageIndex: number) => {
   console.log("Image clicked:", imageIndex);
@@ -187,18 +217,25 @@ const getOriginalPrice = (currentPrice: number): number => {
 onMounted(async () => {
   try {
     const hotelId = parseInt(route.params.id as string);
-
     await hotelStore.getHotelById(hotelId);
     hotel.value = hotelStore.currentHotel as HotelData;
 
     if (hotel.value) {
-      await hotelStore.getHotelRooms(hotelId);
+      await Promise.all([
+        hotelStore.getHotelRooms(hotelId),
+        feedbackStore.fetchMyFeedbacks(),
+        bookingStore.fetchReservations(),
+      ]);
     }
   } catch (error) {
     console.error("Error loading hotel:", error);
   } finally {
     isLoading.value = false;
   }
+});
+
+onBeforeUnmount(() => {
+  hotelStore.clearRoomData();
 });
 </script>
 
