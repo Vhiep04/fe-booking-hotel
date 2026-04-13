@@ -76,7 +76,7 @@ const handleSearch = async (params: {
   cityName: string;
   checkIn: string | null;
   checkOut: string | null;
-  bedType: string;
+  roomTypeName: string;
 }) => {
   await cityStore.getCity({ name: params.cityName });
 
@@ -85,7 +85,7 @@ const handleSearch = async (params: {
     cityName: params.cityName,
     checkIn: params.checkIn || undefined,
     checkOut: params.checkOut || undefined,
-    bedType: params.bedType || undefined,
+    roomTypeName: params.roomTypeName || undefined,
   });
 
   await cityStore.fetchHotels();

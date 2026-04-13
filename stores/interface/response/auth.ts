@@ -31,3 +31,30 @@ export interface ResendOtpResponseData {
   success: boolean;
   message: string;
 }
+
+export interface ForgotPasswordData {
+  expiresIn: string;
+}
+
+export interface VerifyResetOtpData {
+  email: string;
+  resetToken: string;
+  expiresIn: string;
+}
+
+export interface ForgotPasswordResponseData {
+  success: boolean;
+  message: string;
+  data: ForgotPasswordData;
+}
+
+export interface VerifyResetOtpResponseData {
+  success: boolean;
+  message: string;
+  data: VerifyResetOtpData;
+}
+
+export interface ResetPasswordResponseData {
+  success: boolean;
+  message: string;
+}

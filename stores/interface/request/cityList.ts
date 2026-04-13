@@ -8,7 +8,7 @@ export interface CityListRequest {
   sortBy?: SortBy;
   checkIn?: string;
   checkOut?: string;
-  bedType?: string;
+  roomTypeName?: string;
   facilities?: number[];
 }
 

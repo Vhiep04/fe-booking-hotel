@@ -1,17 +1,14 @@
-// stores/searchStore.ts
 import { defineStore } from "pinia";
 import { ref, computed } from "vue";
 
 export const useSearchStore = defineStore(
   "search",
   () => {
-    // State
     const checkIn = ref<string | null>(null);
     const checkOut = ref<string | null>(null);
     const cityName = ref("");
-    const bedType = ref("");
+    const roomTypeName = ref("");
 
-    // Getters
     const checkInDate = computed(() => {
       return checkIn.value ? new Date(checkIn.value) : null;
     });
@@ -29,7 +26,7 @@ export const useSearchStore = defineStore(
 
     const checkInDateOnly = computed(() => {
       if (!checkInDate.value) return null;
-      return toDateOnly(checkInDate.value); // Use your existing helper
+      return toDateOnly(checkInDate.value);
     });
 
     const checkOutDateOnly = computed(() => {
@@ -41,7 +38,6 @@ export const useSearchStore = defineStore(
       return !!(checkIn.value && checkOut.value);
     });
 
-    // Actions
     const setDates = (newCheckIn: Date | null, newCheckOut: Date | null) => {
       checkIn.value = newCheckIn ? newCheckIn.toISOString() : null;
       checkOut.value = newCheckOut ? newCheckOut.toISOString() : null;
@@ -61,8 +57,8 @@ export const useSearchStore = defineStore(
       cityName.value = name;
     };
 
-    const setBedType = (type: string) => {
-      bedType.value = type;
+    const setRoomTypeName = (type: string) => {
+      roomTypeName.value = type;
     };
 
     const clearDates = () => {
@@ -74,27 +70,26 @@ export const useSearchStore = defineStore(
       checkIn.value = null;
       checkOut.value = null;
       cityName.value = "";
-      bedType.value = "";
+      roomTypeName.value = "";
     };
 
     return {
-      // State
       checkIn,
       checkOut,
       cityName,
-      bedType,
-      // Getters
+
+      roomTypeName,
       checkInDate,
       checkOutDate,
       dateRange,
       hasDates,
       checkInDateOnly,
       checkOutDateOnly,
-      // Actions
+
       setDates,
       setDateRange,
       setCityName,
-      setBedType,
+      setRoomTypeName,
       clearDates,
       clearAll,
     };
@@ -103,7 +98,7 @@ export const useSearchStore = defineStore(
     persist: {
       key: "hotel-search",
       storage: process.client ? sessionStorage : undefined,
-      pick: ["checkIn", "checkOut", "cityName", "bedType"],
+      pick: ["checkIn", "checkOut", "cityName", "roomTypeName"],
     },
   },
 );

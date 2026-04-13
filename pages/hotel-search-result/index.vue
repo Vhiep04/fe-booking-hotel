@@ -79,7 +79,7 @@ type SearchParams = {
   cityName: string;
   checkIn: string | null;
   checkOut: string | null;
-  bedType: string;
+  roomTypeName: string;
 };
 
 type FilterParams = {
@@ -93,7 +93,7 @@ const handleSearch = async (params: SearchParams) => {
     cityName: params.cityName.trim(),
     checkIn: params.checkIn || undefined,
     checkOut: params.checkOut || undefined,
-    bedType: params.bedType,
+    roomTypeName: params.roomTypeName,
   });
 
   await cityStore.fetchHotels();

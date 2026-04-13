@@ -37,7 +37,7 @@ export const useCityStore = defineStore(
       maxPrice: undefined,
       checkIn: undefined,
       checkOut: undefined,
-      bedType: "",
+      roomTypeName: "",
       facilities: [],
       sortBy: undefined,
     });
@@ -54,7 +54,7 @@ export const useCityStore = defineStore(
         maxPrice: undefined,
         checkIn: undefined,
         checkOut: undefined,
-        bedType: "",
+        roomTypeName: "",
         facilities: [],
         sortBy: undefined,
       };

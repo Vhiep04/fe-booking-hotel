@@ -1,5 +1,5 @@
 <template>
-  <Card class="w-full max-w-3xl overflow-hidden shadow-xl">
+  <Card class="w-full max-w-3xl overflow-hidden shadow-2xl">
     <template #content>
       <div class="grid grid-cols-1 lg:grid-cols-[40%_60%] gap-0">
         <!-- Left side - Image -->
@@ -74,7 +74,10 @@
                     Remember Me
                   </label>
                 </div>
-                <a href="#" class="text-sm text-blue-600 hover:text-blue-500">
+                <a
+                  href="/forgot-password"
+                  class="text-sm text-blue-600 hover:text-blue-500"
+                >
                   Forgot Password?
                 </a>
               </div>

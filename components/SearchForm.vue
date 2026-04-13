@@ -70,8 +70,7 @@
         <Button
           type="submit"
           :label="t('Search')"
-          class="h-[50px] w-full px-8 text-white bg-[#07689F]! hover:bg-[#0A7FBF]! border-none!"
-          severity="info"
+          class="custom-btn-search h-[50px] w-full px-8 text-white bg-[#07689F]! hover:bg-[#0A7FBF]! border-none!"
           :loading="loading"
           @click="handleSearch"
         />
@@ -168,14 +167,14 @@ const handleSearch = () => {
   if (!validateForm()) return;
 
   if (localRoomType.value?.code) {
-    searchStore.setBedType(localRoomType.value.code);
+    searchStore.setRoomTypeName(localRoomType.value.code);
   }
 
   emit("search", {
     cityName: searchStore.cityName,
     checkIn: searchStore.checkInDateOnly,
     checkOut: searchStore.checkOutDateOnly,
-    bedType: localRoomType.value?.code ?? "",
+    roomTypeName: localRoomType.value?.code ?? "",
   });
 
   emit("getCity", {
@@ -201,5 +200,19 @@ onMounted(() => {
 :deep(.p-invalid .p-inputtext:focus) {
   border-color: #ef4444 !important;
   box-shadow: 0 0 0 0.2rem rgba(239, 68, 68, 0.25) !important;
+}
+:deep(.custom-btn-search) {
+  position: relative;
+  background-color: #07689f !important;
+  opacity: 1 !important;
+  overflow: hidden;
+}
+
+:deep(.custom-btn-search.p-button-loading) {
+  background-color: #ffffff !important;
+}
+
+:deep(.custom-btn-search:hover) {
+  background-color: #0a7fbf !important;
 }
 </style>
