@@ -12,10 +12,9 @@
         />
       </div>
 
-      <!-- Heart / Favourite Button -->
       <button
         class="absolute top-3 left-3 w-8 h-8 flex items-center justify-center rounded-full bg-white/80 backdrop-blur-sm shadow transition-all duration-300 opacity-0 group-hover:opacity-100 hover:scale-110 hover:bg-white"
-        :class="{ '!opacity-100': isFavourited }"
+        :class="{ 'opacity-100': isFavourited }"
         :disabled="favouriteStore.isLoading"
         @click.stop="handleToggleFavourite"
       >
@@ -58,10 +57,15 @@ const props = defineProps<Props>();
 
 const router = useRouter();
 const favouriteStore = useFavouriteHotelStore();
+const authStore = useAuthStore();
 
 const isFavourited = computed(() => favouriteStore.isFavourited(props.hotelId));
 
 async function handleToggleFavourite() {
+  if (!authStore.isAuthenticated) {
+    router.push("/login");
+    return;
+  }
   await favouriteStore.toggleFavourite(props.hotelId);
 }
 

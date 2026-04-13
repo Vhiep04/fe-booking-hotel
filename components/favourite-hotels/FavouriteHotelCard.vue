@@ -2,7 +2,6 @@
   <div
     class="group flex bg-white dark:bg-slate-800 rounded-2xl border border-slate-100 dark:border-slate-700 overflow-hidden shadow-sm hover:shadow-xl hover:-translate-y-0.5 transition-all duration-300 cursor-pointer"
   >
-    <!-- ── Image ──────────────────────────────────────────────────────────── -->
     <div class="relative w-[190px] shrink-0 overflow-hidden">
       <img
         :src="hotel.hotelImgUrl || FALLBACK"
@@ -11,7 +10,6 @@
         @error="(e) => ((e.target as HTMLImageElement).src = FALLBACK)"
       />
 
-      <!-- Favourite Button -->
       <Button
         :icon="isFavourited ? 'pi pi-heart-fill' : 'pi pi-heart'"
         rounded
@@ -20,13 +18,12 @@
         size="small"
         :loading="isToggling"
         :class="[
-          '!absolute top-2 left-2 !w-9 !h-9 !bg-white/90 dark:!bg-slate-800/90 backdrop-blur-sm shadow-md',
-          isFavourited ? '!text-blue-500' : '!text-slate-400',
+          'absolute! top-2 left-2 w-9! h-9! bg-white/90! dark:bg-slate-800/90! backdrop-blur-sm shadow-md',
+          isFavourited ? 'text-blue-500!' : 'text-slate-400!',
         ]"
         @click.stop="handleToggle"
       />
 
-      <!-- Rating Chip -->
       <div
         class="absolute bottom-2 right-2 flex items-center gap-1 bg-white/95 dark:bg-slate-800/95 backdrop-blur-sm rounded-full px-2.5 py-1 shadow text-xs font-bold text-slate-800 dark:text-white"
       >
@@ -36,14 +33,12 @@
     </div>
 
     <div class="flex flex-col flex-1 p-4 min-w-0">
-      <!-- Hotel Name -->
       <h3
         class="text-[15px] font-bold text-slate-900 dark:text-white leading-snug line-clamp-2 mb-1"
       >
         {{ hotel.hotelName }}
       </h3>
 
-      <!-- Location -->
       <div
         class="flex items-center gap-1 text-slate-500 dark:text-slate-400 text-xs mb-3"
       >
@@ -51,11 +46,9 @@
         <span>{{ hotel.cityName }}, {{ hotel.country }}</span>
       </div>
 
-      <Divider class="!my-0 !mb-3" />
+      <Divider class="my-0! mb-3!" />
 
-      <!-- Price + Review Score -->
       <div class="flex items-end justify-between gap-3">
-        <!-- Price -->
         <div class="flex flex-col gap-0.5">
           <span
             class="text-[10px] uppercase tracking-widest text-slate-400 font-medium"
@@ -76,7 +69,6 @@
           >
         </div>
 
-        <!-- Review Badge (Booking.com style) -->
         <div class="flex items-center gap-2 shrink-0">
           <div class="flex flex-col items-end gap-0.5">
             <span
@@ -88,7 +80,7 @@
               {{ hotel.totalReviews?.toLocaleString() }} reviews
             </span>
           </div>
-          <!-- Score Box -->
+
           <div
             :class="[
               'w-9 h-9 rounded-lg rounded-br-none flex items-center justify-center text-sm font-bold text-white',
@@ -100,12 +92,11 @@
         </div>
       </div>
 
-      <!-- Badges -->
       <div class="flex flex-wrap gap-1.5 mt-3">
         <Tag
           v-if="hotel.sustainableLevel"
           severity="success"
-          class="!text-[10px] !px-2 !py-0.5 !rounded-full !font-medium"
+          class="text-[10px]! px-2! py-0.5! rounded-full! font-medium!"
         >
           <template #default>
             <i class="pi pi-verified mr-1 text-[10px]" />
@@ -116,7 +107,7 @@
         <Tag
           v-if="discountLabel"
           severity="warn"
-          class="!text-[10px] !px-2 !py-0.5 !rounded-full !font-medium"
+          class="text-[10px]! px-2! py-0.5! rounded-full! font-medium!"
         >
           <template #default>
             <i class="pi pi-tag mr-1 text-[10px]" />
@@ -125,7 +116,6 @@
         </Tag>
       </div>
 
-      <!-- See Availability CTA -->
       <div class="mt-auto pt-3">
         <Button
           label="See Availability"
@@ -133,7 +123,7 @@
           icon-pos="right"
           size="small"
           text
-          class="!p-0 !text-blue-600 dark:!text-blue-400 !font-bold !text-sm"
+          class="p-0! text-blue-600! dark:text-blue-400! font-bold! text-sm!"
           @click.stop="$emit('view', hotel)"
         />
       </div>

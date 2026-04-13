@@ -35,7 +35,6 @@
         </OverlayPanel>
 
         <template v-if="authStore.isAuthenticated">
-          <!-- Favourite -->
           <NuxtLink
             class="text-gray-700 hover:text-red-500 transition-colors"
             to="/favourite-hotels"
@@ -43,7 +42,6 @@
             <i class="pi pi-heart" style="font-size: 1.2rem"></i>
           </NuxtLink>
 
-          <!-- Notifications -->
           <button
             class="text-gray-700 hover:text-blue-600 transition-colors relative"
             @click="toggleNotifications"
@@ -70,12 +68,10 @@
                 </button>
               </div>
 
-              <!-- Loading -->
               <div v-if="notificationStore.loading" class="text-center py-6">
                 <i class="pi pi-spin pi-spinner text-gray-400"></i>
               </div>
 
-              <!-- List -->
               <div v-else class="flex flex-col gap-1 max-h-80 overflow-y-auto">
                 <div
                   v-for="n in notifications"
@@ -153,6 +149,17 @@
         </template>
       </div>
     </div>
+    <nav class="px-10 py-2 flex justify-center gap-3 flex-wrap">
+      <NuxtLink
+        v-for="item in navItems"
+        :key="item.name"
+        :to="item.path"
+        class="px-4 py-1.5 rounded-full border border-gray-300 text-sm text-gray-500 hover:bg-gray-100 hover:text-gray-800 hover:border-gray-400 transition-colors cursor-pointer"
+        active-class="border-gray-500 text-gray-800 font-medium"
+      >
+        {{ item.name }}
+      </NuxtLink>
+    </nav>
   </header>
 </template>
 
@@ -177,6 +184,14 @@ const authStore = useAuthStore();
 const notificationStore = useNotificationStore();
 
 const langPanel = ref();
+const navItems = [
+  { name: "Home", path: "/" },
+  { name: "%Deals", path: "/deals" },
+  { name: "Hotel", path: "/hotel" },
+  { name: "Flight", path: "/flight" },
+  { name: "Apartment", path: "/apartment" },
+  { name: "Camper", path: "/camper" },
+];
 const languages: { code: LocaleCode; label: string; flag: string }[] = [
   { code: "en", label: "English", flag: enFlag },
   { code: "vi", label: "Tiếng Việt", flag: viFlag },
