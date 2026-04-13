@@ -36,9 +36,12 @@
 
         <template v-if="authStore.isAuthenticated">
           <!-- Favourite -->
-          <button class="text-gray-700 hover:text-red-500 transition-colors">
+          <NuxtLink
+            class="text-gray-700 hover:text-red-500 transition-colors"
+            to="/favourite-hotels"
+          >
             <i class="pi pi-heart" style="font-size: 1.2rem"></i>
-          </button>
+          </NuxtLink>
 
           <!-- Notifications -->
           <button

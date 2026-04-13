@@ -1,247 +1,205 @@
 <template>
-  <div
-    class="min-h-screen bg-gradient-to-b from-slate-50 to-white dark:from-slate-900 dark:to-slate-800"
-  >
-    <!-- Header -->
+  <div class="min-h-screen bg-slate-50 dark:bg-slate-900">
     <div
-      class="bg-white dark:bg-slate-800 border-b border-slate-200 dark:border-slate-700 sticky top-0 z-10"
+      class="sticky top-0 z-10 bg-white dark:bg-slate-800 border-b border-slate-200 dark:border-slate-700 shadow-sm"
     >
-      <div class="max-w-7xl mx-auto px-4 md:px-8 py-6">
-        <div class="flex items-center justify-between mb-2">
-          <h1 class="text-3xl font-bold text-slate-900 dark:text-white">
+      <div class="max-w-4xl mx-auto px-4 md:px-8 py-5">
+        <div class="flex items-center justify-between mb-1">
+          <h1
+            class="text-2xl font-extrabold text-slate-900 dark:text-white tracking-tight"
+          >
             My Favourite Hotels
           </h1>
           <NuxtLink
             to="/"
-            class="text-blue-600 dark:text-blue-400 hover:underline text-sm"
+            class="text-sm text-slate-500 hover:text-blue-600 dark:text-slate-400 dark:hover:text-blue-400 flex items-center gap-1 transition-colors"
           >
-            ← Back to Home
+            <i class="pi pi-arrow-left text-xs" />
+            Back to Home
           </NuxtLink>
         </div>
-        <p class="text-slate-600 dark:text-slate-400">
-          You have
-          <span class="font-semibold">{{ totalFavourites }}</span> favourite
-          hotel{{ totalFavourites !== 1 ? "s" : "" }}
+        <p class="text-sm text-slate-500 dark:text-slate-400">
+          <template v-if="!store.isLoading">
+            <span class="font-semibold text-blue-600 dark:text-blue-400">
+              {{ store.totalCount }}
+            </span>
+            saved propert{{ store.totalCount !== 1 ? "ies" : "y" }}
+          </template>
+          <Skeleton v-else width="80px" height="16px" class="inline-block" />
         </p>
       </div>
     </div>
 
-    <!-- Main Content -->
-    <div class="max-w-7xl mx-auto px-4 md:px-8 py-8">
-      <!-- Filter & Sort Section -->
-      <div class="grid grid-cols-1 md:grid-cols-5 gap-4 mb-8">
-        <!-- Search -->
-        <IconField>
-          <InputIcon class="pi pi-search" />
-          <InputText
-            v-model="filters.search"
-            placeholder="Search hotels..."
-            class="w-full"
-          />
-        </IconField>
+    <div class="max-w-4xl mx-auto px-4 md:px-8 py-6 flex flex-col gap-5">
+      <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
+        <div class="col-span-2 sm:col-span-3 lg:col-span-1">
+          <IconField>
+            <InputIcon class="pi pi-search" />
+            <InputText
+              v-model="filters.search"
+              placeholder="Search hotels…"
+              class="w-full !text-sm"
+            />
+          </IconField>
+        </div>
 
-        <!-- Location Filter -->
-        <Dropdown
+        <Select
           v-model="filters.location"
           :options="locationOptions"
           option-label="label"
           option-value="value"
           placeholder="All Locations"
-          @change="filterHotels"
+          show-clear
+          class="w-full !text-sm"
         />
 
-        <!-- Price Range Filter -->
-        <Dropdown
+        <Select
           v-model="filters.priceRange"
           :options="priceRanges"
           option-label="label"
           option-value="value"
           placeholder="All Prices"
-          @change="filterHotels"
+          show-clear
+          class="w-full !text-sm"
         />
 
-        <!-- Rating Filter -->
-        <Dropdown
+        <Select
           v-model="filters.rating"
           :options="ratingOptions"
           option-label="label"
           option-value="value"
           placeholder="All Ratings"
-          @change="filterHotels"
+          show-clear
+          class="w-full !text-sm"
         />
 
-        <!-- Sort -->
-        <Dropdown
+        <Select
           v-model="sortBy"
           :options="sortOptions"
           option-label="label"
           option-value="value"
           placeholder="Sort by"
-          @change="sortHotels"
+          show-clear
+          class="w-full !text-sm"
         />
       </div>
 
-      <!-- Empty State -->
-      <div v-if="filteredHotels.length === 0" class="py-16">
-        <div class="text-center">
-          <div
-            class="w-24 h-24 bg-slate-100 dark:bg-slate-700 rounded-full mx-auto mb-4 flex items-center justify-center"
-          >
-            <i
-              class="pi pi-heart-fill text-4xl text-slate-400 dark:text-slate-500"
-            ></i>
-          </div>
-          <h3 class="text-xl font-semibold text-slate-900 dark:text-white mb-2">
-            No Favourite Hotels Yet
-          </h3>
-          <p class="text-slate-600 dark:text-slate-400 mb-6">
-            Start adding hotels to your favourites to see them here
-          </p>
-          <NuxtLink
-            to="/hotels"
-            class="inline-block px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
-          >
-            Explore Hotels
-          </NuxtLink>
-        </div>
+      <div v-if="hasActiveFilters" class="flex flex-wrap gap-2 -mt-1">
+        <Chip
+          v-if="filters.search"
+          :label="`Search: ${filters.search}`"
+          removable
+          class="!text-xs"
+          @remove="filters.search = ''"
+        />
+        <Chip
+          v-if="filters.location"
+          :label="filters.location"
+          removable
+          class="!text-xs"
+          @remove="filters.location = null"
+        />
+        <Chip
+          v-if="filters.priceRange"
+          :label="
+            priceRanges.find((p) => p.value === filters.priceRange)?.label ?? ''
+          "
+          removable
+          class="!text-xs"
+          @remove="filters.priceRange = null"
+        />
+        <Chip
+          v-if="filters.rating"
+          :label="`${filters.rating}+ Stars`"
+          removable
+          class="!text-xs"
+          @remove="filters.rating = null"
+        />
+        <Button
+          label="Clear all"
+          text
+          severity="secondary"
+          size="small"
+          class="!text-xs !py-0"
+          @click="resetFilters"
+        />
       </div>
 
-      <!-- Hotels Grid -->
-      <div v-else class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <div v-if="store.isLoading" class="flex flex-col gap-3">
         <div
-          v-for="hotel in filteredHotels"
-          :key="hotel.id"
-          class="bg-white dark:bg-slate-800 rounded-xl overflow-hidden shadow-md hover:shadow-xl transition-shadow duration-300"
+          v-for="n in 4"
+          :key="n"
+          class="flex bg-white dark:bg-slate-800 rounded-2xl overflow-hidden border border-slate-100 dark:border-slate-700 h-[170px]"
         >
-          <!-- Hotel Image -->
-          <div
-            class="relative h-48 bg-slate-200 dark:bg-slate-700 overflow-hidden"
-          >
-            <img
-              :src="
-                hotel.image ||
-                'https://images.unsplash.com/photo-1631049307264-da0ec9d70304?w=400&h=300&fit=crop'
-              "
-              :alt="hotel.name"
-              class="w-full h-full object-cover hover:scale-110 transition-transform duration-300"
-            />
-            <!-- Rating Badge -->
-            <div
-              class="absolute top-3 right-3 bg-yellow-500 text-white px-3 py-1 rounded-full text-sm font-semibold flex items-center gap-1"
-            >
-              <i class="pi pi-star-fill text-xs"></i>
-              {{ hotel.rating || "4.5" }}
-            </div>
-            <!-- Favourite Button -->
-            <button
-              @click="toggleFavourite(hotel.id)"
-              class="absolute top-3 left-3 w-10 h-10 bg-white dark:bg-slate-800 rounded-full flex items-center justify-center shadow-md hover:shadow-lg transition"
-            >
-              <i
-                :class="[
-                  'pi text-lg',
-                  isFavourite(hotel.id)
-                    ? 'pi-heart-fill text-red-500'
-                    : 'pi-heart text-slate-400',
-                ]"
-              ></i>
-            </button>
-          </div>
-
-          <!-- Hotel Info -->
-          <div class="p-4">
-            <!-- Name -->
-            <h3
-              class="text-lg font-bold text-slate-900 dark:text-white mb-1 line-clamp-2"
-            >
-              {{ hotel.name }}
-            </h3>
-
-            <!-- Location -->
-            <div
-              class="flex items-center gap-1 text-slate-600 dark:text-slate-400 text-sm mb-3"
-            >
-              <i class="pi pi-map-marker text-xs"></i>
-              {{ hotel.location || "Unknown Location" }}
-            </div>
-
-            <!-- Description -->
-            <p
-              class="text-slate-600 dark:text-slate-400 text-sm mb-4 line-clamp-2"
-            >
-              {{
-                hotel.description || "Beautiful hotel with excellent amenities"
-              }}
-            </p>
-
-            <!-- Amenities -->
-            <div class="flex gap-2 mb-4 flex-wrap">
-              <span
-                v-for="(amenity, idx) in hotel.amenities?.slice(0, 2)"
-                :key="idx"
-                class="px-2 py-1 bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400 text-xs rounded-full"
-              >
-                {{ amenity }}
-              </span>
-              <span
-                v-if="hotel.amenities?.length > 2"
-                class="px-2 py-1 text-xs text-slate-600 dark:text-slate-400"
-              >
-                +{{ hotel.amenities.length - 2 }} more
-              </span>
-            </div>
-
-            <!-- Price & Action -->
-            <div
-              class="flex items-center justify-between pt-4 border-t border-slate-200 dark:border-slate-700"
-            >
-              <div>
-                <p class="text-2xl font-bold text-slate-900 dark:text-white">
-                  ${{ hotel.price || "99" }}
-                </p>
-                <p class="text-xs text-slate-600 dark:text-slate-400">
-                  per night
-                </p>
-              </div>
-              <NuxtLink
-                :to="`/hotels/${hotel.id}`"
-                class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition text-sm font-medium"
-              >
-                View Details
-              </NuxtLink>
-            </div>
+          <Skeleton
+            width="190px"
+            height="100%"
+            class="shrink-0 !rounded-none"
+          />
+          <div class="flex flex-col gap-3 flex-1 p-4">
+            <Skeleton width="65%" height="16px" />
+            <Skeleton width="40%" height="12px" />
+            <Skeleton width="30%" height="28px" class="mt-auto" />
           </div>
         </div>
       </div>
 
-      <!-- Pagination -->
       <div
-        v-if="filteredHotels.length > 0"
-        class="flex items-center justify-center gap-4 mt-12"
+        v-else-if="filtered.length === 0"
+        class="flex flex-col items-center justify-center py-20 text-center"
       >
-        <Button
-          icon="pi pi-chevron-left"
-          severity="secondary"
-          text
-          :disabled="currentPage === 1"
-          @click="currentPage--"
-        />
-        <div class="flex gap-2">
-          <Button
-            v-for="page in totalPages"
-            :key="page"
-            :label="String(page)"
-            :severity="currentPage === page ? 'primary' : 'secondary'"
-            text
-            @click="currentPage = page"
-          />
+        <div
+          class="w-20 h-20 rounded-full bg-slate-100 dark:bg-slate-700 flex items-center justify-center mb-4"
+        >
+          <i class="pi pi-heart text-4xl text-slate-300 dark:text-slate-500" />
         </div>
+        <h3 class="text-lg font-bold text-slate-800 dark:text-white mb-2">
+          {{
+            store.favourites.length === 0
+              ? "No favourites yet"
+              : "No results found"
+          }}
+        </h3>
+        <p class="text-sm text-slate-500 dark:text-slate-400 max-w-xs mb-5">
+          {{
+            store.favourites.length === 0
+              ? "Save hotels you love and they'll appear here."
+              : "Try adjusting your filters to find what you're looking for."
+          }}
+        </p>
+        <NuxtLink v-if="store.favourites.length === 0" to="/">
+          <Button label="Explore Hotels" icon="pi pi-search" size="small" />
+        </NuxtLink>
         <Button
-          icon="pi pi-chevron-right"
+          v-else
+          label="Clear Filters"
+          icon="pi pi-filter-slash"
           severity="secondary"
-          text
-          :disabled="currentPage === totalPages"
-          @click="currentPage++"
+          size="small"
+          outlined
+          @click="resetFilters"
+        />
+      </div>
+
+      <div v-else class="flex flex-col gap-3">
+        <FavouriteHotelCard
+          v-for="hotel in paginated"
+          :key="hotel.favouriteId"
+          :hotel="hotel"
+          :is-favourited="store.isFavourited(hotel.hotelId)"
+          @toggle-favourite="store.toggleFavourite($event)"
+          @view="navigateToHotel"
+        />
+      </div>
+
+      <div v-if="totalPages > 1" class="flex justify-center pt-2">
+        <Paginator
+          v-model:first="paginatorFirst"
+          :rows="PER_PAGE"
+          :total-records="filtered.length"
+          :rows-per-page-options="[5, 10, 20]"
+          template="PrevPageLink PageLinks NextPageLink RowsPerPageDropdown"
+          class="!bg-transparent !border-none"
         />
       </div>
     </div>
@@ -249,220 +207,145 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from "vue";
+import { ref, computed, watch, onMounted } from "vue";
+import { useRouter } from "vue-router";
+import Button from "primevue/button";
 import InputText from "primevue/inputtext";
 import IconField from "primevue/iconfield";
 import InputIcon from "primevue/inputicon";
-import Dropdown from "primevue/dropdown";
-import Button from "primevue/button";
+import Select from "primevue/select";
+import Chip from "primevue/chip";
+import Skeleton from "primevue/skeleton";
+import Paginator from "primevue/paginator";
+import { useFavouriteHotelStore } from "~/stores/favouriteHotels";
+import FavouriteHotelCard from "~/components/favourite-hotels/FavouriteHotelCard.vue";
 
-// Sample Data - Replace with API call
-const favouriteHotels = ref([
-  {
-    id: 1,
-    name: "Grand Plaza Hotel",
-    location: "New York",
-    price: 189,
-    rating: 4.8,
-    image:
-      "https://images.unsplash.com/photo-1631049307264-da0ec9d70304?w=400&h=300&fit=crop",
-    description: "Luxury hotel in the heart of Manhattan",
-    amenities: ["Free WiFi", "Gym", "Pool", "Restaurant"],
-  },
-  {
-    id: 2,
-    name: "Sunset Beach Resort",
-    location: "Miami",
-    price: 159,
-    rating: 4.6,
-    image:
-      "https://images.unsplash.com/photo-1566150905458-1bf1fc113f0d?w=400&h=300&fit=crop",
-    description: "Beautiful beachfront resort with stunning ocean views",
-    amenities: ["Beach Access", "Spa", "Bar", "Parking"],
-  },
-  {
-    id: 3,
-    name: "Mountain View Lodge",
-    location: "Denver",
-    price: 129,
-    rating: 4.4,
-    image:
-      "https://images.unsplash.com/photo-1551524164-0fcaf6c6daea?w=400&h=300&fit=crop",
-    description: "Cozy lodge with panoramic mountain views",
-    amenities: ["Hiking Trails", "Fireplace", "Restaurant", "WiFi"],
-  },
-  {
-    id: 4,
-    name: "Modern City Center",
-    location: "Los Angeles",
-    price: 179,
-    rating: 4.7,
-    image:
-      "https://images.unsplash.com/photo-1597696058674-c9f498c0f20d?w=400&h=300&fit=crop",
-    description: "Contemporary hotel in LA downtown",
-    amenities: ["Rooftop Bar", "Gym", "Concierge", "Parking"],
-  },
-  {
-    id: 5,
-    name: "Historic Boston Inn",
-    location: "Boston",
-    price: 149,
-    rating: 4.5,
-    image:
-      "https://images.unsplash.com/photo-1518929458119-e5bf27a6d881?w=400&h=300&fit=crop",
-    description: "Classic hotel with historical charm",
-    amenities: ["Bar", "Restaurant", "Meeting Rooms", "WiFi"],
-  },
-  {
-    id: 6,
-    name: "Tropical Paradise Hotel",
-    location: "Hawaii",
-    price: 249,
-    rating: 4.9,
-    image:
-      "https://images.unsplash.com/photo-1582719471384-894fbb16e074?w=400&h=300&fit=crop",
-    description: "Ultimate tropical vacation destination",
-    amenities: ["Beach Club", "Water Sports", "Spa", "Restaurant"],
-  },
-]);
-
-// Filters
-const filters = ref({
-  search: "",
-  location: null,
-  priceRange: null,
-  rating: null,
+const { t } = useI18n();
+useHead({
+  title: t("Favourite Hotels"),
 });
 
-const sortBy = ref(null);
-const currentPage = ref(1);
-const itemsPerPage = 9;
+const store = useFavouriteHotelStore();
+const router = useRouter();
 
-// Filter Options
-const locationOptions = ref([
-  { label: "New York", value: "New York" },
-  { label: "Miami", value: "Miami" },
-  { label: "Denver", value: "Denver" },
-  { label: "Los Angeles", value: "Los Angeles" },
-  { label: "Boston", value: "Boston" },
-  { label: "Hawaii", value: "Hawaii" },
-]);
+const filters = ref({
+  search: "",
+  location: null as string | null,
+  priceRange: null as [number, number] | null,
+  rating: null as number | null,
+});
+const sortBy = ref<string | null>(null);
 
-const priceRanges = ref([
-  { label: "Under $100", value: [0, 100] },
-  { label: "$100 - $150", value: [100, 150] },
-  { label: "$150 - $200", value: [150, 200] },
-  { label: "$200+", value: [200, 999] },
-]);
+const PER_PAGE = 10;
+const paginatorFirst = ref(0);
 
-const ratingOptions = ref([
+const locationOptions = computed(() =>
+  [...new Set(store.favourites.map((h) => h.cityName))]
+    .sort()
+    .map((c) => ({ label: c, value: c })),
+);
+
+const priceRanges = [
+  { label: "Under $100", value: [0, 100] as [number, number] },
+  { label: "$100 – $150", value: [100, 150] as [number, number] },
+  { label: "$150 – $200", value: [150, 200] as [number, number] },
+  { label: "$200+", value: [200, 9999] as [number, number] },
+];
+
+const ratingOptions = [
   { label: "4.5+ Stars", value: 4.5 },
   { label: "4.0+ Stars", value: 4.0 },
   { label: "3.5+ Stars", value: 3.5 },
   { label: "3.0+ Stars", value: 3.0 },
-]);
+];
 
-const sortOptions = ref([
+const sortOptions = [
   { label: "Price: Low to High", value: "price-asc" },
   { label: "Price: High to Low", value: "price-desc" },
   { label: "Rating: High to Low", value: "rating-desc" },
-  { label: "Rating: Low to High", value: "rating-asc" },
-  { label: "Name: A to Z", value: "name-asc" },
-]);
+  { label: "Name: A–Z", value: "name-asc" },
+];
 
-// Computed
-const filteredHotels = computed(() => {
-  let result = [...favouriteHotels.value];
+const filtered = computed(() => {
+  let list = [...store.favourites];
 
-  // Apply text search
   if (filters.value.search) {
-    const search = filters.value.search.toLowerCase();
-    result = result.filter(
+    const q = filters.value.search.toLowerCase();
+    list = list.filter(
       (h) =>
-        h.name.toLowerCase().includes(search) ||
-        h.location.toLowerCase().includes(search) ||
-        h.description.toLowerCase().includes(search),
+        h.hotelName.toLowerCase().includes(q) ||
+        h.cityName.toLowerCase().includes(q) ||
+        h.country.toLowerCase().includes(q),
     );
   }
-
-  // Apply location filter
   if (filters.value.location) {
-    result = result.filter((h) => h.location === filters.value.location);
+    list = list.filter((h) => h.cityName === filters.value.location);
   }
-
-  // Apply price range filter
   if (filters.value.priceRange) {
     const [min, max] = filters.value.priceRange;
-    result = result.filter((h) => h.price >= min && h.price <= max);
+    list = list.filter((h) => h.minPrice >= min && h.minPrice <= max);
   }
-
-  // Apply rating filter
   if (filters.value.rating) {
-    result = result.filter((h) => h.rating >= filters.value.rating);
+    list = list.filter((h) => (h.averageRating ?? 0) >= filters.value.rating!);
   }
 
-  // Apply sorting
-  if (sortBy.value) {
-    switch (sortBy.value) {
-      case "price-asc":
-        result.sort((a, b) => a.price - b.price);
-        break;
-      case "price-desc":
-        result.sort((a, b) => b.price - a.price);
-        break;
-      case "rating-desc":
-        result.sort((a, b) => b.rating - a.rating);
-        break;
-      case "rating-asc":
-        result.sort((a, b) => a.rating - b.rating);
-        break;
-      case "name-asc":
-        result.sort((a, b) => a.name.localeCompare(b.name));
-        break;
-    }
+  switch (sortBy.value) {
+    case "price-asc":
+      list.sort((a, b) => a.minPrice - b.minPrice);
+      break;
+    case "price-desc":
+      list.sort((a, b) => b.minPrice - a.minPrice);
+      break;
+    case "rating-desc":
+      list.sort((a, b) => (b.averageRating ?? 0) - (a.averageRating ?? 0));
+      break;
+    case "name-asc":
+      list.sort((a, b) => a.hotelName.localeCompare(b.hotelName));
+      break;
   }
 
-  return result;
+  return list;
 });
 
-const paginatedHotels = computed(() => {
-  const start = (currentPage.value - 1) * itemsPerPage;
-  return filteredHotels.value.slice(start, start + itemsPerPage);
-});
+const totalPages = computed(() => Math.ceil(filtered.value.length / PER_PAGE));
 
-const totalPages = computed(() => {
-  return Math.ceil(filteredHotels.value.length / itemsPerPage);
-});
+const paginated = computed(() =>
+  filtered.value.slice(paginatorFirst.value, paginatorFirst.value + PER_PAGE),
+);
 
-const totalFavourites = computed(() => favouriteHotels.value.length);
+const hasActiveFilters = computed(
+  () =>
+    !!(
+      filters.value.search ||
+      filters.value.location ||
+      filters.value.priceRange ||
+      filters.value.rating
+    ),
+);
 
-// Methods
-const filterHotels = () => {
-  currentPage.value = 1;
-};
+watch(
+  [filters, sortBy],
+  () => {
+    paginatorFirst.value = 0;
+  },
+  { deep: true },
+);
 
-const sortHotels = () => {
-  currentPage.value = 1;
-};
-
-const toggleFavourite = (hotelId: number) => {
-  // API call to toggle favourite
-  console.log("[v0] Toggle favourite hotel:", hotelId);
-  // const response = await $fetch(`/api/hotels/${hotelId}/favourite`, { method: 'POST' })
-};
-
-const isFavourite = (hotelId: number) => {
-  return favouriteHotels.value.some((h) => h.id === hotelId);
-};
-</script>
-
-<style scoped>
-/* :deep(.p-inputtext),
-:deep(.p-dropdown) {
-  @apply dark:bg-slate-700 dark:text-white dark:border-slate-600;
+function resetFilters() {
+  filters.value = {
+    search: "",
+    location: null,
+    priceRange: null,
+    rating: null,
+  };
+  sortBy.value = null;
 }
 
-:deep(.p-button-text) {
-  @apply dark:text-slate-400 dark:hover:text-slate-200;
-} */
-</style>
+function navigateToHotel(hotel: FavouriteHotel) {
+  router.push(`/hotels/${hotel.hotelId}`);
+}
+
+onMounted(() => {
+  store.fetchFavourites();
+});
+</script>

@@ -18,7 +18,7 @@
     <div class="mt-10 flex justify-center">
       <Paginator
         :rows="12"
-        :totalRecords="pagination.totalCount"
+        :total-records="pagination.totalCount"
         :first="(pagination.currentPage - 1) * pagination.pageSize"
         @page="onPageChange"
       />
@@ -27,12 +27,14 @@
 </template>
 
 <script setup lang="ts">
+import { ref, computed, onMounted } from "vue";
 import Paginator from "primevue/paginator";
-import { onMounted } from "vue";
-import { useHotelStore } from "#imports";
+
 import HotelCard from "./HotelCard.vue";
 
 const hotelStore = useHotelStore();
+const favouriteStore = useFavouriteHotelStore();
+
 const gridRef = ref<HTMLElement>();
 
 const hotel = computed(() => hotelStore.hotel);
@@ -51,9 +53,10 @@ const onPageChange = (e: any) => {
 
 onMounted(() => {
   hotelStore.getHotelList(hotelStore.searchStage);
+
+  // Fetch favourites so isFavourited() works correctly in every HotelCard
+  if (favouriteStore.favourites.length === 0) {
+    favouriteStore.fetchFavourites();
+  }
 });
 </script>
-
-<style scoped>
-/* Optional để card đẹp hơn */
-</style>
