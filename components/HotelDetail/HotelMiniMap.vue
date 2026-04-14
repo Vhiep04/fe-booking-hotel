@@ -1,15 +1,18 @@
 <template>
   <div
     class="border rounded-lg overflow-hidden cursor-pointer group relative"
+    style="position: relative; z-index: 0"
     @click="$emit('click')"
   >
     <div
       ref="miniMapContainer"
-      class="w-full h-[160px] pointer-events-none"
+      class="w-full"
+      style="height: 160px; position: relative; z-index: 0"
     ></div>
 
     <div
       class="absolute bottom-0 left-0 right-0 bg-blue-600 group-hover:bg-blue-700 text-white text-center text-sm font-semibold py-2 transition-colors"
+      style="z-index: 1"
     >
       Hiển thị trên bản đồ
     </div>
@@ -45,7 +48,7 @@ const makeIcon = () =>
     shadowSize: [41, 41],
   });
 
-const initMiniMap = () => {
+const initMiniMap = async () => {
   if (!miniMapContainer.value) return;
 
   if (miniMap) {
@@ -72,6 +75,9 @@ const initMiniMap = () => {
   }).addTo(miniMap);
 
   $L.marker(coords, { icon: makeIcon() }).addTo(miniMap);
+
+  await nextTick();
+  miniMap.invalidateSize();
 };
 
 const destroyMiniMap = () => {
@@ -100,5 +106,16 @@ onBeforeUnmount(() => destroyMiniMap());
 <style scoped>
 :deep(.leaflet-control-attribution) {
   display: none;
+}
+
+:deep(.leaflet-pane),
+:deep(.leaflet-top),
+:deep(.leaflet-bottom) {
+  z-index: 1 !important;
+  position: absolute;
+}
+
+:deep(.leaflet-map-pane) {
+  z-index: 1 !important;
 }
 </style>

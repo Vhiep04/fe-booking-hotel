@@ -4,7 +4,6 @@
       <i class="pi pi-spin pi-spinner text-4xl text-blue-600"></i>
     </div>
 
-    <!-- Hotel Details -->
     <div v-else-if="hotel">
       <HotelDetailHeader
         v-if="hotel"
@@ -14,22 +13,10 @@
         @showMap="showMap = true"
       />
 
-      <HotelDetailTabs :description="hotel.description" />
-
-      <div class="grid md:grid-cols-3 gap-6 mb-8">
-        <HotelAmenities
-          :facilities="hotel.popularFacilities"
-          class="md:col-span-2"
-        />
-
-        <HotelBookingCard
-          :location="hotel.location"
-          :min-price="hotel.minPricePerNight"
-          :max-price="hotel.maxPricePerNight"
-          :room-types="hotel.availableRoomTypes"
-          @book-now="scrollToRooms"
-        />
-      </div>
+      <HotelDetailTabs
+        :description="hotel.description"
+        :facilities="hotel.facilities"
+      />
 
       <div class="bg-white rounded-lg shadow-sm p-6 mb-8">
         <div class="flex items-center justify-between mb-6">

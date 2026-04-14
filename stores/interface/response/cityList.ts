@@ -32,16 +32,26 @@ export interface HotelData {
   description: string;
   latitude: number;
   longitude: number;
-  minPricePerNight: number;
-  maxPricePerNight: number;
-  primaryImageUrl: string;
+  minPrice: number;
+  maxPrice: number;
+  imgUrl: string;
+  primaryImageUrl?: string;
   images: ImageHotel[];
-  availableRoomTypes: string[];
-  popularFacilities: Facility[];
-  averageRating?: string;
+  availableRoomTypes?: string[];
+  roomTypes: RoomType[];
+  facilities: string[];
+  averageRating?: number;
   recentFeedbacks: Feedback[];
   totalReviews: number;
   ratingDistribution: RatingDistribution;
+}
+
+interface RoomType {
+  roomTypeId: number;
+  typeName: string;
+  pricePerNight: number;
+  capacity: number;
+  imgUrl: string;
 }
 
 export interface CityData {

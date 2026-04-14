@@ -11,20 +11,34 @@
           {{ tab.title }}
         </Tab>
       </TabList>
+
       <TabPanels>
-        <!-- Place Details Tab -->
         <TabPanel value="0" class="p-6">
-          <div class="grid md:grid-cols-2 gap-6">
-            <div class="space-y-4">
-              <p class="text-gray-700 leading-relaxed">
-                {{ description }}
-              </p>
+          <p class="text-gray-700 leading-relaxed">{{ description }}</p>
+        </TabPanel>
+
+        <TabPanel value="1" class="p-6">
+          <div
+            v-if="facilities && facilities.length"
+            class="grid sm:grid-cols-2 md:grid-cols-3 gap-3"
+          >
+            <div
+              v-for="facility in facilities"
+              :key="facility"
+              class="flex items-center gap-3 p-3 rounded-lg bg-gray-50 text-gray-700"
+            >
+              <i
+                :class="getFacilityIcon(facility)"
+                class="text-blue-500 text-lg"
+              ></i>
+              <span class="text-sm font-medium">{{ facility }}</span>
             </div>
           </div>
+          <div v-else class="text-gray-400 text-sm">No amenities listed.</div>
         </TabPanel>
 
         <!-- Place Rules Tab -->
-        <TabPanel value="1" class="p-6">
+        <TabPanel value="2" class="p-6">
           <div class="space-y-6">
             <div>
               <h3 class="text-lg font-semibold mb-3 text-gray-800">
@@ -89,25 +103,51 @@ import { Tabs, TabList, Tab, TabPanels, TabPanel } from "primevue";
 
 interface Props {
   description: string;
+  facilities?: string[];
 }
 
 defineProps<Props>();
 
 const tabs = ref([
   { title: "Place Details", value: "0" },
-  { title: "Place Rules", value: "1" },
+  { title: "Amenities", value: "1" },
+  { title: "Place Rules", value: "2" },
 ]);
+
+const getFacilityIcon = (name: string): string => {
+  const iconMap: Record<string, string> = {
+    WiFi: "pi pi-wifi",
+    "Own Bathroom": "pi pi-home",
+    Kitchen: "pi pi-building",
+    "Sea View": "pi pi-eye",
+    "Baby Bed": "pi pi-heart",
+    Bathtub: "pi pi-home",
+    "Air Conditioning": "pi pi-sun",
+    Balcony: "pi pi-building",
+    "Mini Bar": "pi pi-ticket",
+    "Safe Box": "pi pi-lock",
+    TV: "pi pi-tablet",
+    "Coffee Maker": "pi pi-ticket",
+    "Breakfast Included": "pi pi-calendar",
+    "Free Cancellation": "pi pi-check",
+    Pool: "pi pi-heart",
+    "All-Inclusive": "pi pi-star",
+    "Pet Friendly": "pi pi-heart",
+    Gym: "pi pi-heart",
+    Spa: "pi pi-heart",
+    Restaurant: "pi pi-building",
+  };
+  return iconMap[name] || "pi pi-check-circle";
+};
 </script>
 
 <style scoped>
 :deep(.p-tablist) {
   background: transparent;
 }
-
 :deep(.p-tab) {
   border-bottom: 2px solid transparent;
 }
-
 :deep(.p-tab.p-tab-active) {
   color: #2563eb;
   border-bottom-color: #2563eb;
