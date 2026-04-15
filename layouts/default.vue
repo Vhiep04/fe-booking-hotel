@@ -9,9 +9,12 @@
       </div>
     </container>
     <Footer />
+
+    <ChatBot />
   </div>
 </template>
 
 <script setup lang="ts">
 import HeaderPage from "~/components/shared/HeaderPage.vue";
+import ChatBot from "~/components/shared/ChatBot.vue";
 </script>

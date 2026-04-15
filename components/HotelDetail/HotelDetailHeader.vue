@@ -129,7 +129,7 @@ const breadcrumbs = [
   { label: "Trang chủ", link: "/" },
   { label: "Khách sạn", link: "/hotels" },
   { label: "Việt Nam", link: "/hotels/vietnam" },
-  { label: props.hotel.city?.name ?? "Khách sạn", link: null },
+  { label: props.hotel.name ?? "Khách sạn", link: null },
 ];
 
 const DEFAULT_IMAGE =
