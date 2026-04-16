@@ -62,11 +62,8 @@ import HotelFilter from "~/components/admin/hotel/HotelFilter.vue";
 import HotelFormDialog from "~/components/admin/hotel/HotelFormDialog.vue";
 import HotelTable from "~/components/admin/hotel/HotelTable.vue";
 import { useCitiesStore } from "~/stores/admin/cities";
-import {
-  useAdminHotelStore,
-  type Hotel,
-  type HotelPayload,
-} from "~/stores/admin/hotels";
+import { useAdminHotelStore } from "~/stores/admin/hotels";
+import type { Hotel, HotelPayload } from "~/stores/admin/interfaces/hotels";
 
 definePageMeta({ layout: "admin", middleware: ["admin"] });
 useHead({ title: "Hotel Management" });

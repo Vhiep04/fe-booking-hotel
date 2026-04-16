@@ -75,8 +75,12 @@ const FALLBACK_IMAGE =
 
 const primaryImage = computed(() => {
   const primary = props.city.images?.find((img) => img.isPrimary);
-  return (
-    primary?.imageUrl ?? props.city.images?.[0]?.imageUrl ?? FALLBACK_IMAGE
-  );
+  const url =
+    primary?.imageUrl ?? props.city.images?.[0]?.imageUrl ?? FALLBACK_IMAGE;
+  // Append Unsplash sizing params nếu là Unsplash URL
+  if (url.includes("unsplash.com") && !url.includes("?")) {
+    return `${url}?w=500&h=300&fit=crop`;
+  }
+  return url;
 });
 </script>

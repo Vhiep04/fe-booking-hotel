@@ -1,29 +1,16 @@
 import { defineStore } from "pinia";
 import { ref } from "vue";
 import { useApiStore } from "./api";
-import type { PaymentPayload } from "./interface/request/payments";
-import type { CreatePaymentRes } from "./interface/response/payments";
-
-export interface SendReceiptPayload {
-  email: string;
-  name: string;
-  userId: string;
-  roomId: number;
-  checkInDate: string;
-  checkOutDate: string;
-  transactionId: string;
-  orderId: string;
-  amount: number;
-  paymentMethod: string;
-  orderDescription: string;
-}
-
-export interface SendReceiptRes {
-  success: boolean;
-  reservationId: number;
-  emailSent: boolean;
-  message: string;
-}
+import type {
+  CashBookingPayload,
+  PaymentPayload,
+  SendReceiptPayload,
+} from "./interface/request/payments";
+import type {
+  CashBookingRes,
+  CreatePaymentRes,
+  SendReceiptRes,
+} from "./interface/response/payments";
 
 export const usePaymentStore = defineStore("payment", () => {
   const apiStore = useApiStore();
@@ -81,6 +68,28 @@ export const usePaymentStore = defineStore("payment", () => {
     }
   }
 
+  async function cashBooking(payload: CashBookingPayload) {
+    isLoading.value = true;
+    error.value = null;
+
+    try {
+      const response = await apiStore.apiRequest<CashBookingRes>({
+        endpoint: "/Payment/cash-booking",
+        method: "POST",
+        data: payload,
+        auth: true,
+      });
+
+      return response;
+    } catch (e) {
+      error.value = "An error occurred while processing cash booking";
+      console.error(e);
+      return null;
+    } finally {
+      isLoading.value = false;
+    }
+  }
+
   function clearPayment() {
     paymentUrl.value = null;
     error.value = null;
@@ -92,6 +101,7 @@ export const usePaymentStore = defineStore("payment", () => {
     error,
     createPayment,
     sendReceipt,
+    cashBooking,
     clearPayment,
   };
 });

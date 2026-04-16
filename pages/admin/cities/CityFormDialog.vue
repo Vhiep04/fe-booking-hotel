@@ -18,31 +18,31 @@
 
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div class="md:col-span-2 flex flex-col gap-1">
-            <label class="text-sm font-medium"
-              >City Name <span class="text-red-500">*</span></label
-            >
+            <label class="text-sm font-medium">
+              City Name <span class="text-red-500">*</span>
+            </label>
             <InputText
               v-model="form.name"
               placeholder="e.g. Ho Chi Minh City"
               :class="{ 'p-invalid': submitted && !form.name }"
             />
-            <small v-if="submitted && !form.name" class="p-error"
-              >City name is required</small
-            >
+            <small v-if="submitted && !form.name" class="p-error">
+              City name is required
+            </small>
           </div>
 
           <div class="flex flex-col gap-1">
-            <label class="text-sm font-medium"
-              >Country <span class="text-red-500">*</span></label
-            >
+            <label class="text-sm font-medium">
+              Country <span class="text-red-500">*</span>
+            </label>
             <InputText
               v-model="form.country"
               placeholder="e.g. Vietnam"
               :class="{ 'p-invalid': submitted && !form.country }"
             />
-            <small v-if="submitted && !form.country" class="p-error"
-              >Country is required</small
-            >
+            <small v-if="submitted && !form.country" class="p-error">
+              Country is required
+            </small>
           </div>
 
           <div class="flex flex-col gap-1">
@@ -51,7 +51,7 @@
               v-model="form.description"
               rows="3"
               placeholder="Enter a short description..."
-              class="w-full"
+              class="w-full resize-none"
             />
           </div>
         </div>
@@ -64,6 +64,7 @@
         >
           <i class="pi pi-map-marker" /> Coordinates
         </span>
+
         <div class="grid grid-cols-2 gap-4">
           <div class="flex flex-col gap-1">
             <label class="text-sm font-medium">Latitude</label>
@@ -75,6 +76,7 @@
               class="w-full"
             />
           </div>
+
           <div class="flex flex-col gap-1">
             <label class="text-sm font-medium">Longitude</label>
             <InputNumber
@@ -88,6 +90,7 @@
         </div>
       </div>
 
+      <!-- Primary Image -->
       <div class="flex flex-col gap-3">
         <span
           class="text-xs font-bold uppercase tracking-widest text-(--admin-text-muted) flex items-center gap-1.5"
@@ -152,86 +155,8 @@
             (e) => {
               const f = (e.target as HTMLInputElement).files?.[0];
               if (f) setFile(f);
+              (e.target as HTMLInputElement).value = '';
             }
-          "
-        />
-      </div>
-
-      <!-- Gallery Images -->
-      <div class="flex flex-col gap-3">
-        <span
-          class="text-xs font-bold uppercase tracking-widest text-(--admin-text-muted) flex items-center gap-1.5"
-        >
-          <i class="pi pi-images" /> Gallery
-          <span
-            class="ml-auto text-[0.65rem] font-semibold bg-(--admin-primary-light) text-(--admin-primary) px-2 py-0.5 rounded-full"
-          >
-            {{ galleryPreviews.length }} / {{ MAX_GALLERY }}
-          </span>
-        </span>
-
-        <div
-          v-if="galleryPreviews.length > 0"
-          class="grid grid-cols-4 sm:grid-cols-6 gap-2"
-        >
-          <div
-            v-for="(img, i) in galleryPreviews"
-            :key="i"
-            class="relative aspect-square rounded-lg overflow-hidden group"
-          >
-            <img
-              :src="img"
-              class="w-full h-full object-cover group-hover:scale-105 transition-transform"
-            />
-            <button
-              class="absolute top-1 right-1 w-5 h-5 rounded-full bg-red-500/90 text-white text-[0.55rem] flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
-              @click="
-                galleryPreviews.splice(i, 1);
-                galleryFiles.splice(i, 1);
-              "
-            >
-              <i class="pi pi-times" />
-            </button>
-          </div>
-          <div
-            v-if="galleryPreviews.length < MAX_GALLERY"
-            class="aspect-square rounded-lg border-2 border-dashed border-(--admin-surface-border) flex items-center justify-center cursor-pointer text-(--admin-text-muted) hover:border-(--admin-primary) hover:text-(--admin-primary) hover:bg-(--admin-primary-light) transition-colors"
-            @click="galleryInput?.click()"
-          >
-            <i class="pi pi-plus text-lg" />
-          </div>
-        </div>
-
-        <div
-          v-else
-          class="rounded-xl border-2 border-dashed border-(--admin-surface-border) cursor-pointer hover:border-(--admin-primary) hover:bg-(--admin-primary-light) transition-colors"
-          @click="galleryInput?.click()"
-          @dragover.prevent
-          @drop.prevent="
-            (e) => addFiles(Array.from(e.dataTransfer?.files ?? []))
-          "
-        >
-          <div
-            class="flex flex-col items-center justify-center py-8 gap-2 text-(--admin-text-muted)"
-          >
-            <i class="pi pi-images text-2xl" />
-            <p class="text-sm font-medium">
-              Drop images or
-              <span class="text-(--admin-primary) font-semibold">browse</span>
-            </p>
-            <p class="text-xs">Up to {{ MAX_GALLERY }} images</p>
-          </div>
-        </div>
-
-        <input
-          ref="galleryInput"
-          type="file"
-          accept="image/*"
-          multiple
-          class="hidden"
-          @change="
-            (e) =>
-              addFiles(Array.from((e.target as HTMLInputElement).files ?? []))
           "
         />
       </div>
@@ -243,13 +168,13 @@
         icon="pi pi-times"
         severity="secondary"
         outlined
-        :disabled="saving"
+        :disabled="saving || uploading"
         @click="emit('hide')"
       />
       <Button
         :label="isEditing ? 'Update City' : 'Add City'"
         :icon="isEditing ? 'pi pi-check' : 'pi pi-plus'"
-        :loading="saving"
+        :loading="saving || uploading"
         @click="handleSave"
       />
     </template>
@@ -262,13 +187,13 @@ import InputText from "primevue/inputtext";
 import InputNumber from "primevue/inputnumber";
 import Textarea from "primevue/textarea";
 import Button from "primevue/button";
+
 import type {
   CityDto,
   CreateCityPayload,
   UpdateCityPayload,
 } from "~/stores/admin/interfaces/cities";
-
-const MAX_GALLERY = 8;
+import { useUploadStore } from "~/stores/admin/uploadImage";
 
 const props = defineProps<{
   modelValue: boolean;
@@ -280,9 +205,16 @@ const props = defineProps<{
 const emit = defineEmits<{
   (e: "update:modelValue", value: boolean): void;
   (e: "hide"): void;
-  (e: "save-create", payload: CreateCityPayload): void;
-  (e: "save-update", id: number, payload: UpdateCityPayload): void;
+  (e: "save-create", payload: CreateCityPayload, imageUrl: string): void;
+  (
+    e: "save-update",
+    id: number,
+    payload: UpdateCityPayload,
+    imageUrl: string,
+  ): void;
 }>();
+
+const uploadStore = useUploadStore();
 
 const visible = computed({
   get: () => props.modelValue,
@@ -290,12 +222,10 @@ const visible = computed({
 });
 
 const submitted = ref(false);
+const uploading = ref(false);
 const primaryInput = ref<HTMLInputElement | null>(null);
-const galleryInput = ref<HTMLInputElement | null>(null);
 const primaryPreview = ref<string | null>(null);
 const primaryFile = ref<File | null>(null);
-const galleryPreviews = ref<string[]>([]);
-const galleryFiles = ref<File[]>([]);
 
 const defaultForm = {
   name: "",
@@ -305,6 +235,8 @@ const defaultForm = {
   longitude: 0,
 };
 const form = ref({ ...defaultForm });
+
+const existingImagePublicId = ref<string | null>(null);
 
 watch(
   () => props.editingCity,
@@ -318,14 +250,68 @@ watch(
           longitude: city.longitude ?? 0,
         }
       : { ...defaultForm };
-    primaryPreview.value = null;
+
+    const existingPrimary = city?.images?.find((img) => img.isPrimary);
+
+    // Fix URL cho Unsplash
+    let previewUrl = existingPrimary?.imageUrl ?? null;
+    if (previewUrl?.includes("unsplash.com") && !previewUrl.includes("?")) {
+      previewUrl = `${previewUrl}?w=800&h=400&fit=crop`;
+    }
+    primaryPreview.value = previewUrl;
+
+    // Lưu publicId để delete nếu user upload ảnh mới
+    // Giả sử API trả về publicId trong image object — nếu không có thì bỏ qua phần delete
+    existingImagePublicId.value = (existingPrimary as any)?.publicId ?? null;
+
     primaryFile.value = null;
-    galleryPreviews.value = [];
-    galleryFiles.value = [];
     submitted.value = false;
   },
   { immediate: true },
 );
+
+async function handleSave() {
+  submitted.value = true;
+  if (!form.value.name || !form.value.country) return;
+
+  let imageUrl = "";
+
+  if (primaryFile.value) {
+    uploading.value = true;
+
+    // Upload ảnh mới trước
+    const res = await uploadStore.uploadImage(primaryFile.value, "cities");
+    uploading.value = false;
+
+    if (!res?.success || !res.data) return;
+    imageUrl = res.data.url;
+
+    // Nếu đang edit và có ảnh cũ → delete ảnh cũ
+    if (props.isEditing && existingImagePublicId.value) {
+      await uploadStore.deleteImage(existingImagePublicId.value);
+      // Fire-and-forget, không cần block nếu delete lỗi
+    }
+  }
+
+  const payload = {
+    name: form.value.name,
+    country: form.value.country,
+    description: form.value.description,
+    latitude: form.value.latitude ?? 0,
+    longitude: form.value.longitude ?? 0,
+  };
+
+  if (props.isEditing && props.editingCity) {
+    emit(
+      "save-update",
+      props.editingCity.cityId,
+      payload as UpdateCityPayload,
+      imageUrl,
+    );
+  } else {
+    emit("save-create", payload as CreateCityPayload, imageUrl);
+  }
+}
 
 function toPreview(file: File): Promise<string> {
   return new Promise((res) => {
@@ -340,36 +326,38 @@ async function setFile(file: File) {
   primaryPreview.value = await toPreview(file);
 }
 
-async function addFiles(files: File[]) {
-  const remaining = MAX_GALLERY - galleryFiles.value.length;
-  const toAdd = files
-    .filter((f) => f.type.startsWith("image/"))
-    .slice(0, remaining);
-  for (const file of toAdd) {
-    galleryFiles.value.push(file);
-    galleryPreviews.value.push(await toPreview(file));
-  }
-  if (galleryInput.value) galleryInput.value.value = "";
-}
+// async function handleSave() {
+//   submitted.value = true;
+//   if (!form.value.name || !form.value.country) return;
 
-function handleSave() {
-  submitted.value = true;
-  if (!form.value.name || !form.value.country) return;
+//   let imageUrl = "";
 
-  const payload = {
-    name: form.value.name,
-    country: form.value.country,
-    description: form.value.description,
-    latitude: form.value.latitude ?? 0,
-    longitude: form.value.longitude ?? 0,
-    // primaryImage: primaryFile.value,
-    // galleryImages: galleryFiles.value,
-  };
+//   if (primaryFile.value) {
+//     uploading.value = true;
+//     const res = await uploadStore.uploadImage(primaryFile.value, "cities");
+//     uploading.value = false;
 
-  if (props.isEditing && props.editingCity) {
-    emit("save-update", props.editingCity.cityId, payload as UpdateCityPayload);
-  } else {
-    emit("save-create", payload as CreateCityPayload);
-  }
-}
+//     if (!res?.success || !res.data) return;
+//     imageUrl = res.data.url;
+//   }
+
+//   const payload = {
+//     name: form.value.name,
+//     country: form.value.country,
+//     description: form.value.description,
+//     latitude: form.value.latitude ?? 0,
+//     longitude: form.value.longitude ?? 0,
+//   };
+
+//   if (props.isEditing && props.editingCity) {
+//     emit(
+//       "save-update",
+//       props.editingCity.cityId,
+//       payload as UpdateCityPayload,
+//       imageUrl,
+//     );
+//   } else {
+//     emit("save-create", payload as CreateCityPayload, imageUrl);
+//   }
+// }
 </script>

@@ -3,11 +3,19 @@ import { useApiStore } from "#imports";
 import type {
   ApiResponse,
   CityDto,
+  CityImageDto,
   CreateCityPayload,
   GetCitiesParams,
   PaginatedCities,
   UpdateCityPayload,
 } from "./interfaces/cities";
+
+export interface AddCityImagePayload {
+  imageUrl: string;
+  isPrimary: boolean;
+  displayOrder: number;
+  description: string;
+}
 
 export const useCitiesStore = defineStore("cities", () => {
   const apiStore = useApiStore();
@@ -21,61 +29,82 @@ export const useCitiesStore = defineStore("cities", () => {
     if (search) queryParams.search = search;
     if (country) queryParams.country = country;
 
-    const response = await apiStore.apiRequest<ApiResponse<PaginatedCities>>({
+    return await apiStore.apiRequest<ApiResponse<PaginatedCities>>({
       method: "GET",
       endpoint: "/admin/cities",
       params: queryParams,
       auth: true,
     });
-
-    return response;
   }
 
   async function createCity(
     payload: CreateCityPayload,
   ): Promise<ApiResponse<CityDto>> {
-    const response = await apiStore.apiRequest<ApiResponse<CityDto>>({
+    return await apiStore.apiRequest<ApiResponse<CityDto>>({
       method: "POST",
       endpoint: "/admin/cities",
       data: payload,
       auth: true,
     });
-
-    return response;
   }
 
   async function getCityById(id: number): Promise<ApiResponse<CityDto>> {
-    const response = await apiStore.apiRequest<ApiResponse<CityDto>>({
+    return await apiStore.apiRequest<ApiResponse<CityDto>>({
       method: "GET",
       endpoint: `/admin/cities/${id}`,
       auth: true,
     });
-
-    return response;
   }
 
   async function updateCity(
     id: number,
     payload: UpdateCityPayload,
   ): Promise<ApiResponse<CityDto>> {
-    const response = await apiStore.apiRequest<ApiResponse<CityDto>>({
+    return await apiStore.apiRequest<ApiResponse<CityDto>>({
       method: "PUT",
       endpoint: `/admin/cities/${id}`,
       data: payload,
       auth: true,
     });
-
-    return response;
   }
 
   async function deleteCity(id: number): Promise<ApiResponse<boolean>> {
-    const response = await apiStore.apiRequest<ApiResponse<boolean>>({
+    return await apiStore.apiRequest<ApiResponse<boolean>>({
       method: "DELETE",
       endpoint: `/admin/cities/${id}`,
       auth: true,
     });
+  }
 
-    return response;
+  async function getCountries(): Promise<ApiResponse<string[]>> {
+    return await apiStore.apiRequest<ApiResponse<string[]>>({
+      method: "GET",
+      endpoint: "/admin/cities/countries",
+      auth: true,
+    });
+  }
+
+  async function addCityImage(
+    cityId: number,
+    payload: AddCityImagePayload,
+  ): Promise<ApiResponse<CityImageDto>> {
+    return await apiStore.apiRequest<ApiResponse<CityImageDto>>({
+      method: "POST",
+      endpoint: `/admin/cities/${cityId}/images`,
+      data: payload,
+      auth: true,
+    });
+  }
+
+  async function deleteCityImage(
+    cityId: number,
+    imageId: number,
+  ): Promise<ApiResponse<boolean>> {
+    return await apiStore.apiRequest<ApiResponse<boolean>>({
+      method: "DELETE",
+      endpoint: `/admin/cities/${cityId}/images/${imageId}`,
+      auth: true,
+    });
   }
 
   return {
@@ -84,6 +113,9 @@ export const useCitiesStore = defineStore("cities", () => {
     getCityById,
     updateCity,
     deleteCity,
+    getCountries,
+    addCityImage,
+    deleteCityImage,
   };
 });
 

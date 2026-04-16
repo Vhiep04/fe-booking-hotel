@@ -186,11 +186,10 @@ const notificationStore = useNotificationStore();
 const langPanel = ref();
 const navItems = [
   { name: "Home", path: "/" },
-  { name: "%Deals", path: "/deals" },
-  { name: "Hotel", path: "/hotel" },
-  { name: "Flight", path: "/flight" },
-  { name: "Apartment", path: "/apartment" },
-  { name: "Camper", path: "/camper" },
+  // { name: "Hotel", path: "/hotel" },
+  // { name: "Flight", path: "/flight" },
+  { name: "My reservation", path: "/reservation" },
+  { name: "My favourite hotel", path: "/favourite-hotels" },
 ];
 const languages: { code: LocaleCode; label: string; flag: string }[] = [
   { code: "en", label: "English", flag: enFlag },

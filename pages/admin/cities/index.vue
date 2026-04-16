@@ -133,7 +133,10 @@ import { useToast } from "primevue/usetoast";
 import CityCard from "./CityCard.vue";
 import CityFormDialog from "./CityFormDialog.vue";
 import CityDeleteDialog from "./CityDeleteDialog.vue";
-import { useCitiesStore } from "~/stores/admin/cities";
+import {
+  useCitiesStore,
+  type AddCityImagePayload,
+} from "~/stores/admin/cities";
 import type {
   CityDto,
   CreateCityPayload,
@@ -249,11 +252,22 @@ function closeCityDialog() {
   editingCity.value = null;
 }
 
-async function handleCreate(payload: CreateCityPayload) {
+async function handleCreate(payload: CreateCityPayload, imageUrl: string) {
   saving.value = true;
   try {
     const res = await citiesStore.createCity(payload);
     if (res.success) {
+      // ✅ Lưu ảnh vào DB nếu có upload
+      if (imageUrl && res.data?.cityId) {
+        const imagePayload: AddCityImagePayload = {
+          imageUrl,
+          isPrimary: true,
+          displayOrder: 1,
+          description: "",
+        };
+        await citiesStore.addCityImage(res.data.cityId, imagePayload);
+      }
+
       toast.add({
         severity: "success",
         summary: "Success",
@@ -282,11 +296,34 @@ async function handleCreate(payload: CreateCityPayload) {
   }
 }
 
-async function handleUpdate(id: number, payload: UpdateCityPayload) {
+async function handleUpdate(
+  id: number,
+  payload: UpdateCityPayload,
+  imageUrl: string,
+) {
   saving.value = true;
   try {
     const res = await citiesStore.updateCity(id, payload);
     if (res.success) {
+      if (imageUrl) {
+        const existingCity = cities.value.find((c) => c.cityId === id);
+        const existingPrimary = existingCity?.images?.find(
+          (img) => img.isPrimary,
+        );
+
+        if (existingPrimary) {
+          await citiesStore.deleteCityImage(id, existingPrimary.imageId);
+        }
+
+        const imagePayload: AddCityImagePayload = {
+          imageUrl,
+          isPrimary: true,
+          displayOrder: 1,
+          description: "",
+        };
+        await citiesStore.addCityImage(id, imagePayload);
+      }
+
       toast.add({
         severity: "success",
         summary: "Success",

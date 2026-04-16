@@ -298,6 +298,37 @@ export const useAdminHotelStore = defineStore("adminHotel", () => {
     }
   }
 
+  async function bulkAddHotelImages(hotelId: number, imageUrls: string[]) {
+    isLoading.value = true;
+    error.value = null;
+
+    try {
+      const response = await apiStore.apiRequest<ApiResponse<HotelImage[]>>({
+        endpoint: `/admin/hotels/${hotelId}/images/bulk`,
+        method: "POST",
+        auth: true,
+        data: { imageUrls },
+      });
+
+      if (response?.success) {
+        if (selectedHotel.value?.hotelId === hotelId) {
+          selectedHotel.value.images.push(...response.data);
+        }
+        const item = hotels.value?.items.find((h) => h.hotelId === hotelId);
+        if (item) item.images.push(...response.data);
+      } else {
+        error.value = response?.message ?? "Failed to bulk add images";
+      }
+
+      return response;
+    } catch (e: any) {
+      error.value = e?.message ?? "An error occurred";
+      throw e;
+    } finally {
+      isLoading.value = false;
+    }
+  }
+
   function clearSelectedHotel() {
     selectedHotel.value = null;
   }
@@ -321,6 +352,7 @@ export const useAdminHotelStore = defineStore("adminHotel", () => {
     deleteHotelImage,
     setPrimaryImage,
     reorderHotelImages,
+    bulkAddHotelImages,
     clearSelectedHotel,
     clearError,
   };

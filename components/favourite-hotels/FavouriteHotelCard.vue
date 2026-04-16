@@ -136,7 +136,6 @@ import { ref, computed } from "vue";
 import Button from "primevue/button";
 import Divider from "primevue/divider";
 import Tag from "primevue/tag";
-import type { FavouriteHotel } from "@/stores/favouriteHotelStore";
 
 const props = defineProps<{
   hotel: FavouriteHotel;
