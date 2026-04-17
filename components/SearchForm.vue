@@ -1,9 +1,15 @@
 <template>
   <div class="space-y-2">
     <div
-      class="grid border-3 border-[#FFB700] rounded-lg w-full bg-[#FFB700] grid-cols-1 sm:grid-cols-2 lg:grid-cols-[40%_30%_20%_10%]"
+      class="grid border-3 border-[#FFB700] rounded-lg w-full bg-[#FFB700] grid-cols-1"
+      :class="[
+        hideLocation
+          ? 'sm:grid-cols-2 lg:grid-cols-[45%_35%_20%]'
+          : 'sm:grid-cols-2 lg:grid-cols-[40%_30%_20%_10%]',
+      ]"
     >
       <div
+        v-if="!hideLocation"
         class="border-2 border-[#FFB700] rounded-lg inline-flex items-center"
       >
         <CustomInputText
@@ -66,7 +72,9 @@
         </Select>
       </div>
 
-      <div class="border-2 border-[#FFB700] rounded-lg inline-flex">
+      <div
+        class="border-2 border-[#FFB700] rounded-lg inline-flex sm:col-span-2 lg:col-span-1"
+      >
         <Button
           type="submit"
           :label="t('Search')"
@@ -77,17 +85,22 @@
       </div>
     </div>
 
-    <!-- Error Messages -->
     <div
-      class="w-full grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-[40%_30%_20%_10%] gap-0"
+      class="w-full grid grid-cols-1 gap-0"
+      :class="[
+        hideLocation
+          ? 'sm:grid-cols-2 lg:grid-cols-[45%_35%_20%]'
+          : 'sm:grid-cols-2 lg:grid-cols-[40%_30%_20%_10%]',
+      ]"
     >
-      <div class="text-red-500 text-sm px-4 min-h-5">
+      <div v-if="!hideLocation" class="text-red-500 text-sm px-4 min-h-5">
         {{ errors.search }}
       </div>
-      <div class="text-red-500 text-sm px-4 min-h-5">
+      <div
+        class="text-red-500 text-sm px-4 min-h-5 sm:col-span-2 lg:col-span-1"
+      >
         {{ errors.dates }}
       </div>
-      <div class="text-red-500 text-sm px-4 min-h-5"></div>
     </div>
   </div>
 </template>
@@ -106,9 +119,13 @@ const { t } = useI18n();
 
 interface Props {
   loading: boolean;
+  hideLocation?: boolean;
 }
 
-defineProps<Props>();
+const props = withDefaults(defineProps<Props>(), {
+  loading: false,
+  hideLocation: false,
+});
 
 const emit = defineEmits<{
   search: [params: any];
@@ -139,24 +156,31 @@ const rooms = computed(() =>
 
 const validateForm = (): boolean => {
   let isValid = true;
-
   errors.search = "";
   errors.dates = "";
 
-  if (!searchStore.cityName || searchStore.cityName.trim() === "") {
-    errors.search = "Please enter a destination";
-    isValid = false;
+  if (!props.hideLocation) {
+    if (!searchStore.cityName || searchStore.cityName.trim() === "") {
+      errors.search = "Please enter a destination";
+      isValid = false;
+    }
   }
 
   if (!searchStore.hasDates) {
     errors.dates = "Please select check-in and check-out dates";
     isValid = false;
   } else {
-    const checkIn = searchStore.checkInDateOnly!;
-    const checkOut = searchStore.checkOutDateOnly!;
-    if (checkOut <= checkIn) {
-      errors.dates = "Check-out date must be after check-in date";
+    const dates = searchStore.dateRange;
+    if (!dates || !dates[0] || !dates[1]) {
+      errors.dates = "Please select both check-in and check-out dates";
       isValid = false;
+    } else {
+      const checkIn = new Date(dates[0]);
+      const checkOut = new Date(dates[1]);
+      if (checkOut <= checkIn) {
+        errors.dates = "Check-out date must be after check-in date";
+        isValid = false;
+      }
     }
   }
 

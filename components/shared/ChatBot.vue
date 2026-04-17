@@ -1,6 +1,5 @@
 <template>
   <div class="fixed bottom-6 right-6 z-9999 flex flex-col items-end">
-    <!-- Minimized bubble -->
     <button
       v-if="isMinimized"
       @click="isMinimized = false"
@@ -13,7 +12,7 @@
     <div
       v-else
       class="w-[360px] flex flex-col rounded-[20px] overflow-hidden border border-gray-200 shadow-2xl bg-white"
-      style="height: 70vh"
+      style="height: 80vh"
     >
       <!-- Chat header -->
       <div
@@ -80,7 +79,7 @@
 
         <div class="flex-1 p-4 mt-8 overflow-y-auto">
           <div
-            class="bg-white rounded-2xl border border-gray-100 p-4 -mt-10 shadow-md"
+            class="bg-white rounded-2xl border border-gray-100 p-4 -mt-4 shadow-md"
           >
             <div class="flex items-center gap-2.5 mb-3">
               <div

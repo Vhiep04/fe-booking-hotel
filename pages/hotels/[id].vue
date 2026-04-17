@@ -18,12 +18,56 @@
         :facilities="hotel.facilities"
       />
 
-      <div class="bg-white rounded-lg shadow-sm p-6 mb-8">
+      <div ref="searchFormSection" class="mb-6 space-y-4">
+        <h2 class="text-2xl font-bold text-gray-900">
+          {{ t("Availability") }}
+        </h2>
+        <div class="text-red-500 flex items-center gap-2">
+          <i class="pi pi-exclamation-circle"></i>
+          <p>Select dates to see this property's availability and prices</p>
+        </div>
+        <SearchForm
+          :loading="isSearching"
+          :hide-location="true"
+          @search="handleSearch"
+          @getCity="handleGetCity"
+        />
+      </div>
+
+      <Dialog
+        v-model:visible="showDatesDialog"
+        :modal="true"
+        :closable="false"
+        :draggable="false"
+        :style="{ width: '420px' }"
+        pt:root:class="rounded-xl shadow-xl"
+        pt:header:class="pb-0"
+        pt:content:class="pt-3 pb-5 px-6"
+        :header="t('Notice')"
+        @hide="onDialogHide"
+      >
+        <p class="text-sm text-gray-700 leading-relaxed">
+          {{
+            "To see available rooms and prices please enter your check-in and check-out dates."
+          }}
+        </p>
+
+        <template #footer>
+          <div class="flex justify-end px-4 pb-4">
+            <Button :label="t('OK')" text @click="showDatesDialog = false" />
+          </div>
+        </template>
+      </Dialog>
+
+      <div class="">
         <div class="flex items-center justify-between mb-6">
           <h2 class="text-2xl font-bold text-gray-900">
             {{ t("Choose Your Room") }}
           </h2>
-          <div v-if="roomListData" class="text-sm text-gray-600">
+          <div
+            v-if="roomListData && hasSearchData"
+            class="text-sm text-gray-600"
+          >
             <span class="font-semibold">{{ roomListData.availableRooms }}</span>
             {{ t("Availability") }}
             <span class="mx-2">|</span>
@@ -48,7 +92,9 @@
             :key="room.roomId"
             :room="room"
             :original-price="getOriginalPrice(room.pricePerNight)"
+            :has-search-data="hasSearchData"
             @reserve="handleRoomReserve"
+            @showPrices="scrollToSearchForm"
           />
         </div>
 
@@ -60,7 +106,6 @@
         </div>
       </div>
 
-      <!-- Feedbacks Section -->
       <HotelFeedbacks :hotel="hotel" />
 
       <HotelFeedbackForm
@@ -74,7 +119,6 @@
       />
     </div>
 
-    <!-- Error State -->
     <div v-else class="flex flex-col justify-center items-center min-h-screen">
       <i class="pi pi-exclamation-triangle text-6xl text-red-500 mb-4"></i>
       <p class="text-xl text-gray-700">
@@ -99,27 +143,36 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, computed } from "vue";
+import { ref, onMounted, computed, nextTick } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import { useCityStore } from "~/stores/cityList";
 import { useHotelStore } from "~/stores/hotelList";
 import type { HotelData } from "~/stores/interface/response/cityList";
 import HotelDetailTabs from "~/components/HotelDetail/HotelDetailTabs.vue";
-import HotelAmenities from "~/components/HotelDetail/HotelAmenities.vue";
-import HotelBookingCard from "~/components/HotelDetail/HotelBookingCard.vue";
 import HotelRoomCard from "~/components/HotelDetail/HotelRoomCard.vue";
 import HotelMapModal from "~/components/HotelDetail/HotelMapModal.vue";
 import HotelFeedbacks from "~/components/HotelDetail/HotelFeedbacks.vue";
 import HotelFeedbackForm from "~/components/HotelDetail/HotelFeedbackForm.vue";
+import SearchForm from "~/components/SearchForm.vue";
+import Dialog from "primevue/dialog";
+import Button from "primevue/button";
 
 const { t } = useI18n();
 const hotel = ref<HotelData | null>(null);
+
+const showDatesDialog = ref(false);
+const currentHostname = computed(() =>
+  typeof window !== "undefined" ? window.location.hostname : "",
+);
 
 useHead({
   title: computed(() => (hotel.value ? hotel.value.name : t("Loading..."))),
 });
 
 const showMap = ref(false);
+const isSearching = ref(false);
+// Whether valid search data exists in sessionStorage
+const hasSearchData = ref(false);
 
 const lat = computed(() => hotel.value?.latitude ?? 16.0544);
 const lng = computed(() => hotel.value?.longitude ?? 108.2022);
@@ -148,6 +201,7 @@ const handleFeedbackChange = async () => {
 
 const isLoading = ref(true);
 const roomsSection = ref<HTMLElement | null>(null);
+const searchFormSection = ref<HTMLElement | null>(null);
 
 const rooms = computed(() => hotelStore.currentHotelRooms);
 const roomListData = computed(() => hotelStore.roomListData);
@@ -160,7 +214,6 @@ const canLeaveFeedback = computed(() => {
   );
 });
 
-// tìm reservation completed của hotel này
 const completedReservation = computed(() =>
   bookingStore.reservations.find(
     (r) =>
@@ -168,14 +221,64 @@ const completedReservation = computed(() =>
   ),
 );
 
-const handleImageClick = (imageIndex: number) => {
-  console.log("Image clicked:", imageIndex);
-};
-
 const scrollToRooms = () => {
   if (roomsSection.value) {
     roomsSection.value.scrollIntoView({ behavior: "smooth", block: "start" });
   }
+};
+const targetScrollY = ref(0);
+
+const scrollToSearchForm = () => {
+  if (document.activeElement instanceof HTMLElement) {
+    document.activeElement.blur();
+  }
+
+  if (searchFormSection.value) {
+    const top =
+      searchFormSection.value.getBoundingClientRect().top + window.scrollY - 80;
+    targetScrollY.value = top; // lưu lại target
+    window.scrollTo({ top, behavior: "smooth" });
+  }
+
+  nextTick(() => {
+    showDatesDialog.value = true;
+  });
+};
+
+const onDialogHide = () => {
+  setTimeout(() => {
+    window.scrollTo({ top: targetScrollY.value, behavior: "instant" });
+  }, 50);
+};
+const handleSearch = async (params: {
+  cityName: string;
+  checkIn: string;
+  checkOut: string;
+  roomTypeName: string;
+}) => {
+  isSearching.value = true;
+  try {
+    const hotelId = parseInt(route.params.id as string);
+    sessionStorage.setItem(
+      "hotel-search",
+      JSON.stringify({
+        checkIn: params.checkIn,
+        checkOut: params.checkOut,
+        cityName: params.cityName,
+        roomTypeName: params.roomTypeName,
+      }),
+    );
+    hasSearchData.value = true;
+    await hotelStore.getHotelRooms(hotelId);
+  } catch (error) {
+    console.error("Search error:", error);
+  } finally {
+    isSearching.value = false;
+  }
+};
+
+const handleGetCity = (params: { name: string }) => {
+  cityStore.getCity(params);
 };
 
 const handleRoomReserve = (roomId: number, count: number) => {
@@ -204,6 +307,30 @@ const getOriginalPrice = (currentPrice: number): number => {
 onMounted(async () => {
   try {
     const hotelId = parseInt(route.params.id as string);
+
+    // Check sessionStorage for previous search data
+    const stored = sessionStorage.getItem("hotel-search");
+    if (stored) {
+      try {
+        const parsed = JSON.parse(stored);
+        if (parsed?.checkIn && parsed?.checkOut) {
+          hasSearchData.value = true;
+          // Pre-fill the search store so SearchForm reflects the saved state
+          const searchStore = useSearchStore();
+          searchStore.setCityName(parsed.cityName ?? "");
+          searchStore.setDateRange([
+            new Date(parsed.checkIn),
+            new Date(parsed.checkOut),
+          ]);
+          if (parsed.roomTypeName) {
+            searchStore.setRoomTypeName(parsed.roomTypeName);
+          }
+        }
+      } catch {
+        // malformed JSON — ignore
+      }
+    }
+
     await hotelStore.getHotelById(hotelId);
     hotel.value = hotelStore.currentHotel as HotelData;
 

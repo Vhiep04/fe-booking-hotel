@@ -23,7 +23,6 @@
               {{ t("Room Facilities") }}:
             </p>
 
-            <!-- Display first 10 facilities -->
             <div class="grid grid-cols-2 gap-1">
               <div
                 v-for="facility in displayedFacilities"
@@ -35,7 +34,6 @@
               </div>
             </div>
 
-            <!-- Show more button if there are more facilities -->
             <button
               v-if="room.facilities.length > 10"
               class="text-blue-600 text-xs hover:underline mt-2"
@@ -50,90 +48,99 @@
           </div>
         </div>
 
-        <!-- Price & Booking Options -->
-        <div class="col-span-3 border-l pl-4">
-          <div class="space-y-2">
-            <!-- Free Cancellation Badge -->
+        <!-- Price & Booking Options — only shown when search data exists -->
+        <template v-if="hasSearchData">
+          <div class="col-span-3 border-l pl-4">
+            <div class="space-y-2">
+              <div
+                v-if="room.facilities.includes('Free Cancellation')"
+                class="flex items-center gap-1 text-green-600 text-xs"
+              >
+                <i class="pi pi-check-circle"></i>
+                <span>
+                  {{ t("Free Cancellation Before") }}
+                  {{ freeCancellationDateVi }}
+                </span>
+              </div>
+
+              <div
+                v-if="room.facilities.includes('Breakfast Included')"
+                class="flex items-center gap-1 text-green-600 text-xs"
+              >
+                <i class="pi pi-check-circle"></i>
+                <span>{{ t("No Prepayment Pay At Property") }}</span>
+              </div>
+
+              <div class="flex items-center gap-1 text-green-600 text-xs">
+                <i class="pi pi-check-circle"></i>
+                <span>{{ t("Free Cancellation Refund") }}</span>
+              </div>
+
+              <div class="text-xs text-gray-600">
+                <i class="pi pi-info-circle text-gray-400"></i>
+                {{ t("Pay One Night Only") }}
+              </div>
+            </div>
+          </div>
+
+          <!-- Price & Select Button -->
+          <div class="col-span-2 flex flex-col items-end justify-between">
+            <div v-if="originalPrice" class="text-right">
+              <p class="text-xs text-gray-400 line-through">
+                {{ formatPrice(originalPrice) }}
+              </p>
+            </div>
+
+            <div class="text-right">
+              <p class="text-2xl font-bold text-green-600">
+                {{ formatPrice(room.pricePerNight) }}
+              </p>
+              <p class="text-xs text-gray-500">
+                {{ t("Taxes And Fees Included") }}
+              </p>
+            </div>
+
             <div
-              v-if="room.facilities.includes('Free Cancellation')"
-              class="flex items-center gap-1 text-green-600 text-xs"
+              v-if="room.isAvailable"
+              class="bg-green-50 text-green-700 px-2 py-1 rounded text-xs"
             >
-              <i class="pi pi-check-circle"></i>
-              <span>
-                {{ t("Free Cancellation Before") }} {{ freeCancellationDateVi }}
-              </span>
+              {{ t("Available") }}
             </div>
-
-            <!-- Breakfast Included -->
             <div
-              v-if="room.facilities.includes('Breakfast Included')"
-              class="flex items-center gap-1 text-green-600 text-xs"
+              v-else
+              class="bg-red-50 text-red-700 px-2 py-1 rounded text-xs"
             >
-              <i class="pi pi-check-circle"></i>
-              <span>{{ t("No Prepayment Pay At Property") }}</span>
+              {{ t("Sold Out") }}
             </div>
 
-            <!-- Refund Policy -->
-            <div class="flex items-center gap-1 text-green-600 text-xs">
-              <i class="pi pi-check-circle"></i>
-              <span>{{ t("Free Cancellation Refund") }}</span>
+            <div class="flex items-center gap-2 mt-2">
+              <Select
+                v-model="selectedRoomCount"
+                :options="roomCountOptions"
+                placeholder="0"
+                class="w-16"
+                :disabled="!room.isAvailable"
+              />
+              <Button
+                :label="t('Reserve Now')"
+                class="bg-blue-600 hover:bg-blue-700 text-white text-sm px-4 py-2"
+                :disabled="!room.isAvailable || selectedRoomCount === 0"
+                @click="handleReserve"
+              />
             </div>
-
-            <!-- No Prepayment -->
-            <div class="text-xs text-gray-600">
-              <i class="pi pi-info-circle text-gray-400"></i>
-              {{ t("Pay One Night Only") }}
-            </div>
           </div>
-        </div>
+        </template>
 
-        <!-- Price & Select Button -->
-        <div class="col-span-2 flex flex-col items-end justify-between">
-          <!-- Strikethrough Price -->
-          <div v-if="originalPrice" class="text-right">
-            <p class="text-xs text-gray-400 line-through">
-              {{ formatPrice(originalPrice) }}
-            </p>
-          </div>
-
-          <!-- Current Price -->
-          <div class="text-right">
-            <p class="text-2xl font-bold text-green-600">
-              {{ formatPrice(room.pricePerNight) }}
-            </p>
-            <p class="text-xs text-gray-500">
-              {{ t("Taxes And Fees Included") }}
-            </p>
-          </div>
-
-          <!-- Availability Badge -->
-          <div
-            v-if="room.isAvailable"
-            class="bg-green-50 text-green-700 px-2 py-1 rounded text-xs"
-          >
-            {{ t("Available") }}
-          </div>
-          <div v-else class="bg-red-50 text-red-700 px-2 py-1 rounded text-xs">
-            {{ t("Sold Out") }}
-          </div>
-
-          <!-- Select Rooms Dropdown & Button -->
-          <div class="flex items-center gap-2 mt-2">
-            <Select
-              v-model="selectedRoomCount"
-              :options="roomCountOptions"
-              placeholder="0"
-              class="w-16"
-              :disabled="!room.isAvailable"
-            />
+        <template v-else>
+          <div class="col-span-5 flex items-center justify-end">
             <Button
-              :label="t('Reserve Now')"
-              class="bg-blue-600 hover:bg-blue-700 text-white text-sm px-4 py-2"
-              :disabled="!room.isAvailable || selectedRoomCount === 0"
-              @click="handleReserve"
+              :label="t('Show prices')"
+              icon="pi pi-tag"
+              class="bg-blue-600 hover:bg-blue-700 text-white text-sm px-6 py-2"
+              @click="emit('showPrices')"
             />
           </div>
-        </div>
+        </template>
       </div>
     </template>
   </Card>
@@ -150,36 +157,26 @@ const { t } = useI18n();
 
 const searchStore = useSearchStore();
 
-const freeCancellationDate = computed(() => {
-  if (!searchStore.checkIn) return null;
-
-  return dayjs(searchStore.checkIn).subtract(3, "day").format("D MMMM, YYYY"); // "5 tháng 1, 2026"
-});
-
 const freeCancellationDateVi = computed(() => {
   if (!searchStore.checkIn) return null;
-
   return dayjs(searchStore.checkIn)
     .subtract(3, "day")
     .locale("vi")
     .format("D MMMM, YYYY");
 });
 
-const canCancelFree = computed(() => {
-  if (!searchStore.checkIn) return false;
-
-  const deadline = dayjs(searchStore.checkIn).subtract(3, "day");
-  return dayjs().isBefore(deadline);
-});
-
 interface Props {
   room: Room;
   originalPrice?: number;
+  /** Whether the user has already entered search dates — controls price visibility */
+  hasSearchData: boolean;
 }
 
 const props = defineProps<Props>();
 const emit = defineEmits<{
   reserve: [roomId: number, count: number];
+  /** Emitted when "Show prices" is clicked so the parent can scroll to the search form */
+  showPrices: [];
 }>();
 
 const showAllFacilities = ref(false);
@@ -188,9 +185,7 @@ const selectedRoomCount = ref(0);
 const roomCountOptions = [0, 1, 2, 3, 4, 5];
 
 const displayedFacilities = computed(() => {
-  if (showAllFacilities.value) {
-    return props.room.facilities;
-  }
+  if (showAllFacilities.value) return props.room.facilities;
   return props.room.facilities.slice(0, 10);
 });
 
