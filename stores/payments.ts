@@ -19,11 +19,12 @@ export const usePaymentStore = defineStore("payment", () => {
   const isLoading = ref(false);
   const error = ref<string | null>(null);
 
-  async function createPayment(payload: PaymentPayload) {
+  async function createPayment(
+    payload: PaymentPayload,
+  ): Promise<string | null> {
     isLoading.value = true;
     error.value = null;
     paymentUrl.value = null;
-
     try {
       const response = await apiStore.apiRequest<CreatePaymentRes>({
         endpoint: "/Payment/create-payment",
@@ -31,16 +32,16 @@ export const usePaymentStore = defineStore("payment", () => {
         data: payload,
         auth: true,
       });
-
       if (response?.paymentUrl) {
         paymentUrl.value = response.paymentUrl;
-        window.location.href = response.paymentUrl;
-      } else {
-        error.value = "Failed to get payment URL";
+        return response.paymentUrl;
       }
+      error.value = "Failed to get payment URL";
+      return null;
     } catch (e) {
       error.value = "An error occurred while creating payment";
       console.error(e);
+      return null;
     } finally {
       isLoading.value = false;
     }

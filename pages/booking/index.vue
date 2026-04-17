@@ -1,6 +1,5 @@
 <template>
   <div class="min-h-screen bg-gray-100">
-    <!-- Progress Bar -->
     <div class="bg-white border-b border-gray-200 sticky top-0 z-10">
       <div class="max-w-7xl mx-auto px-4 py-3">
         <div class="flex items-center justify-center gap-0">
@@ -43,7 +42,6 @@
       </div>
     </div>
 
-    <!-- Loading -->
     <div
       v-if="roomStore.isLoading || paymentStore.isLoading"
       class="flex justify-center items-center py-32"
@@ -51,7 +49,6 @@
       <i class="pi pi-spin pi-spinner text-4xl text-blue-600"></i>
     </div>
 
-    <!-- Error -->
     <div
       v-else-if="roomStore.error"
       class="flex flex-col justify-center items-center py-32"
@@ -60,7 +57,6 @@
       <p class="text-xl text-gray-700">{{ roomStore.error }}</p>
     </div>
 
-    <!-- Main Content -->
     <div v-else class="max-w-7xl mx-auto px-4 py-6">
       <div class="flex flex-col lg:flex-row gap-6">
         <CheckoutLeftPanel
@@ -80,6 +76,10 @@
       </div>
     </div>
   </div>
+  <PaymentLoading
+    v-model="paymentStore.isLoading"
+    message="Hệ thống đang xử lý đặt phòng của bạn..."
+  />
 </template>
 
 <script setup lang="ts">
@@ -91,8 +91,10 @@ import CheckoutCenterPanel from "~/components/Booking/CheckoutCenterPanel.vue";
 import { useGetRoomStore } from "~/stores/getRoom";
 import { usePaymentStore } from "~/stores/payments";
 import { useAuthStore } from "~/stores/auth";
+import PaymentLoading from "~/components/shared/PaymentLoading.vue";
 
 const { t } = useI18n();
+const router = useRouter();
 
 useHead({
   title: t("Detail Booking"),
@@ -102,6 +104,7 @@ const route = useRoute();
 const roomStore = useGetRoomStore();
 const paymentStore = usePaymentStore();
 const authStore = useAuthStore();
+const hotelStore = useHotelStore();
 const toast = useToast();
 
 const currentStep = ref(2);
@@ -119,8 +122,8 @@ const roomCount = computed(() => Number(route.query.rooms) || 1);
 const hotel = computed(() => {
   const r = roomStore.room;
   return {
-    name: `Hotel #${r?.hotelId ?? hotelId.value}`,
-    address: "",
+    name: hotelStore.currentHotel?.name ?? `Hotel #${hotelId.value}`,
+    address: hotelStore.currentHotel?.location ?? "",
     rating: 0,
     reviewCount: 0,
     reviewLabel: "",
@@ -244,30 +247,71 @@ async function handleVnpayReturn() {
   }
 }
 
-async function handleSubmit() {
-  sessionStorage.setItem(
-    "pendingBookingGuest",
-    JSON.stringify({
+async function handleSubmit(method: "vnpay" | "cash") {
+  if (method === "vnpay") {
+    sessionStorage.setItem(
+      "pendingBookingGuest",
+      JSON.stringify({
+        email: guestDetails.value.email,
+        name: `${guestDetails.value.firstName} ${guestDetails.value.lastName}`,
+        userId: authStore.userInfo?.userId ?? "",
+        roomId: roomId.value,
+        checkInDate: booking.value.checkInDate,
+        checkOutDate: booking.value.checkOutDate,
+      }),
+    );
+
+    const url = await paymentStore.createPayment({
+      orderType: "other",
+      amount: roomStore.room?.pricePerNight ?? 0,
+      orderDescription: roomStore.room?.roomType ?? "Room booking",
+      name: `${guestDetails.value.firstName} ${guestDetails.value.lastName}`,
+    });
+
+    if (url) {
+      window.location.replace(url);
+    }
+  } else {
+    // Cash
+    const r = roomStore.room;
+    const result = await paymentStore.cashBooking({
       email: guestDetails.value.email,
       name: `${guestDetails.value.firstName} ${guestDetails.value.lastName}`,
+      phoneNumber: guestDetails.value.phone,
       userId: authStore.userInfo?.userId ?? "",
       roomId: roomId.value,
+      hotelName: hotel.value.name,
+      hotelAddress: hotel.value.address,
       checkInDate: booking.value.checkInDate,
       checkOutDate: booking.value.checkOutDate,
-    }),
-  );
+      amount: r?.pricePerNight ?? 0,
+      orderDescription: r?.roomType ?? "Room booking",
+    });
 
-  await paymentStore.createPayment({
-    orderType: "other",
-    amount: roomStore.room?.pricePerNight ?? 0,
-    orderDescription: roomStore.room?.roomType ?? "Room booking",
-    name: `${guestDetails.value.firstName} ${guestDetails.value.lastName}`,
-  });
+    if (result?.success) {
+      sessionStorage.setItem(
+        "cashBookingResponse",
+        JSON.stringify({
+          reservationId: result.reservationId,
+          name: `${guestDetails.value.firstName} ${guestDetails.value.lastName}`,
+          hotelName: hotel.value.name,
+          hotelAddress: hotel.value.address,
+          orderDescription: roomStore.room?.roomType ?? "",
+          checkInDate: booking.value.checkInDate,
+          checkOutDate: booking.value.checkOutDate,
+          amount: roomStore.room?.pricePerNight ?? 0,
+          emailSent: result.emailSent,
+          message: result.message,
+        }),
+      );
+      router.push("/payment/cash-success");
+    }
+  }
 }
-
 onMounted(async () => {
   if (hotelId.value && roomId.value) {
     await roomStore.fetchRoom(hotelId.value, roomId.value);
+    await hotelStore.getHotelById(hotelId.value);
   }
   await handleVnpayReturn();
 });

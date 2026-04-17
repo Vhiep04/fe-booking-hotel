@@ -1,5 +1,3 @@
-// stores/interface/dashboard.ts
-
 export interface RevenueChart {
   year: number;
   month: number;

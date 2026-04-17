@@ -6,7 +6,6 @@
     :modal="true"
   >
     <div v-if="booking" class="space-y-6">
-      <!-- IDs -->
       <div class="grid grid-cols-2 gap-4">
         <div>
           <label class="text-sm text-(--admin-text-muted)"> Booking ID </label>
@@ -22,7 +21,6 @@
 
       <Divider />
 
-      <!-- Hotel Info -->
       <div>
         <h4 class="font-semibold mb-3">Hotel Information</h4>
         <p class="font-semibold text-lg">{{ booking.hotelName }}</p>
@@ -34,7 +32,6 @@
 
       <Divider />
 
-      <!-- Guest Info -->
       <div>
         <h4 class="font-semibold mb-3">Guest Information</h4>
         <div class="grid grid-cols-2 gap-4">
@@ -51,7 +48,6 @@
 
       <Divider />
 
-      <!-- Stay Info -->
       <div>
         <h4 class="font-semibold mb-3">Stay Information</h4>
         <div class="grid grid-cols-3 gap-4">
@@ -72,7 +68,6 @@
 
       <Divider />
 
-      <!-- Payment Info -->
       <div>
         <h4 class="font-semibold mb-3">Payment Information</h4>
         <div class="grid grid-cols-2 gap-4 mb-4">
@@ -97,7 +92,6 @@
           </div>
         </div>
 
-        <!-- Payment history -->
         <div v-if="booking.payments?.length > 0">
           <label class="text-sm text-(--admin-text-muted) mb-2 block">
             Payment History

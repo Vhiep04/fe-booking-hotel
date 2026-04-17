@@ -1,10 +1,9 @@
 <template>
   <div class="layout-sidebar">
-    <!-- Logo -->
     <div class="layout-sidebar-logo">
       <NuxtLink to="/admin">
         <img
-          src="/assets/images/england-flag.svg"
+          src="/assets/images/logo_easyset24.svg"
           alt="Booking Admin"
           class="h-8"
         />
@@ -12,16 +11,14 @@
       </NuxtLink>
     </div>
 
-    <!-- Menu -->
     <div class="layout-menu-container">
       <AppMenu :model="menuItems" />
     </div>
 
-    <!-- Sidebar Footer -->
-    <div class="p-4 border-t border-[var(--admin-sidebar-border)]">
-      <div class="flex items-center gap-3 text-[var(--admin-sidebar-text)]">
+    <div class="p-4 border-t border-(--admin-sidebar-border)">
+      <div class="flex items-center gap-3 text-(--admin-sidebar-text)">
         <i class="pi pi-info-circle text-sm"></i>
-        <span class="text-xs text-[var(--admin-sidebar-text-muted)]">
+        <span class="text-xs text-(--admin-sidebar-text-muted)">
           v1.0.0 - Booking Admin
         </span>
       </div>
@@ -31,19 +28,17 @@
 
 <script setup lang="ts">
 import AppMenu from "./AppMenu.vue";
+import type { MenuItem, MenuEntry } from "./AppMenu.vue";
+import { useDashboardStore } from "~/stores/admin/dashboard";
 
-interface MenuItem {
-  label: string;
-  icon?: string;
-  to?: string;
-  items?: MenuItem[];
-  badge?: string | number;
-  badgeClass?: string;
-  separator?: boolean;
-  visible?: boolean;
-}
+const dashboardStore = useDashboardStore();
 
-const menuItems = ref<MenuItem[]>([
+const data = computed(() => dashboardStore.dashboardData);
+
+const badge = (count: number | undefined, cls: string): Partial<MenuItem> =>
+  count ? { badge: count, badgeClass: cls } : {};
+
+const menuItems = computed<MenuEntry[]>(() => [
   {
     label: "Dashboard",
     icon: "pi pi-home",
@@ -57,72 +52,51 @@ const menuItems = ref<MenuItem[]>([
         label: "All Bookings",
         icon: "pi pi-list",
         to: "/admin/bookings",
+        ...badge(data.value?.totalReservations, "bg-blue-500"),
       },
       {
         label: "Pending",
         icon: "pi pi-clock",
         to: "/admin/bookings?status=pending",
-        badge: "5",
-        badgeClass: "bg-yellow-500",
+        ...badge(data.value?.pendingReservations, "bg-yellow-500"),
       },
       {
         label: "Confirmed",
         icon: "pi pi-check-circle",
         to: "/admin/bookings?status=confirmed",
+        ...badge(data.value?.confirmedReservations, "bg-blue-100"),
+      },
+      {
+        label: "Completed",
+        icon: "pi pi-verified",
+        to: "/admin/bookings?status=completed",
+        ...badge(data.value?.completedReservations, "bg-green-500"),
       },
       {
         label: "Cancelled",
         icon: "pi pi-times-circle",
         to: "/admin/bookings?status=cancelled",
+        ...badge(data.value?.cancelledReservations, "bg-red-500"),
       },
     ],
   },
   {
     label: "Hotels",
     icon: "pi pi-building",
-    items: [
-      {
-        label: "All Hotels",
-        icon: "pi pi-list",
-        to: "/admin/hotels",
-      },
-      {
-        label: "Add New",
-        icon: "pi pi-plus",
-        to: "/admin/hotels/create",
-      },
-      {
-        label: "Categories",
-        icon: "pi pi-tags",
-        to: "/admin/hotels/categories",
-      },
-    ],
+    to: "/admin/hotels",
+    ...badge(data.value?.totalHotels, "bg-blue-500"),
   },
   {
     label: "Users",
     icon: "pi pi-users",
-    items: [
-      {
-        label: "All Users",
-        icon: "pi pi-list",
-        to: "/admin/users",
-      },
-      {
-        label: "Administrators",
-        icon: "pi pi-shield",
-        to: "/admin/users?role=admin",
-      },
-      {
-        label: "Customers",
-        icon: "pi pi-user",
-        to: "/admin/users?role=customer",
-      },
-    ],
+    to: "/admin/users",
+    ...badge(data.value?.totalUsers, "bg-blue-500"),
   },
   {
     label: "Cities",
     icon: "pi pi-map-marker",
     to: "/admin/cities",
+    ...badge(data.value?.totalCities, "bg-blue-500"),
   },
   {
     label: "Facilities",
@@ -133,6 +107,7 @@ const menuItems = ref<MenuItem[]>([
     label: "Rooms",
     icon: "pi pi-inbox",
     to: "/admin/rooms",
+    ...badge(data.value?.totalRooms, "bg-blue-500"),
   },
   { separator: true },
   {

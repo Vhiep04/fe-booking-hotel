@@ -71,7 +71,7 @@ const loading = ref(false);
 const updatingId = ref<number | null>(null);
 const detailDialog = ref(false);
 const selectedBooking = ref<Reservation | null>(null);
-
+let debounceTimer: ReturnType<typeof setTimeout> | null = null;
 const pagination = ref({ page: 1, pageSize: 10, totalCount: 0 });
 
 const filters = ref<BookingFiltersModel>({
@@ -80,8 +80,6 @@ const filters = ref<BookingFiltersModel>({
   dateFrom: null,
   dateTo: null,
 });
-
-// ─── Fetch ────────────────────────────────────────────────────────────────────
 
 async function fetchReservations() {
   loading.value = true;
@@ -117,7 +115,6 @@ async function fetchReservations() {
   }
 }
 
-let debounceTimer: ReturnType<typeof setTimeout> | null = null;
 watch(
   filters,
   () => {
@@ -127,10 +124,6 @@ watch(
   },
   { deep: true },
 );
-
-onMounted(fetchReservations);
-
-// ─── Handlers ─────────────────────────────────────────────────────────────────
 
 function onPageChange({ page, rows }: { page: number; rows: number }) {
   pagination.value.page = page;
@@ -197,4 +190,6 @@ function exportData() {
     life: 3000,
   });
 }
+
+onMounted(fetchReservations);
 </script>

@@ -1,6 +1,5 @@
 <template>
   <div class="flex-1 space-y-4">
-    <!-- Guest Details Form -->
     <div class="bg-white rounded-lg border border-gray-200 p-6">
       <h2 class="text-xl font-bold text-gray-900 mb-5">Enter your details</h2>
 
@@ -15,7 +14,6 @@
       </div>
 
       <div class="space-y-4">
-        <!-- Name -->
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div>
             <label class="block text-sm font-medium text-gray-700 mb-1"
@@ -39,7 +37,6 @@
           </div>
         </div>
 
-        <!-- Email -->
         <div>
           <label class="block text-sm font-medium text-gray-700 mb-1"
             >Email address <span class="text-red-500">*</span></label
@@ -55,7 +52,6 @@
           </p>
         </div>
 
-        <!-- Country -->
         <div>
           <label class="block text-sm font-medium text-gray-700 mb-1"
             >Country/Region <span class="text-red-500">*</span></label
@@ -71,13 +67,11 @@
           />
         </div>
 
-        <!-- Phone -->
         <div class="w-[49%]">
           <label class="block text-sm font-medium text-gray-700 mb-1"
             >Phone number <span class="text-red-500">*</span></label
           >
           <div class="flex gap-2">
-            <!-- Phone code Select – driven by selected country (read-only via disabled) -->
             <Select
               :model-value="selectedPhoneCode"
               :options="phoneCodeOptions"
@@ -100,7 +94,6 @@
       </div>
     </div>
 
-    <!-- Good to Know + Room Info -->
     <div class="bg-white rounded-lg border border-gray-200 p-6">
       <h3 class="font-bold text-gray-900 text-lg mb-4">Good to know:</h3>
       <ul class="space-y-2 mb-6">
@@ -144,7 +137,6 @@
             <i class="pi pi-users text-gray-500" />
             Guests: {{ booking.room.guests }} adults
           </div>
-          <!-- Main guest with edit pencil -->
           <div class="flex items-center gap-2 text-gray-700">
             <i class="pi pi-user text-gray-500" />
             <span>Main guest:</span>
@@ -214,7 +206,6 @@
       />
     </div>
 
-    <!-- Submit -->
     <div class="flex justify-end items-center gap-4 py-4">
       <span
         class="text-blue-600 text-sm flex items-center gap-1 cursor-pointer"
@@ -222,13 +213,21 @@
         <i class="pi pi-tag" />
         We Price Match
       </span>
-      <!-- Button Pay via VNPAY -->
+      <Button
+        label="Thanh toán tiền mặt"
+        icon="pi pi-wallet"
+        severity="info"
+        :loading="isPaying"
+        :disabled="isPaying"
+        @click="validateAndSubmit('cash')"
+      />
+
       <Button
         label="Pay via VNPAY"
         icon="pi pi-credit-card"
         :loading="isPaying"
         :disabled="isPaying"
-        @click="validateAndSubmit"
+        @click="validateAndSubmit('vnpay')"
       />
     </div>
     <div class="text-center pb-4">
@@ -237,7 +236,6 @@
       >
     </div>
 
-    <!-- Main Guest Dialog -->
     <Dialog
       v-model:visible="showMainGuestDialog"
       modal
@@ -292,37 +290,6 @@ import { useToast } from "primevue/usetoast";
 
 const toast = useToast();
 
-function validateAndSubmit() {
-  const errors: string[] = [];
-
-  if (!props.guestDetails.firstName.trim()) errors.push("First name");
-  if (!props.guestDetails.lastName.trim()) errors.push("Last name");
-  if (!props.guestDetails.email.trim()) {
-    errors.push("Email address");
-  } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(props.guestDetails.email)) {
-    toast.add({
-      severity: "warn",
-      summary: "Email không hợp lệ",
-      detail: "Vui lòng nhập đúng định dạng email.",
-      life: 4000,
-    });
-    return;
-  }
-  if (!props.guestDetails.country.trim()) errors.push("Country/Region");
-  if (!props.guestDetails.phone.trim()) errors.push("Phone number");
-
-  if (errors.length > 0) {
-    toast.add({
-      severity: "error",
-      summary: "Vui lòng điền đầy đủ thông tin",
-      detail: `Các trường bắt buộc còn thiếu: ${errors.join(", ")}`,
-      life: 5000,
-    });
-    return;
-  }
-
-  emit("submit");
-}
 const props = defineProps<{
   guestDetails: {
     firstName: string;
@@ -352,21 +319,49 @@ const emit = defineEmits([
 
 const authStore = useAuthStore();
 
-// Main guest dialog state
 const showMainGuestDialog = ref(false);
 const editMainGuestName = ref("");
 const mainGuestName = ref("");
 
-// Country list from the imported file
 const countryList = COUNTRIES;
 
-// Computed: phone code derived from currently selected country
+function validateAndSubmit(method: "vnpay" | "cash") {
+  const errors: string[] = [];
+
+  if (!props.guestDetails.firstName.trim()) errors.push("First name");
+  if (!props.guestDetails.lastName.trim()) errors.push("Last name");
+  if (!props.guestDetails.email.trim()) {
+    errors.push("Email address");
+  } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(props.guestDetails.email)) {
+    toast.add({
+      severity: "warn",
+      summary: "Email không hợp lệ",
+      detail: "Vui lòng nhập đúng định dạng email.",
+      life: 4000,
+    });
+    return;
+  }
+  if (!props.guestDetails.country.trim()) errors.push("Country/Region");
+  if (!props.guestDetails.phone.trim()) errors.push("Phone number");
+
+  if (errors.length > 0) {
+    toast.add({
+      severity: "error",
+      summary: "Vui lòng điền đầy đủ thông tin",
+      detail: `Các trường bắt buộc còn thiếu: ${errors.join(", ")}`,
+      life: 5000,
+    });
+    return;
+  }
+
+  emit("submit", method);
+}
+
 const selectedPhoneCode = computed(() => {
   const found = COUNTRIES.find((c) => c.name === props.guestDetails.country);
   return found ? found.dialCode : "";
 });
 
-// Options list for the phone code Select (label shown in dropdown)
 const phoneCodeOptions = computed(() =>
   COUNTRIES.map((c) => ({
     label: `${c.flag} ${c.dialCode}`,
@@ -374,23 +369,6 @@ const phoneCodeOptions = computed(() =>
   })),
 );
 
-// On mount: call /me and pre-fill form
-onMounted(async () => {
-  await authStore.fetchUserInfo();
-  const user = authStore.userInfo;
-  if (user) {
-    emit("update:guestDetails", {
-      ...props.guestDetails,
-      firstName: user.firstName ?? props.guestDetails.firstName,
-      lastName: user.lastName ?? props.guestDetails.lastName,
-      email: user.email ?? props.guestDetails.email,
-      phone: user.phoneNumber ?? props.guestDetails.phone,
-    });
-    mainGuestName.value = user.fullName ?? `${user.firstName} ${user.lastName}`;
-  }
-});
-
-// Country change: update country in guestDetails (phone code auto-updates via computed)
 function onCountryChange(newCountry: string) {
   emit("update:guestDetails", {
     ...props.guestDetails,
@@ -398,7 +376,6 @@ function onCountryChange(newCountry: string) {
   });
 }
 
-// Main guest dialog
 function openMainGuestDialog() {
   editMainGuestName.value = mainGuestName.value;
   showMainGuestDialog.value = true;
@@ -409,7 +386,6 @@ function saveMainGuest() {
   showMainGuestDialog.value = false;
 }
 
-// Generic field update
 const update = (field: string, event: Event) => {
   emit("update:guestDetails", {
     ...props.guestDetails,
@@ -432,4 +408,19 @@ const timeOptions = [
   "After 10:00 PM",
   "I don't know",
 ];
+
+onMounted(async () => {
+  await authStore.fetchUserInfo();
+  const user = authStore.userInfo;
+  if (user) {
+    emit("update:guestDetails", {
+      ...props.guestDetails,
+      firstName: user.firstName ?? props.guestDetails.firstName,
+      lastName: user.lastName ?? props.guestDetails.lastName,
+      email: user.email ?? props.guestDetails.email,
+      phone: user.phoneNumber ?? props.guestDetails.phone,
+    });
+    mainGuestName.value = user.fullName ?? `${user.firstName} ${user.lastName}`;
+  }
+});
 </script>
