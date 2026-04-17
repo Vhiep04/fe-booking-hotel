@@ -2,8 +2,6 @@ import { defineStore } from "pinia";
 import { ref, computed } from "vue";
 import { useApiStore } from "@/stores/api";
 
-// ─── Types ────────────────────────────────────────────────────────────────────
-
 export interface FavouriteHotel {
   favouriteId: number;
   hotelId: number;
@@ -84,7 +82,6 @@ export const useFavouriteHotelStore = defineStore("favouriteHotel", () => {
       });
 
       if (response?.success) {
-        // Avoid duplicates in local state
         const exists = favourites.value.some((f) => f.hotelId === hotelId);
         if (!exists) {
           favourites.value.push(response.data);

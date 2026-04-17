@@ -20,8 +20,20 @@
     <!-- Header -->
     <div class="flex flex-col lg:flex-row justify-between gap-4">
       <div>
+        <!-- Stars mapped from averageRating -->
         <div class="flex items-center gap-1 mb-1">
-          <span class="text-yellow-400 text-sm">★ ★ ★</span>
+          <span
+            v-for="star in starCount"
+            :key="'filled-' + star"
+            class="text-yellow-400 text-sm"
+            >★</span
+          >
+          <span
+            v-for="empty in 5 - starCount"
+            :key="'empty-' + empty"
+            class="text-gray-300 text-sm"
+            >★</span
+          >
         </div>
         <h1 class="text-2xl font-bold text-gray-900">{{ hotel.name }}</h1>
         <div class="flex items-center text-sm text-gray-600 mt-1">
@@ -37,8 +49,17 @@
       </div>
 
       <div class="flex items-start gap-3">
-        <button class="border rounded-lg p-2 hover:bg-gray-100">
-          <i class="pi pi-heart"></i>
+        <!-- Heart button wired to toggleFavourite -->
+        <button
+          class="border rounded-lg p-2 hover:bg-gray-100 transition-colors"
+          :class="{ 'text-red-500 border-red-300 bg-red-50': isFavourited }"
+          :disabled="favouriteStore.isLoading"
+          @click="handleToggleFavourite"
+        >
+          <i
+            class="pi"
+            :class="isFavourited ? 'pi-heart-fill' : 'pi-heart'"
+          ></i>
         </button>
         <button class="border rounded-lg p-2 hover:bg-gray-100">
           <i class="pi pi-share-alt"></i>
@@ -47,13 +68,11 @@
           class="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2 rounded-lg font-semibold"
           @click="$emit('bookNow')"
         >
-          Đặt ngay
+          {{ t("Reserve Now") }}
         </button>
       </div>
     </div>
 
-    <!-- Gallery + Rating box -->
-    <!-- ✅ Fix: thêm relative + overflow-hidden, bỏ gap lớn -->
     <div class="grid lg:grid-cols-4 gap-3 mt-6 overflow-hidden">
       <!-- Gallery -->
       <div
@@ -117,6 +136,8 @@ import { computed } from "vue";
 import type { HotelData } from "~/stores/interface/response/cityList";
 import HotelMiniMap from "./HotelMiniMap.vue";
 
+const { t } = useI18n();
+
 interface Props {
   hotel: HotelData;
   isMapOpen?: boolean;
@@ -124,6 +145,26 @@ interface Props {
 
 const props = defineProps<Props>();
 defineEmits(["bookNow", "showMap"]);
+
+const favouriteStore = useFavouriteHotelStore();
+
+const isFavourited = computed(() =>
+  favouriteStore.isFavourited(props.hotel.hotelId),
+);
+
+const handleToggleFavourite = async () => {
+  await favouriteStore.toggleFavourite(props.hotel.hotelId);
+};
+
+const starCount = computed(() => {
+  const rating = Number(props.hotel.averageRating ?? 0);
+  if (rating >= 4.5) return 5;
+  if (rating >= 3.5) return 4;
+  if (rating >= 2.5) return 3;
+  if (rating >= 1.5) return 2;
+  if (rating >= 0.5) return 1;
+  return 0;
+});
 
 const breadcrumbs = [
   { label: "Trang chủ", link: "/" },
@@ -161,11 +202,9 @@ const ratingLabel = computed(() => {
 const firstFeedbackComment = computed(() => {
   const first = props.hotel.recentFeedbacks?.[0];
   if (!first) return "Chưa có đánh giá nào.";
-  const truncated =
-    first.comment.length > 100
-      ? first.comment.slice(0, 100) + "..."
-      : first.comment;
-  return truncated;
+  return first.comment.length > 100
+    ? first.comment.slice(0, 100) + "..."
+    : first.comment;
 });
 
 const onImgError = (e: Event) => {

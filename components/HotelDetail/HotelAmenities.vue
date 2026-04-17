@@ -7,7 +7,7 @@
       class="text-gray-400 text-sm"
     >
       <i class="pi pi-spin pi-spinner mr-2"></i>
-      Loading amenities...
+      Loading facilities...
     </div>
 
     <div v-else class="grid sm:grid-cols-2 gap-4">

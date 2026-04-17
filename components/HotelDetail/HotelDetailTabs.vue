@@ -110,7 +110,7 @@ defineProps<Props>();
 
 const tabs = ref([
   { title: "Place Details", value: "0" },
-  { title: "Amenities", value: "1" },
+  { title: "Facilities", value: "1" },
   { title: "Place Rules", value: "2" },
 ]);
 

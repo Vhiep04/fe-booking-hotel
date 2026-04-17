@@ -18,7 +18,7 @@
         :facilities="hotel.facilities"
       />
 
-      <div ref="searchFormSection" class="mb-6 space-y-4">
+      <div ref="searchFormSection" class="mb-6 space-y-2">
         <h2 class="text-2xl font-bold text-gray-900">
           {{ t("Availability") }}
         </h2>
@@ -171,7 +171,6 @@ useHead({
 
 const showMap = ref(false);
 const isSearching = ref(false);
-// Whether valid search data exists in sessionStorage
 const hasSearchData = ref(false);
 
 const lat = computed(() => hotel.value?.latitude ?? 16.0544);
@@ -183,6 +182,11 @@ const cityStore = useCityStore();
 const hotelStore = useHotelStore();
 const feedbackStore = useFeedbackStore();
 const bookingStore = useReservationStore();
+const favouriteStore = useFavouriteHotelStore();
+
+const isLoading = ref(true);
+const roomsSection = ref<HTMLElement | null>(null);
+const searchFormSection = ref<HTMLElement | null>(null);
 
 const myHotelFeedback = computed(
   () =>
@@ -198,10 +202,6 @@ const handleFeedbackChange = async () => {
   ]);
   hotel.value = hotelStore.currentHotel as HotelData;
 };
-
-const isLoading = ref(true);
-const roomsSection = ref<HTMLElement | null>(null);
-const searchFormSection = ref<HTMLElement | null>(null);
 
 const rooms = computed(() => hotelStore.currentHotelRooms);
 const roomListData = computed(() => hotelStore.roomListData);
@@ -236,7 +236,7 @@ const scrollToSearchForm = () => {
   if (searchFormSection.value) {
     const top =
       searchFormSection.value.getBoundingClientRect().top + window.scrollY - 80;
-    targetScrollY.value = top; // lưu lại target
+    targetScrollY.value = top;
     window.scrollTo({ top, behavior: "smooth" });
   }
 
@@ -308,14 +308,12 @@ onMounted(async () => {
   try {
     const hotelId = parseInt(route.params.id as string);
 
-    // Check sessionStorage for previous search data
     const stored = sessionStorage.getItem("hotel-search");
     if (stored) {
       try {
         const parsed = JSON.parse(stored);
         if (parsed?.checkIn && parsed?.checkOut) {
           hasSearchData.value = true;
-          // Pre-fill the search store so SearchForm reflects the saved state
           const searchStore = useSearchStore();
           searchStore.setCityName(parsed.cityName ?? "");
           searchStore.setDateRange([
@@ -339,6 +337,7 @@ onMounted(async () => {
         hotelStore.getHotelRooms(hotelId),
         feedbackStore.fetchMyFeedbacks(),
         bookingStore.fetchReservations(),
+        favouriteStore.fetchFavourites(),
       ]);
     }
   } catch (error) {
