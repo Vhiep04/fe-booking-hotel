@@ -49,6 +49,19 @@
         </template>
       </Column>
 
+      <Column
+        field="roomNumber"
+        header="RoomNumber"
+        sortable
+        style="min-width: 100px"
+      >
+        <template #body="{ data }">
+          <span class="font-medium text-[var(--admin-text-color)]">
+            #{{ data.roomId }}
+          </span>
+        </template>
+      </Column>
+
       <Column field="userName" header="Guest" sortable style="min-width: 180px">
         <template #body="{ data }">
           <div class="flex items-center gap-2">

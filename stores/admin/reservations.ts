@@ -2,11 +2,11 @@ import { defineStore } from "pinia";
 import { ref } from "vue";
 import { useApiStore } from "@/stores/api";
 import type {
+  ApiResponse,
   GetReservationsParams,
   PaginatedReservations,
   Reservation,
 } from "./interfaces/reservations";
-import type { ApiResponse } from "./interfaces/cities";
 
 export const useReservationsStore = defineStore("reservations", () => {
   const apiStore = useApiStore();

@@ -24,7 +24,9 @@
       <div>
         <h4 class="font-semibold mb-3">Hotel Information</h4>
         <p class="font-semibold text-lg">{{ booking.hotelName }}</p>
-        <p class="text-(--admin-text-muted)">{{ booking.roomType }}</p>
+        <p class="text-(--admin-text-muted)">
+          {{ booking.roomType }} Room Number: {{ booking.roomId }}
+        </p>
         <p class="text-sm text-(--admin-text-muted) mt-1">
           <i class="pi pi-map-marker mr-1"></i>{{ booking.cityName }}
         </p>
