@@ -1,19 +1,42 @@
 <template>
-  <header class="bg-gray-100 px-10 py-2 z-1000">
-    <div class="flex items-center justify-between">
+  <header
+    class="bg-white border-b border-gray-200 px-6 h-[300] z-50 sticky top-0"
+  >
+    <div class="flex items-center justify-between h-16 gap-6">
       <!-- Logo -->
-      <div class="flex items-center space-x-4">
-        <img src="../../assets/images/logo_easyset24.svg" alt="Logo" />
+      <div class="flex items-center shrink-0">
+        <img
+          src="../../assets/images/logo_easyset24.svg"
+          alt="Logo"
+          class="h-10"
+        />
       </div>
 
+      <!-- Nav items (center) -->
+      <nav class="flex items-center gap-1 flex-1 justify-center">
+        <NuxtLink
+          v-for="item in navItems"
+          :key="item.name"
+          :to="item.path"
+          class="px-4 py-1.5 rounded-full text-sm text-gray-500 hover:bg-gray-100 hover:text-gray-800 transition-colors whitespace-nowrap"
+          active-class="bg-gray-100 text-gray-900 font-medium"
+        >
+          {{ t(item.name) }}
+        </NuxtLink>
+      </nav>
+
       <!-- Right side -->
-      <div class="flex items-center space-x-4">
+      <div class="flex items-center gap-3 shrink-0">
         <!-- Language -->
         <button
           @click="toggleLangPanel"
           class="hover:opacity-80 transition-opacity"
         >
-          <img :src="currentFlag" alt="Language" class="w-8 h-6" />
+          <img
+            :src="currentFlag"
+            alt="Language"
+            class="w-7 h-5 rounded-sm object-contain"
+          />
         </button>
 
         <OverlayPanel ref="langPanel">
@@ -24,7 +47,7 @@
               @click="changeLanguage(lang.code)"
               class="flex items-center gap-3 px-4 py-2 cursor-pointer hover:bg-gray-100"
             >
-              <img :src="lang.flag" class="w-6 h-4" />
+              <img :src="lang.flag" class="w-6 h-4 rounded-sm object-cover" />
               <span class="text-sm">{{ lang.label }}</span>
               <i
                 v-if="locale === lang.code"
@@ -35,21 +58,23 @@
         </OverlayPanel>
 
         <template v-if="authStore.isAuthenticated">
+          <!-- Favourite -->
           <NuxtLink
-            class="text-gray-700 hover:text-red-500 transition-colors"
             to="/favourite-hotels"
+            class="w-9 h-9 flex items-center justify-center rounded-full text-gray-500 hover:bg-gray-100 hover:text-red-500 transition-colors"
           >
-            <i class="pi pi-heart" style="font-size: 1.2rem"></i>
+            <i class="pi pi-heart" style="font-size: 1.1rem"></i>
           </NuxtLink>
 
+          <!-- Notifications -->
           <button
-            class="text-gray-700 hover:text-blue-600 transition-colors relative"
+            class="w-9 h-9 flex items-center justify-center rounded-full text-gray-500 hover:bg-gray-100 hover:text-blue-600 transition-colors relative"
             @click="toggleNotifications"
           >
-            <i class="pi pi-bell" style="font-size: 1.2rem"></i>
+            <i class="pi pi-bell" style="font-size: 1.1rem"></i>
             <span
               v-if="notificationCount > 0"
-              class="absolute -top-2 -right-2 w-5 h-5 bg-red-500 text-white text-xs rounded-full flex items-center justify-center"
+              class="absolute top-0.5 right-0.5 w-4 h-4 bg-red-500 text-white text-[10px] rounded-full flex items-center justify-center font-medium"
             >
               {{ notificationCount > 9 ? "9+" : notificationCount }}
             </span>
@@ -133,33 +158,20 @@
           <Button
             @click="login"
             :label="t('Sign in')"
-            size="normal"
-            severity="info"
-            raised
-            class="w-[150px]"
+            size="small"
+            severity="secondary"
+            outlined
           />
           <Button
             @click="register"
             :label="t('Register')"
-            size="normal"
+            size="small"
             severity="info"
             raised
-            class="w-[150px]"
           />
         </template>
       </div>
     </div>
-    <nav class="px-10 py-2 flex justify-center gap-3 flex-wrap">
-      <NuxtLink
-        v-for="item in navItems"
-        :key="item.name"
-        :to="item.path"
-        class="px-4 py-1.5 rounded-full border border-gray-300 text-sm text-gray-500 hover:bg-gray-100 hover:text-gray-800 hover:border-gray-400 transition-colors cursor-pointer"
-        active-class="border-gray-500 text-gray-800 font-medium"
-      >
-        {{ item.name }}
-      </NuxtLink>
-    </nav>
   </header>
 </template>
 

@@ -1,11 +1,11 @@
 <template>
   <div class="min-h-screen bg-white">
     <div class="max-w-5xl mx-auto px-6 py-10 flex gap-10">
-      <SidebarNav
+      <!-- <SidebarNav
         :items="navItems"
         :active="activeSection"
         @select="activeSection = $event"
-      />
+      /> -->
 
       <div class="flex-1">
         <div class="flex items-start justify-between mb-6">

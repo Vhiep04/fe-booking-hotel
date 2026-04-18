@@ -112,7 +112,7 @@
       <Column header="Actions" style="min-width: 120px">
         <template #body="{ data }">
           <div class="flex items-center gap-1">
-            <Button
+            <!-- <Button
               icon="pi pi-eye"
               severity="info"
               text
@@ -120,7 +120,7 @@
               size="small"
               v-tooltip.top="'View'"
               @click="emit('view', data)"
-            />
+            /> -->
             <Button
               icon="pi pi-pencil"
               severity="secondary"
@@ -128,7 +128,7 @@
               rounded
               size="small"
               v-tooltip.top="'Edit'"
-              @click="emit('edit', data)"
+              @click="emit('view', data)"
             />
             <Button
               icon="pi pi-trash"

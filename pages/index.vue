@@ -28,7 +28,6 @@
           Discover Your Trips <br />
           Worldwide !
         </p>
-        <!-- Chỉ cần SearchForm, không cần CityInfoCard -->
         <SearchForm :loading="cityStore.isLoading" @search="handleSearch" />
       </div>
     </div>

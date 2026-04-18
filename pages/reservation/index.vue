@@ -1,6 +1,6 @@
 <template>
   <div
-    class="min-h-screen mx-auto max-w-6xl px-4 md:px-8 pb-12 dark:bg-slate-900"
+    class="min-h-screen mt-4 mx-auto max-w-6xl px-4 md:px-8 pb-12 dark:bg-slate-900"
   >
     <div class="mb-8 max-w-6xl">
       <p class="text-[#07689F] font-bold text-2xl mb-2">My Reservations</p>

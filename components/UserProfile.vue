@@ -113,17 +113,17 @@ const menuItems = computed<MenuItem[]>(() => [
     route: "/user-info",
     command: () => router.push("/user-info"),
   },
-  ...(!props.isAdmin
-    ? [
-        {
-          label: "My Reservations",
-          icon: "pi pi-calendar",
-          showArrow: true,
-          route: "/reservation",
-          command: () => router.push("/reservation"),
-        },
-      ]
-    : []),
+  // ...(!props.isAdmin
+  //   ? [
+  //       {
+  //         label: "My Reservations",
+  //         icon: "pi pi-calendar",
+  //         showArrow: true,
+  //         route: "/reservation",
+  //         command: () => router.push("/reservation"),
+  //       },
+  //     ]
+  //   : []),
 ]);
 
 const handleSignOut = () => {

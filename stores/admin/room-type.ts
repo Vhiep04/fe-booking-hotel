@@ -22,7 +22,7 @@ export const useRoomTypeStore = defineStore("roomType", () => {
 
     return await apiStore.apiRequest<ApiResponse<PaginatedRoomTypes>>({
       method: "GET",
-      endpoint: "/api/admin/room-types",
+      endpoint: "/admin/room-types",
       params: queryParams,
       auth: true,
     });
@@ -33,7 +33,7 @@ export const useRoomTypeStore = defineStore("roomType", () => {
   ): Promise<ApiResponse<RoomTypeDto[]>> {
     return await apiStore.apiRequest<ApiResponse<RoomTypeDto[]>>({
       method: "GET",
-      endpoint: `/api/admin/room-types/by-hotel/${hotelId}`,
+      endpoint: `/admin/room-types/by-hotel/${hotelId}`,
       auth: true,
     });
   }
@@ -43,7 +43,7 @@ export const useRoomTypeStore = defineStore("roomType", () => {
   ): Promise<ApiResponse<RoomTypeDto>> {
     return await apiStore.apiRequest<ApiResponse<RoomTypeDto>>({
       method: "GET",
-      endpoint: `/api/admin/room-types/${id}`,
+      endpoint: `/admin/room-types/${id}`,
       auth: true,
     });
   }
@@ -53,7 +53,7 @@ export const useRoomTypeStore = defineStore("roomType", () => {
   ): Promise<ApiResponse<RoomTypeDto>> {
     return await apiStore.apiRequest<ApiResponse<RoomTypeDto>>({
       method: "POST",
-      endpoint: "/api/admin/room-types",
+      endpoint: "/admin/room-types",
       data: payload,
       auth: true,
     });
@@ -65,7 +65,7 @@ export const useRoomTypeStore = defineStore("roomType", () => {
   ): Promise<ApiResponse<RoomTypeDto>> {
     return await apiStore.apiRequest<ApiResponse<RoomTypeDto>>({
       method: "PUT",
-      endpoint: `/api/admin/room-types/${id}`,
+      endpoint: `/admin/room-types/${id}`,
       data: payload,
       auth: true,
     });
@@ -74,7 +74,7 @@ export const useRoomTypeStore = defineStore("roomType", () => {
   async function deleteRoomType(id: number): Promise<ApiResponse<boolean>> {
     return await apiStore.apiRequest<ApiResponse<boolean>>({
       method: "DELETE",
-      endpoint: `/api/admin/room-types/${id}`,
+      endpoint: `/admin/room-types/${id}`,
       auth: true,
     });
   }

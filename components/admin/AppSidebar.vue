@@ -109,48 +109,48 @@ const menuItems = computed<MenuEntry[]>(() => [
     to: "/admin/rooms",
     ...badge(data.value?.totalRooms, "bg-blue-500"),
   },
-  { separator: true },
-  {
-    label: "Reports",
-    icon: "pi pi-chart-bar",
-    items: [
-      {
-        label: "Revenue Report",
-        icon: "pi pi-dollar",
-        to: "/admin/reports/revenue",
-      },
-      {
-        label: "Booking Report",
-        icon: "pi pi-calendar",
-        to: "/admin/reports/bookings",
-      },
-      {
-        label: "User Report",
-        icon: "pi pi-users",
-        to: "/admin/reports/users",
-      },
-    ],
-  },
-  {
-    label: "Settings",
-    icon: "pi pi-cog",
-    items: [
-      {
-        label: "General",
-        icon: "pi pi-sliders-h",
-        to: "/admin/settings/general",
-      },
-      {
-        label: "Payment",
-        icon: "pi pi-credit-card",
-        to: "/admin/settings/payment",
-      },
-      {
-        label: "Email Templates",
-        icon: "pi pi-envelope",
-        to: "/admin/settings/email",
-      },
-    ],
-  },
+  // { separator: true },
+  // {
+  //   label: "Reports",
+  //   icon: "pi pi-chart-bar",
+  //   items: [
+  //     {
+  //       label: "Revenue Report",
+  //       icon: "pi pi-dollar",
+  //       to: "/admin/reports/revenue",
+  //     },
+  //     {
+  //       label: "Booking Report",
+  //       icon: "pi pi-calendar",
+  //       to: "/admin/reports/bookings",
+  //     },
+  //     {
+  //       label: "User Report",
+  //       icon: "pi pi-users",
+  //       to: "/admin/reports/users",
+  //     },
+  //   ],
+  // },
+  // {
+  //   label: "Settings",
+  //   icon: "pi pi-cog",
+  //   items: [
+  //     {
+  //       label: "General",
+  //       icon: "pi pi-sliders-h",
+  //       to: "/admin/settings/general",
+  //     },
+  //     {
+  //       label: "Payment",
+  //       icon: "pi pi-credit-card",
+  //       to: "/admin/settings/payment",
+  //     },
+  //     {
+  //       label: "Email Templates",
+  //       icon: "pi pi-envelope",
+  //       to: "/admin/settings/email",
+  //     },
+  //   ],
+  // },
 ]);
 </script>
