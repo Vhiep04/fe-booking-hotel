@@ -77,8 +77,8 @@
     </div>
   </div>
   <PaymentLoading
-    v-model="paymentStore.isLoading"
-    message="Hệ thống đang xử lý đặt phòng của bạn..."
+    v-model="isRedirecting"
+    message="Đang chuyển hướng đến cổng thanh toán..."
   />
 </template>
 
@@ -271,15 +271,36 @@ async function handleVnpayReturn() {
   }
 }
 
+const isRedirecting = ref(false);
+
 async function handleSubmit(method: "vnpay" | "cash") {
   if (method === "vnpay") {
+    const amount = price.value.total;
+    if (!amount || amount < 5000) {
+      toast.add({
+        severity: "error",
+        summary: "Lỗi",
+        detail: "Số tiền không hợp lệ.",
+        life: 4000,
+      });
+      return;
+    }
+
     const url = await paymentStore.createPayment({
       orderType: "other",
-      amount: price.value.total, // ← đã nhân đêm × phòng
+      amount,
       orderDescription: roomStore.room?.roomType ?? "Room booking",
       name: `${guestDetails.value.firstName} ${guestDetails.value.lastName}`,
     });
-    if (url) window.location.replace(url);
+
+    if (url) {
+      isRedirecting.value = true;
+      // Delay nhỏ để tránh nháy, sau đó mới redirect
+      await nextTick();
+      setTimeout(() => {
+        window.location.href = url;
+      }, 300);
+    }
   } else {
     const r = roomStore.room;
     const result = await paymentStore.cashBooking({
@@ -317,15 +338,37 @@ async function handleSubmit(method: "vnpay" | "cash") {
   }
 }
 
+// booking/index.vue — onMounted xử lý đầy đủ
 onMounted(async () => {
-  if (hotelId.value && roomId.value) {
-    await roomStore.fetchRoom(hotelId.value, roomId.value);
-    await hotelStore.getHotelById(hotelId.value);
+  // Chặn user back về trang VNPAY sandbox
+  history.pushState(null, "", location.href);
+  window.addEventListener("popstate", () => {
+    history.pushState(null, "", location.href);
+    // Redirect về hotel detail thay vì VNPAY
+    const hId = searchStore.pendingHotelId;
+    if (hId) router.replace(`/hotels/${hId}`);
+  });
+
+  // Lấy từ query, fallback về searchStore nếu mất (khi back)
+  const hId = hotelId.value || searchStore.pendingHotelId;
+  const rId = roomId.value || searchStore.pendingRoomId;
+
+  if (!hId || !rId) {
+    // Không có data gì cả → về trang chủ
+    router.replace("/");
+    return;
   }
+
+  await Promise.all([
+    roomStore.fetchRoom(hId, rId),
+    hotelStore.getHotelById(hId),
+  ]);
+
   await handleVnpayReturn();
 });
 
 onBeforeUnmount(() => {
+  window.removeEventListener("popstate", () => {});
   roomStore.clearRoom();
   paymentStore.clearPayment();
 });

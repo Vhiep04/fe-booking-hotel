@@ -9,6 +9,18 @@ export const useSearchStore = defineStore(
     const checkOut = ref<string | null>(null);
     const cityName = ref("");
     const roomTypeName = ref("");
+    const pendingHotelId = ref<number | null>(null);
+    const pendingRoomId = ref<number | null>(null);
+
+    const setPendingBooking = (hotelId: number, roomId: number) => {
+      pendingHotelId.value = hotelId;
+      pendingRoomId.value = roomId;
+    };
+
+    const clearPendingBooking = () => {
+      pendingHotelId.value = null;
+      pendingRoomId.value = null;
+    };
 
     const checkInDate = computed(() =>
       checkIn.value ? dayjs(checkIn.value).toDate() : null,
@@ -77,19 +89,30 @@ export const useSearchStore = defineStore(
       hasDates,
       checkInDateOnly,
       checkOutDateOnly,
+      pendingHotelId,
+      pendingRoomId,
       setDates,
       setDateRange,
       setCityName,
       setRoomTypeName,
       clearDates,
       clearAll,
+      setPendingBooking,
+      clearPendingBooking,
     };
   },
   {
     persist: {
       key: "hotel-search",
       storage: process.client ? sessionStorage : undefined,
-      pick: ["checkIn", "checkOut", "cityName", "roomTypeName"],
+      pick: [
+        "checkIn",
+        "checkOut",
+        "cityName",
+        "roomTypeName",
+        "pendingHotelId",
+        "pendingRoomId",
+      ],
     },
   },
 );

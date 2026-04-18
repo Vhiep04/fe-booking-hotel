@@ -153,7 +153,7 @@ import HotelRoomCard from "~/components/HotelDetail/HotelRoomCard.vue";
 import HotelMapModal from "~/components/HotelDetail/HotelMapModal.vue";
 import HotelFeedbacks from "~/components/HotelDetail/HotelFeedbacks.vue";
 import HotelFeedbackForm from "~/components/HotelDetail/HotelFeedbackForm.vue";
-import SearchForm from "~/components/SearchForm.vue";
+import { useSearchStore } from "~/stores/searchStore";
 import Dialog from "primevue/dialog";
 import Button from "primevue/button";
 
@@ -181,6 +181,7 @@ const router = useRouter();
 const cityStore = useCityStore();
 const hotelStore = useHotelStore();
 const feedbackStore = useFeedbackStore();
+const searchStore = useSearchStore();
 const bookingStore = useReservationStore();
 const favouriteStore = useFavouriteHotelStore();
 
@@ -274,12 +275,13 @@ const handleGetCity = (params: { name: string }) => {
 };
 
 const handleRoomReserve = (roomId: number) => {
+  const hotelId = hotel.value?.hotelId;
+  if (!hotelId) return;
+
+  searchStore.setPendingBooking(hotelId, roomId);
   router.push({
     path: "/booking",
-    query: {
-      hotelId: hotel.value?.hotelId,
-      roomId,
-    },
+    query: { hotelId, roomId },
   });
 };
 
