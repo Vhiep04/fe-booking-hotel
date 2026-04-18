@@ -2,7 +2,7 @@
   <div
     class="group flex bg-white dark:bg-slate-800 rounded-2xl border border-slate-100 dark:border-slate-700 overflow-hidden shadow-sm hover:shadow-xl hover:-translate-y-0.5 transition-all duration-300 cursor-pointer"
   >
-    <div class="relative w-[190px] shrink-0 overflow-hidden">
+    <div class="relative w-[250px] shrink-0 overflow-hidden">
       <img
         :src="hotel.hotelImgUrl || FALLBACK"
         :alt="hotel.hotelName"
@@ -55,14 +55,14 @@
             >From</span
           >
           <div class="flex items-baseline gap-0.5 leading-none">
-            <span class="text-sm font-bold text-slate-600 dark:text-slate-300"
-              >$</span
-            >
             <span
               class="text-[28px] font-extrabold text-slate-900 dark:text-white"
             >
               {{ hotel.minPrice }}
             </span>
+            <span class="text-sm font-bold text-slate-600 dark:text-slate-300"
+              >VNĐ</span
+            >
           </div>
           <span class="text-[10px] text-slate-400"
             >Includes taxes &amp; charges</span

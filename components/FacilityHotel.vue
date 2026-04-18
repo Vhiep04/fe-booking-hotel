@@ -22,7 +22,7 @@
           <InputNumber
             v-model="localBudgetRange[0]"
             inputId="minprice"
-            prefix="$"
+            suffix="Đ"
             class="w-20"
             :min="0"
             :max="localBudgetRange[1]"
@@ -33,7 +33,7 @@
           <InputNumber
             v-model="localBudgetRange[1]"
             inputId="maxprice"
-            prefix="$"
+            suffix="Đ"
             class="w-20"
             :min="localBudgetRange[0]"
             :max="25000000"
@@ -119,7 +119,7 @@ const emit = defineEmits<{
       minPrice?: number;
       maxPrice?: number;
       facilities: number[];
-    }
+    },
   ];
 }>();
 
@@ -142,14 +142,14 @@ watch(
   (newFacilities) => {
     localRoomFacilities.value = [...newFacilities];
   },
-  { immediate: true }
+  { immediate: true },
 );
 
 watch(
   () => [props.minPrice, props.maxPrice],
   ([newMin, newMax]) => {
     localBudgetRange.value = [newMin ?? 0, newMax ?? 25000000];
-  }
+  },
 );
 
 // Emit changes

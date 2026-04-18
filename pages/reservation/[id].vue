@@ -1,6 +1,5 @@
 <template>
-  <div class="min-h-screen bg-[#F5F7FA] mt-6 ml-36 mr-36 pb-12">
-    <!-- Back -->
+  <div class="min-h-screen mt-6 ml-36 mr-36 pb-12">
     <NuxtLink
       to="/reservation"
       class="inline-flex items-center gap-2 text-[#07689F] text-sm font-semibold mb-6 hover:underline"
@@ -165,7 +164,7 @@
               <div class="flex justify-between items-center">
                 <span class="font-semibold text-gray-700">Total Price</span>
                 <span class="font-bold text-[#07689F] text-lg"
-                  >${{ reservation.totalPrice.toLocaleString() }}</span
+                  >{{ reservation.totalPrice.toLocaleString() }} VNĐ</span
                 >
               </div>
             </div>

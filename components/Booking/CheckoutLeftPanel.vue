@@ -1,5 +1,5 @@
 <template>
-  <div class="lg:w-96 flex-shrink-0 space-y-4">
+  <div class="lg:w-96 shrink-0 space-y-4">
     <!-- Hotel Info Card -->
     <div class="bg-white rounded-lg border border-gray-200 overflow-hidden">
       <img

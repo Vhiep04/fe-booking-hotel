@@ -15,7 +15,7 @@
 
     <!-- Content Section -->
     <div class="flex-1">
-      <div class="mb-6">
+      <!-- <div class="mb-6">
         <Dropdown
           v-model="selectedSort"
           :options="sortOptions"
@@ -23,7 +23,7 @@
           placeholder="Sort By : Our Top Picks For Families"
           class="w-full md:w-80 border-2 border-gray-300 rounded-lg"
         />
-      </div>
+      </div> -->
 
       <h2 class="text-3xl font-bold text-gray-900 mb-2">
         {{ cityData?.name }}

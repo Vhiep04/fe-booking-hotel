@@ -64,7 +64,7 @@ const menuItems = computed<MenuEntry[]>(() => [
         label: "Confirmed",
         icon: "pi pi-check-circle",
         to: "/admin/bookings?status=confirmed",
-        ...badge(data.value?.confirmedReservations, "bg-blue-100"),
+        ...badge(data.value?.confirmedReservations, "bg-purple-500"),
       },
       {
         label: "Completed",

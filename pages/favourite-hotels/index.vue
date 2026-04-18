@@ -1,22 +1,11 @@
 <template>
-  <div class="min-h-screen bg-slate-50 dark:bg-slate-900">
-    <div
-      class="sticky top-0 z-10 bg-white dark:bg-slate-800 border-b border-slate-200 dark:border-slate-700 shadow-sm"
-    >
-      <div class="max-w-4xl mx-auto px-4 md:px-8 py-5">
+  <div class="min-h-screen pb-12 dark:bg-slate-900">
+    <div class="sticky top-0 z-10 dark:bg-slate-800">
+      <div class="max-w-6xl mx-auto px-4 md:px-8">
         <div class="flex items-center justify-between mb-1">
-          <h1
-            class="text-2xl font-extrabold text-slate-900 dark:text-white tracking-tight"
-          >
+          <p class="text-[#07689F] font-bold text-2xl mb-2">
             My Favourite Hotels
-          </h1>
-          <NuxtLink
-            to="/"
-            class="text-sm text-slate-500 hover:text-blue-600 dark:text-slate-400 dark:hover:text-blue-400 flex items-center gap-1 transition-colors"
-          >
-            <i class="pi pi-arrow-left text-xs" />
-            Back to Home
-          </NuxtLink>
+          </p>
         </div>
         <p class="text-sm text-slate-500 dark:text-slate-400">
           <template v-if="!store.isLoading">
@@ -30,7 +19,7 @@
       </div>
     </div>
 
-    <div class="max-w-4xl mx-auto px-4 md:px-8 py-6 flex flex-col gap-5">
+    <div class="mx-auto max-w-6xl py-6 flex flex-col gap-5 px-4 md:px-8">
       <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
         <div class="col-span-2 sm:col-span-3 lg:col-span-1">
           <IconField>
@@ -246,10 +235,16 @@ const locationOptions = computed(() =>
 );
 
 const priceRanges = [
-  { label: "Under $100", value: [0, 100] as [number, number] },
-  { label: "$100 – $150", value: [100, 150] as [number, number] },
-  { label: "$150 – $200", value: [150, 200] as [number, number] },
-  { label: "$200+", value: [200, 9999] as [number, number] },
+  { label: "Under 1.000.000 VNĐ", value: [0, 1000000] as [number, number] },
+  {
+    label: "1.000.000 – 1.500.000 VNĐ",
+    value: [1000000, 1500000] as [number, number],
+  },
+  {
+    label: "1.500.000 – 2.000.000 VNĐ",
+    value: [1500000, 2000000] as [number, number],
+  },
+  { label: "2.000.000 + ", value: [2000000, 9999000] as [number, number] },
 ];
 
 const ratingOptions = [

@@ -1,17 +1,17 @@
 <template>
   <div
-    class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden flex hover:shadow-md transition-shadow duration-200 cursor-pointer"
+    class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden flex hover:shadow-xl hover:-translate-y-0.5 transition-all duration-300 cursor-pointer"
     @click="goToDetail"
   >
     <!-- Hotel Image -->
-    <div class="relative w-48 shrink-0 overflow-hidden">
+    <div class="relative w-[250px] shrink-0 overflow-hidden">
       <img
         :src="reservation.hotelImage || '/placeholder-hotel.jpg'"
         :alt="reservation.hotelName"
         class="w-full h-full object-cover"
       />
       <div
-        class="absolute inset-0 bg-gradient-to-r from-transparent to-black/10"
+        class="absolute inset-0 bg-linear-to-r from-transparent to-black/10"
       />
     </div>
 
@@ -71,7 +71,7 @@
         </div>
         <div class="flex items-center gap-3">
           <p class="font-bold text-[#07689F]">
-            ${{ reservation.totalPrice.toLocaleString() }}
+            {{ reservation.totalPrice.toLocaleString() }}VNĐ
           </p>
           <Button
             v-if="canCancel"

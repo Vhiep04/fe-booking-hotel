@@ -464,7 +464,6 @@ async function handleSave() {
         return;
       }
       hotelId = props.editingHotel.hotelId;
-      await hotelStore.fetchHotels();
     } else {
       const res = await hotelStore.createHotel(form.value);
       if (!res?.success || !res.data) {

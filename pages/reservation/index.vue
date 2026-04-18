@@ -1,15 +1,15 @@
 <template>
-  <div class="min-h-screen bg-[#F5F7FA] mt-6 ml-36 mr-36 pb-12">
-    <!-- Header -->
-    <div class="mb-8">
+  <div
+    class="min-h-screen mx-auto max-w-6xl px-4 md:px-8 pb-12 dark:bg-slate-900"
+  >
+    <div class="mb-8 max-w-6xl">
       <p class="text-[#07689F] font-bold text-2xl mb-2">My Reservations</p>
       <p class="text-[#07689F]">
         Manage and track all your bookings in one place.
       </p>
     </div>
 
-    <!-- Filter Tabs -->
-    <div class="flex gap-2 mb-6 border-b border-gray-200">
+    <div class="flex gap-2 max-w-6xl mb-6 border-b border-gray-200">
       <button
         v-for="tab in tabs"
         :key="tab.value"
@@ -32,7 +32,7 @@
     </div>
 
     <!-- Sort -->
-    <div class="flex justify-end mb-4">
+    <!-- <div class="flex justify-end mb-4">
       <Select
         v-model="sortOption"
         :options="sortOptions"
@@ -42,7 +42,7 @@
         class="w-48 text-sm"
         @change="fetchData"
       />
-    </div>
+    </div> -->
 
     <!-- Loading -->
     <template v-if="reservationStore.isLoading">
