@@ -250,6 +250,7 @@ const onDialogHide = () => {
     window.scrollTo({ top: targetScrollY.value, behavior: "instant" });
   }, 50);
 };
+
 const handleSearch = async (params: {
   cityName: string;
   checkIn: string;
@@ -259,17 +260,8 @@ const handleSearch = async (params: {
   isSearching.value = true;
   try {
     const hotelId = parseInt(route.params.id as string);
-    sessionStorage.setItem(
-      "hotel-search",
-      JSON.stringify({
-        checkIn: params.checkIn,
-        checkOut: params.checkOut,
-        cityName: params.cityName,
-        roomTypeName: params.roomTypeName,
-      }),
-    );
     hasSearchData.value = true;
-    await hotelStore.getHotelRooms(hotelId);
+    await hotelStore.getHotelRooms(hotelId, params.checkIn, params.checkOut);
   } catch (error) {
     console.error("Search error:", error);
   } finally {
@@ -281,14 +273,12 @@ const handleGetCity = (params: { name: string }) => {
   cityStore.getCity(params);
 };
 
-const handleRoomReserve = (roomId: number, count: number) => {
-  console.log("Reserve room:", roomId, "count:", count);
+const handleRoomReserve = (roomId: number) => {
   router.push({
     path: "/booking",
     query: {
       hotelId: hotel.value?.hotelId,
-      roomId: roomId,
-      rooms: count,
+      roomId,
     },
   });
 };
@@ -307,34 +297,20 @@ const getOriginalPrice = (currentPrice: number): number => {
 onMounted(async () => {
   try {
     const hotelId = parseInt(route.params.id as string);
+    const searchStore = useSearchStore();
 
-    const stored = sessionStorage.getItem("hotel-search");
-    if (stored) {
-      try {
-        const parsed = JSON.parse(stored);
-        if (parsed?.checkIn && parsed?.checkOut) {
-          hasSearchData.value = true;
-          const searchStore = useSearchStore();
-          searchStore.setCityName(parsed.cityName ?? "");
-          searchStore.setDateRange([
-            new Date(parsed.checkIn),
-            new Date(parsed.checkOut),
-          ]);
-          if (parsed.roomTypeName) {
-            searchStore.setRoomTypeName(parsed.roomTypeName);
-          }
-        }
-      } catch {
-        // malformed JSON — ignore
-      }
+    if (searchStore.checkIn && searchStore.checkOut) {
+      hasSearchData.value = true;
     }
 
     await hotelStore.getHotelById(hotelId);
     hotel.value = hotelStore.currentHotel as HotelData;
 
     if (hotel.value) {
+      const checkIn = searchStore.checkInDateOnly ?? undefined;
+      const checkOut = searchStore.checkOutDateOnly ?? undefined;
       await Promise.all([
-        hotelStore.getHotelRooms(hotelId),
+        hotelStore.getHotelRooms(hotelId, checkIn, checkOut),
         feedbackStore.fetchMyFeedbacks(),
         bookingStore.fetchReservations(),
         favouriteStore.fetchFavourites(),

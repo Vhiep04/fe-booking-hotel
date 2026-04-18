@@ -92,6 +92,7 @@ import { useGetRoomStore } from "~/stores/getRoom";
 import { usePaymentStore } from "~/stores/payments";
 import { useAuthStore } from "~/stores/auth";
 import PaymentLoading from "~/components/shared/PaymentLoading.vue";
+import dayjs from "dayjs";
 
 const { t } = useI18n();
 const router = useRouter();
@@ -117,7 +118,6 @@ const steps = [
 
 const hotelId = computed(() => Number(route.query.hotelId));
 const roomId = computed(() => Number(route.query.roomId));
-const roomCount = computed(() => Number(route.query.rooms) || 1);
 
 const hotel = computed(() => {
   const r = roomStore.room;
@@ -137,51 +137,17 @@ const hotel = computed(() => {
   };
 });
 
-const booking = computed(() => {
-  const r = roomStore.room;
-  return {
-    checkIn: { date: "Sat, Mar 7, 2026", time: "2:00 PM – 12:00 AM" },
-    checkOut: { date: "Sun, Mar 8, 2026", time: "12:00 AM – 12:00 PM" },
-    checkInDate: "2026-03-07",
-    checkOutDate: "2026-03-08",
-    daysAway: 5,
-    nights: 1,
-    rooms: roomCount.value,
-    adults: r?.capacity ?? 2,
-    room: {
-      name: r?.roomType ?? "",
-      guests: r?.capacity ?? 2,
-      noSmoking: false,
-      freeCancellationBefore: "March 5, 2026",
-    },
-  };
-});
-
 const VAT_RATE = 0.08;
 const DISCOUNT_RATE = 0.4;
 
-const price = computed(() => {
-  const r = roomStore.room;
-  const original = r ? Math.round(r.pricePerNight / (1 - DISCOUNT_RATE)) : 0;
-  const discount = original - (r?.pricePerNight ?? 0);
-  const total = r?.pricePerNight ?? 0;
-  const taxes = Math.round(total * VAT_RATE);
-  return {
-    original,
-    discount,
-    discountLabel: "Early 2026 Deal",
-    total,
-    taxes,
-    vatPercent: VAT_RATE * 100,
-    currency: "VND",
-  };
-});
+const searchStore = useSearchStore();
 
-const cancellationPolicy = computed(() => ({
-  freeBeforeDate: "Mar 5",
-  penaltyAfter: price.value.total,
-  currency: "VND",
-}));
+const nights = computed(() => {
+  const ci = searchStore.checkIn;
+  const co = searchStore.checkOut;
+  if (!ci || !co) return 1;
+  return dayjs(co).diff(dayjs(ci), "day") || 1;
+});
 
 const guestDetails = ref({
   firstName: "",
@@ -190,6 +156,64 @@ const guestDetails = ref({
   country: "Vietnam",
   phone: "",
 });
+
+const booking = computed(() => {
+  const r = roomStore.room;
+  const ci = searchStore.checkIn ?? dayjs().format("YYYY-MM-DD");
+  const co = searchStore.checkOut ?? dayjs().add(1, "day").format("YYYY-MM-DD");
+  const daysAway = dayjs(ci).diff(dayjs(), "day");
+
+  return {
+    checkIn: {
+      date: dayjs(ci).format("ddd, MMM D, YYYY"),
+      time: "2:00 PM",
+    },
+    checkOut: {
+      date: dayjs(co).format("ddd, MMM D, YYYY"),
+      time: "12:00 PM",
+    },
+    checkInDate: ci,
+    checkOutDate: co,
+    daysAway: daysAway > 0 ? daysAway : 0,
+    nights: nights.value,
+    rooms: 1,
+    adults: r?.capacity ?? 2,
+    room: {
+      name: r?.roomType ?? "",
+      guests: r?.capacity ?? 2,
+      noSmoking: false,
+      freeCancellationBefore: dayjs(ci)
+        .subtract(3, "day")
+        .format("MMMM D, YYYY"),
+    },
+  };
+});
+const price = computed(() => {
+  const r = roomStore.room;
+  const pricePerNight = r?.pricePerNight ?? 0;
+  const total = pricePerNight * nights.value; // ✅ nhân số đêm
+  const original = Math.round(total / (1 - DISCOUNT_RATE));
+  const discount = original - total;
+  const taxes = Math.round(total * VAT_RATE);
+
+  return {
+    original,
+    discount,
+    discountLabel: "Early 2026 Deal",
+    pricePerNight,
+    nights: nights.value,
+    total,
+    taxes,
+    vatPercent: VAT_RATE * 100,
+    currency: "VND",
+  };
+});
+
+const cancellationPolicy = computed(() => ({
+  freeBeforeDate: dayjs(searchStore.checkIn).subtract(3, "day").format("MMM D"),
+  penaltyAfter: price.value.total,
+  currency: "VND",
+}));
 
 const specialRequest = ref("");
 const arrivalTime = ref("");
@@ -249,30 +273,14 @@ async function handleVnpayReturn() {
 
 async function handleSubmit(method: "vnpay" | "cash") {
   if (method === "vnpay") {
-    sessionStorage.setItem(
-      "pendingBookingGuest",
-      JSON.stringify({
-        email: guestDetails.value.email,
-        name: `${guestDetails.value.firstName} ${guestDetails.value.lastName}`,
-        userId: authStore.userInfo?.userId ?? "",
-        roomId: roomId.value,
-        checkInDate: booking.value.checkInDate,
-        checkOutDate: booking.value.checkOutDate,
-      }),
-    );
-
     const url = await paymentStore.createPayment({
       orderType: "other",
-      amount: roomStore.room?.pricePerNight ?? 0,
+      amount: price.value.total, // ← đã nhân đêm × phòng
       orderDescription: roomStore.room?.roomType ?? "Room booking",
       name: `${guestDetails.value.firstName} ${guestDetails.value.lastName}`,
     });
-
-    if (url) {
-      window.location.replace(url);
-    }
+    if (url) window.location.replace(url);
   } else {
-    // Cash
     const r = roomStore.room;
     const result = await paymentStore.cashBooking({
       email: guestDetails.value.email,
@@ -284,7 +292,7 @@ async function handleSubmit(method: "vnpay" | "cash") {
       hotelAddress: hotel.value.address,
       checkInDate: booking.value.checkInDate,
       checkOutDate: booking.value.checkOutDate,
-      amount: r?.pricePerNight ?? 0,
+      amount: price.value.total,
       orderDescription: r?.roomType ?? "Room booking",
     });
 
@@ -296,10 +304,10 @@ async function handleSubmit(method: "vnpay" | "cash") {
           name: `${guestDetails.value.firstName} ${guestDetails.value.lastName}`,
           hotelName: hotel.value.name,
           hotelAddress: hotel.value.address,
-          orderDescription: roomStore.room?.roomType ?? "",
+          orderDescription: r?.roomType ?? "",
           checkInDate: booking.value.checkInDate,
           checkOutDate: booking.value.checkOutDate,
-          amount: roomStore.room?.pricePerNight ?? 0,
+          amount: price.value.total,
           emailSent: result.emailSent,
           message: result.message,
         }),
@@ -308,6 +316,7 @@ async function handleSubmit(method: "vnpay" | "cash") {
     }
   }
 }
+
 onMounted(async () => {
   if (hotelId.value && roomId.value) {
     await roomStore.fetchRoom(hotelId.value, roomId.value);

@@ -1,5 +1,6 @@
 import { defineStore } from "pinia";
 import { ref, computed } from "vue";
+import dayjs from "dayjs";
 
 export const useSearchStore = defineStore(
   "search",
@@ -9,13 +10,13 @@ export const useSearchStore = defineStore(
     const cityName = ref("");
     const roomTypeName = ref("");
 
-    const checkInDate = computed(() => {
-      return checkIn.value ? new Date(checkIn.value) : null;
-    });
+    const checkInDate = computed(() =>
+      checkIn.value ? dayjs(checkIn.value).toDate() : null,
+    );
 
-    const checkOutDate = computed(() => {
-      return checkOut.value ? new Date(checkOut.value) : null;
-    });
+    const checkOutDate = computed(() =>
+      checkOut.value ? dayjs(checkOut.value).toDate() : null,
+    );
 
     const dateRange = computed<[Date, Date] | null>(() => {
       if (checkInDate.value && checkOutDate.value) {
@@ -24,29 +25,24 @@ export const useSearchStore = defineStore(
       return null;
     });
 
-    const checkInDateOnly = computed(() => {
-      if (!checkInDate.value) return null;
-      return toDateOnly(checkInDate.value);
-    });
+    const checkInDateOnly = computed(() => checkIn.value ?? null);
+    const checkOutDateOnly = computed(() => checkOut.value ?? null);
 
-    const checkOutDateOnly = computed(() => {
-      if (!checkOutDate.value) return null;
-      return toDateOnly(checkOutDate.value);
-    });
-
-    const hasDates = computed(() => {
-      return !!(checkIn.value && checkOut.value);
-    });
+    const hasDates = computed(() => !!(checkIn.value && checkOut.value));
 
     const setDates = (newCheckIn: Date | null, newCheckOut: Date | null) => {
-      checkIn.value = newCheckIn ? newCheckIn.toISOString() : null;
-      checkOut.value = newCheckOut ? newCheckOut.toISOString() : null;
+      checkIn.value = newCheckIn
+        ? dayjs(newCheckIn).format("YYYY-MM-DD")
+        : null;
+      checkOut.value = newCheckOut
+        ? dayjs(newCheckOut).format("YYYY-MM-DD")
+        : null;
     };
 
     const setDateRange = (dates: [Date, Date] | null) => {
-      if (dates && dates[0] && dates[1]) {
-        checkIn.value = dates[0].toISOString();
-        checkOut.value = dates[1].toISOString();
+      if (dates?.[0] && dates?.[1]) {
+        checkIn.value = dayjs(dates[0]).format("YYYY-MM-DD");
+        checkOut.value = dayjs(dates[1]).format("YYYY-MM-DD");
       } else {
         checkIn.value = null;
         checkOut.value = null;
@@ -56,16 +52,13 @@ export const useSearchStore = defineStore(
     const setCityName = (name: string) => {
       cityName.value = name;
     };
-
     const setRoomTypeName = (type: string) => {
       roomTypeName.value = type;
     };
-
     const clearDates = () => {
       checkIn.value = null;
       checkOut.value = null;
     };
-
     const clearAll = () => {
       checkIn.value = null;
       checkOut.value = null;
@@ -77,7 +70,6 @@ export const useSearchStore = defineStore(
       checkIn,
       checkOut,
       cityName,
-
       roomTypeName,
       checkInDate,
       checkOutDate,
@@ -85,7 +77,6 @@ export const useSearchStore = defineStore(
       hasDates,
       checkInDateOnly,
       checkOutDateOnly,
-
       setDates,
       setDateRange,
       setCityName,
