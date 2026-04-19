@@ -43,13 +43,14 @@
                 <div>
                   <p class="text-xs font-semibold">{{ ratingLabel }}</p>
                   <p class="text-xs text-gray-500">
-                    {{ totalReviews }} đánh giá
+                    {{ totalReviews }} {{ t("reviews") }}
                   </p>
                 </div>
               </div>
 
               <p v-if="locationScore" class="text-xs text-gray-600 mt-1">
-                <span class="font-semibold">{{ locationScore }}</span> Địa điểm
+                <span class="font-semibold">{{ locationScore }}</span>
+                {{ t("Location") }}
               </p>
             </div>
           </div>
@@ -62,7 +63,7 @@
             class="mt-3 w-full bg-blue-600 hover:bg-blue-700 text-white py-2 rounded-lg text-sm font-semibold transition-colors"
             @click="handleBookNow"
           >
-            Đặt ngay
+            {{ t("Reserve Now") }}
           </button>
         </div>
 
@@ -75,7 +76,7 @@
             <input
               v-model="searchQuery"
               type="text"
-              placeholder="Xem khoảng cách từ"
+              :placeholder="t('See distance from')"
               class="text-sm outline-none flex-1 placeholder-gray-400"
             />
           </div>
@@ -83,7 +84,7 @@
 
         <div class="p-4 flex-1">
           <p class="text-sm font-semibold mb-3">
-            Các địa điểm tham quan hàng đầu
+            {{ t("Top nearby attractions") }}
           </p>
 
           <div
@@ -91,7 +92,7 @@
             class="flex items-center gap-2 text-sm text-gray-500 py-4"
           >
             <i class="pi pi-spin pi-spinner text-blue-600"></i>
-            <span>Đang tải địa điểm...</span>
+            <span>{{ t("Loading places...") }}</span>
           </div>
 
           <div v-else-if="displayedPlaces.length > 0" class="space-y-2">
@@ -114,18 +115,18 @@
           </div>
 
           <div v-else class="text-sm text-gray-400 py-4 text-center">
-            Không tìm thấy địa điểm gần đây
+            {{ t("No nearby places found") }}
           </div>
         </div>
       </div>
 
+      <!-- Map -->
       <div class="flex-1 relative">
-        <!-- Nút đóng bản đồ -->
         <button
           class="absolute top-4 right-4 z-10 bg-white px-4 py-2 rounded-lg shadow font-semibold text-sm hover:bg-gray-100 transition-colors flex items-center gap-2"
           @click="$emit('close')"
         >
-          Đóng bản đồ
+          {{ t("Close map") }}
         </button>
 
         <MapView
@@ -143,7 +144,10 @@
 
 <script setup lang="ts">
 import { ref, watch, nextTick, computed } from "vue";
+import { useI18n } from "vue-i18n";
 import MapView from "../shared/MapView.vue";
+
+const { t } = useI18n();
 
 const props = defineProps<{
   open: boolean;
@@ -175,7 +179,6 @@ interface NearbyPlace {
 
 const nearbyPlaces = ref<NearbyPlace[]>([]);
 
-// Filter places based on search query
 const displayedPlaces = computed(() => {
   if (!searchQuery.value.trim()) return nearbyPlaces.value.slice(0, 10);
   const q = searchQuery.value.toLowerCase();
@@ -184,17 +187,16 @@ const displayedPlaces = computed(() => {
     .slice(0, 10);
 });
 
-// Rating
 const formattedRating = computed(() => {
   return props.ratingScore ? props.ratingScore.toFixed(1) : "8.2";
 });
 
 const ratingLabel = computed(() => {
   const score = props.ratingScore ?? 8.0;
-  if (score >= 9) return "Xuất sắc";
-  if (score >= 8) return "Rất tốt";
-  if (score >= 7) return "Tốt";
-  return "Khá tốt";
+  if (score >= 9) return t("Excellent");
+  if (score >= 8) return t("Very Good");
+  if (score >= 7) return t("Good");
+  return t("Fairly Good");
 });
 
 const hotelImage = computed(
@@ -203,7 +205,6 @@ const hotelImage = computed(
     "https://images.unsplash.com/photo-1566073771259-6a8506099945?w=200&q=80",
 );
 
-// Icon mapping theo loại địa điểm
 const getIcon = (tags: Record<string, string>): string => {
   if (tags.tourism === "beach" || tags.natural === "beach") return "🏖️";
   if (tags.tourism === "museum") return "🏛️";
@@ -219,7 +220,6 @@ const getIcon = (tags: Record<string, string>): string => {
   return "📍";
 };
 
-// Tính khoảng cách Haversine
 const calculateDistance = (
   lat1: number,
   lon1: number,
@@ -240,7 +240,6 @@ const calculateDistance = (
   return { text, meters: dist };
 };
 
-// Gọi Overpass API
 const fetchNearbyPlaces = async (lat: number, lng: number) => {
   isLoadingPlaces.value = true;
   try {
@@ -285,7 +284,6 @@ const fetchNearbyPlaces = async (lat: number, lng: number) => {
         (a: NearbyPlace, b: NearbyPlace) => a.distanceMeters - b.distanceMeters,
       );
 
-    // Loại bỏ trùng tên
     const seen = new Set<string>();
     nearbyPlaces.value = places.filter((p: NearbyPlace) => {
       if (seen.has(p.name)) return false;
@@ -294,7 +292,6 @@ const fetchNearbyPlaces = async (lat: number, lng: number) => {
     });
   } catch (err) {
     console.error("Failed to fetch nearby places:", err);
-    // Fallback data nếu API lỗi
     nearbyPlaces.value = [
       {
         name: "Công viên Biển Đông",
@@ -321,7 +318,6 @@ const fetchNearbyPlaces = async (lat: number, lng: number) => {
 };
 
 const focusPlace = (place: NearbyPlace) => {
-  // Có thể emit event để MapView zoom tới địa điểm đó nếu cần
   console.log("Focus place:", place);
 };
 
@@ -340,7 +336,6 @@ watch(
         isReady.value = true;
       }, 100);
 
-      // Fetch places khi mở modal
       if (props.lat && props.lng) {
         await fetchNearbyPlaces(props.lat, props.lng);
       }

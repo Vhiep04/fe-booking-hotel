@@ -1,24 +1,27 @@
 <template>
   <div class="flex-1 space-y-4">
     <div class="bg-white rounded-lg border border-gray-200 p-6">
-      <h2 class="text-xl font-bold text-gray-900 mb-5">Enter your details</h2>
+      <h2 class="text-xl font-bold text-gray-900 mb-5">
+        {{ t("Enter your details") }}
+      </h2>
 
       <div
         class="flex items-center gap-2 text-sm text-gray-600 bg-gray-50 border border-gray-200 rounded-lg px-4 py-3 mb-6"
       >
         <i class="pi pi-info-circle text-gray-400" />
-        <span
-          >Almost done! Just fill in the
-          <span class="text-red-500 font-medium">*</span> required info</span
-        >
+        <span>
+          {{ t("Almost done! Just fill in the") }}
+          <span class="text-red-500 font-medium">*</span>
+          {{ t("required info") }}
+        </span>
       </div>
 
       <div class="space-y-4">
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1"
-              >First name <span class="text-red-500">*</span></label
-            >
+            <label class="block text-sm font-medium text-gray-700 mb-1">
+              {{ t("First name") }} <span class="text-red-500">*</span>
+            </label>
             <InputText
               :value="guestDetails.firstName"
               class="w-full"
@@ -26,9 +29,9 @@
             />
           </div>
           <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1"
-              >Last name <span class="text-red-500">*</span></label
-            >
+            <label class="block text-sm font-medium text-gray-700 mb-1">
+              {{ t("Last name") }} <span class="text-red-500">*</span>
+            </label>
             <InputText
               :value="guestDetails.lastName"
               class="w-full"
@@ -38,9 +41,9 @@
         </div>
 
         <div>
-          <label class="block text-sm font-medium text-gray-700 mb-1"
-            >Email address <span class="text-red-500">*</span></label
-          >
+          <label class="block text-sm font-medium text-gray-700 mb-1">
+            {{ t("Email address") }} <span class="text-red-500">*</span>
+          </label>
           <InputText
             :value="guestDetails.email"
             type="email"
@@ -48,14 +51,14 @@
             @input="update('email', $event)"
           />
           <p class="text-xs text-gray-500 mt-1">
-            Confirmation email sent to this address
+            {{ t("Confirmation email sent to this address") }}
           </p>
         </div>
 
         <div>
-          <label class="block text-sm font-medium text-gray-700 mb-1"
-            >Country/Region <span class="text-red-500">*</span></label
-          >
+          <label class="block text-sm font-medium text-gray-700 mb-1">
+            {{ t("Country/Region") }} <span class="text-red-500">*</span>
+          </label>
           <Select
             :model-value="guestDetails.country"
             :options="countryList"
@@ -68,9 +71,9 @@
         </div>
 
         <div class="w-[49%]">
-          <label class="block text-sm font-medium text-gray-700 mb-1"
-            >Phone number <span class="text-red-500">*</span></label
-          >
+          <label class="block text-sm font-medium text-gray-700 mb-1">
+            {{ t("Phone number") }} <span class="text-red-500">*</span>
+          </label>
           <div class="flex gap-2">
             <Select
               :model-value="selectedPhoneCode"
@@ -88,36 +91,45 @@
             />
           </div>
           <p class="text-xs text-gray-500 mt-1">
-            To verify your booking, and for the property to connect if needed
+            {{
+              t(
+                "To verify your booking, and for the property to connect if needed",
+              )
+            }}
           </p>
         </div>
       </div>
     </div>
 
+    <!-- Good to know -->
     <div class="bg-white rounded-lg border border-gray-200 p-6">
-      <h3 class="font-bold text-gray-900 text-lg mb-4">Good to know:</h3>
+      <h3 class="font-bold text-gray-900 text-lg mb-4">
+        {{ t("Good to know:") }}
+      </h3>
       <ul class="space-y-2 mb-6">
         <li class="flex items-start gap-2 text-sm text-gray-700">
           <i class="pi pi-credit-card text-gray-400 mt-0.5 shrink-0" />
-          No credit card needed
+          {{ t("No credit card needed") }}
         </li>
         <li class="flex items-start gap-2 text-sm text-gray-700">
           <i class="pi pi-check-circle text-green-500 mt-0.5 shrink-0" />
-          Stay flexible: You can cancel for free before March 5, 2026 – lock in
-          this great price today.
+          {{
+            t(
+              "Stay flexible: You can cancel for free before March 5, 2026 – lock in this great price today.",
+            )
+          }}
         </li>
         <li class="flex items-start gap-2 text-sm text-gray-700">
           <i class="pi pi-check-circle text-green-500 mt-0.5 shrink-0" />
-          You'll get the entire suite to yourself!
+          {{ t("You'll get the entire suite to yourself!") }}
         </li>
         <li class="flex items-start gap-2 text-sm text-gray-700">
           <i class="pi pi-check-circle text-green-500 mt-0.5 shrink-0" />
-          No payment needed now. You'll pay at the property.
+          {{ t("No payment needed now. You'll pay at the property.") }}
         </li>
         <li class="flex items-start gap-2 text-sm text-gray-700">
           <i class="pi pi-exclamation-circle text-orange-500 mt-0.5 shrink-0" />
-          You're booking the last available King Suite with Balcony we have at
-          SAM Hotel and Apartment Danang on our site.
+          {{ t("You're booking the last available room.") }}
         </li>
       </ul>
 
@@ -128,18 +140,22 @@
         <div class="space-y-2 text-sm">
           <div class="flex items-center gap-2 text-green-600 font-medium">
             <i class="pi pi-check" />
-            <span>Free cancellation</span>
-            <span class="text-gray-500 font-normal"
-              >before {{ booking.room.freeCancellationBefore }}</span
-            >
+            <span>{{ t("Free cancellation") }}</span>
+            <span class="text-gray-500 font-normal">
+              {{
+                t("before {date}", {
+                  date: booking.room.freeCancellationBefore,
+                })
+              }}
+            </span>
           </div>
           <div class="flex items-center gap-2 text-gray-700">
             <i class="pi pi-users text-gray-500" />
-            Guests: {{ booking.room.guests }} adults
+            {{ t("Guests: {n} adults", { n: booking.room.guests }) }}
           </div>
           <div class="flex items-center gap-2 text-gray-700">
             <i class="pi pi-user text-gray-500" />
-            <span>Main guest:</span>
+            <span>{{ t("Main guest:") }}</span>
             <span class="text-blue-600 font-medium">{{ mainGuestName }}</span>
             <i
               class="pi pi-pencil text-blue-400 cursor-pointer hover:text-blue-600 transition-colors"
@@ -148,7 +164,7 @@
           </div>
           <div class="flex items-center gap-2 text-gray-700">
             <i class="pi pi-ban text-gray-500" />
-            No smoking
+            {{ t("No smoking") }}
           </div>
         </div>
       </div>
@@ -156,21 +172,25 @@
 
     <!-- Special Requests -->
     <div class="bg-white rounded-lg border border-gray-200 p-6">
-      <h3 class="font-bold text-gray-900 text-lg mb-2">Special requests</h3>
+      <h3 class="font-bold text-gray-900 text-lg mb-2">
+        {{ t("Special requests") }}
+      </h3>
       <p class="text-sm text-gray-600 mb-4">
-        Special requests can't be guaranteed, but the property will do its best
-        to meet your needs. You can always make a special request after your
-        booking is complete.
+        {{
+          t(
+            "Special requests can't be guaranteed, but the property will do its best to meet your needs. You can always make a special request after your booking is complete.",
+          )
+        }}
       </p>
       <label class="block text-sm text-gray-700 mb-2">
-        Please write your requests in English.
-        <span class="text-gray-400">(optional)</span>
+        {{ t("Please write your requests in English.") }}
+        <span class="text-gray-400">({{ t("optional") }})</span>
       </label>
       <Textarea
         :value="specialRequest"
         rows="4"
         class="w-full"
-        placeholder="e.g. high floor, non-smoking room, early check-in..."
+        :placeholder="t('e.g. high floor, non-smoking room, early check-in...')"
         @input="
           emit(
             'update:specialRequest',
@@ -182,48 +202,54 @@
 
     <!-- Arrival Time -->
     <div class="bg-white rounded-lg border border-gray-200 p-6">
-      <h3 class="font-bold text-gray-900 text-lg mb-4">Your arrival time</h3>
+      <h3 class="font-bold text-gray-900 text-lg mb-4">
+        {{ t("Your arrival time") }}
+      </h3>
       <div class="space-y-2 mb-4">
         <div class="flex items-center gap-2 text-sm text-gray-700">
           <i class="pi pi-check-circle text-green-500" />
-          Your room will be ready for check-in between 2:00 PM and 12:00 AM
+          {{
+            t(
+              "Your room will be ready for check-in between 2:00 PM and 12:00 AM",
+            )
+          }}
         </div>
         <div class="flex items-center gap-2 text-sm text-gray-700">
           <i class="pi pi-user text-gray-500" />
-          24-hour front desk – help whenever you need it!
+          {{ t("24-hour front desk – help whenever you need it!") }}
         </div>
       </div>
       <label class="block text-sm text-gray-700 mb-2">
-        Add your estimated arrival time
-        <span class="text-gray-400">(optional)</span>
+        {{ t("Add your estimated arrival time") }}
+        <span class="text-gray-400">({{ t("optional") }})</span>
       </label>
       <Select
         :model-value="arrivalTime"
         :options="timeOptions"
-        placeholder="Please select"
+        :placeholder="t('Please select')"
         class="w-full sm:w-72"
         @update:model-value="emit('update:arrivalTime', $event)"
       />
     </div>
 
+    <!-- Footer Actions -->
     <div class="flex justify-end items-center gap-4 py-4">
       <span
         class="text-blue-600 text-sm flex items-center gap-1 cursor-pointer"
       >
         <i class="pi pi-tag" />
-        We Price Match
+        {{ t("We Price Match") }}
       </span>
       <Button
-        label="Thanh toán tiền mặt"
+        :label="t('Pay with cash')"
         icon="pi pi-wallet"
         severity="info"
         :loading="isPaying"
         :disabled="isPaying"
         @click="validateAndSubmit('cash')"
       />
-
       <Button
-        label="Pay via VNPAY"
+        :label="t('Pay via VNPAY')"
         icon="pi pi-credit-card"
         :loading="isPaying"
         :disabled="isPaying"
@@ -231,11 +257,12 @@
       />
     </div>
     <div class="text-center pb-4">
-      <a href="#" class="text-blue-600 text-sm underline"
-        >What are my booking conditions?</a
-      >
+      <a href="#" class="text-blue-600 text-sm underline">
+        {{ t("What are my booking conditions?") }}
+      </a>
     </div>
 
+    <!-- Main Guest Dialog -->
     <Dialog
       v-model:visible="showMainGuestDialog"
       modal
@@ -249,20 +276,22 @@
     >
       <template #header>
         <div>
-          <h2 class="text-xl font-bold text-gray-900">Main guest details</h2>
+          <h2 class="text-xl font-bold text-gray-900">
+            {{ t("Main guest details") }}
+          </h2>
           <p class="text-sm text-gray-500 mt-1">{{ booking.room.name }}</p>
         </div>
       </template>
 
       <div class="mt-4 space-y-4">
         <div>
-          <label class="block text-sm font-medium text-gray-700 mb-1"
-            >Guest's full name</label
-          >
+          <label class="block text-sm font-medium text-gray-700 mb-1">
+            {{ t("Guest's full name") }}
+          </label>
           <InputText
             v-model="editMainGuestName"
             class="w-full"
-            placeholder="Enter full name"
+            :placeholder="t('Enter full name')"
           />
         </div>
       </div>
@@ -270,7 +299,7 @@
       <template #footer>
         <div class="flex gap-3 pt-2">
           <Button
-            label="Save"
+            :label="t('Save')"
             class="bg-blue-600! border-blue-600! flex-1"
             @click="saveMainGuest"
           />
@@ -288,6 +317,7 @@ import { useAuthStore } from "#imports";
 import { COUNTRIES } from "@/data/countries";
 import { useToast } from "primevue/usetoast";
 
+const { t } = useI18n();
 const toast = useToast();
 
 const props = defineProps<{
@@ -328,27 +358,27 @@ const countryList = COUNTRIES;
 function validateAndSubmit(method: "vnpay" | "cash") {
   const errors: string[] = [];
 
-  if (!props.guestDetails.firstName.trim()) errors.push("First name");
-  if (!props.guestDetails.lastName.trim()) errors.push("Last name");
+  if (!props.guestDetails.firstName.trim()) errors.push(t("First name"));
+  if (!props.guestDetails.lastName.trim()) errors.push(t("Last name"));
   if (!props.guestDetails.email.trim()) {
-    errors.push("Email address");
+    errors.push(t("Email address"));
   } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(props.guestDetails.email)) {
     toast.add({
       severity: "warn",
-      summary: "Email không hợp lệ",
-      detail: "Vui lòng nhập đúng định dạng email.",
+      summary: t("Invalid email"),
+      detail: t("Please enter a valid email address."),
       life: 4000,
     });
     return;
   }
-  if (!props.guestDetails.country.trim()) errors.push("Country/Region");
-  if (!props.guestDetails.phone.trim()) errors.push("Phone number");
+  if (!props.guestDetails.country.trim()) errors.push(t("Country/Region"));
+  if (!props.guestDetails.phone.trim()) errors.push(t("Phone number"));
 
   if (errors.length > 0) {
     toast.add({
       severity: "error",
-      summary: "Vui lòng điền đầy đủ thông tin",
-      detail: `Các trường bắt buộc còn thiếu: ${errors.join(", ")}`,
+      summary: t("Please fill in all required fields"),
+      detail: `${t("Missing required fields:")} ${errors.join(", ")}`,
       life: 5000,
     });
     return;
@@ -393,21 +423,21 @@ const update = (field: string, event: Event) => {
   });
 };
 
-const timeOptions = [
-  "Before 12:00 PM",
-  "12:00 PM – 1:00 PM",
-  "1:00 PM – 2:00 PM",
-  "2:00 PM – 3:00 PM",
-  "3:00 PM – 4:00 PM",
-  "4:00 PM – 5:00 PM",
-  "5:00 PM – 6:00 PM",
-  "6:00 PM – 7:00 PM",
-  "7:00 PM – 8:00 PM",
-  "8:00 PM – 9:00 PM",
-  "9:00 PM – 10:00 PM",
-  "After 10:00 PM",
-  "I don't know",
-];
+const timeOptions = computed(() => [
+  t("Before 12:00 PM"),
+  t("12:00 PM – 1:00 PM"),
+  t("1:00 PM – 2:00 PM"),
+  t("2:00 PM – 3:00 PM"),
+  t("3:00 PM – 4:00 PM"),
+  t("4:00 PM – 5:00 PM"),
+  t("5:00 PM – 6:00 PM"),
+  t("6:00 PM – 7:00 PM"),
+  t("7:00 PM – 8:00 PM"),
+  t("8:00 PM – 9:00 PM"),
+  t("9:00 PM – 10:00 PM"),
+  t("After 10:00 PM"),
+  t("I don't know"),
+]);
 
 onMounted(async () => {
   await authStore.fetchUserInfo();

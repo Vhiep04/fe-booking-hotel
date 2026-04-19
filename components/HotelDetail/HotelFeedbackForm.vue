@@ -345,7 +345,6 @@ const authStore = useAuthStore();
 
 const isLoggedIn = computed(() => authStore.isAuthenticated);
 
-// userInfo có: fullName, email, ... — dùng fullName hoặc email để lấy initial
 const displayName = computed(
   () => authStore.userInfo?.fullName ?? authStore.userInfo?.email ?? "User",
 );

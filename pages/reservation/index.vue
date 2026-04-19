@@ -3,9 +3,11 @@
     class="min-h-screen mt-4 mx-auto max-w-6xl px-4 md:px-8 pb-12 dark:bg-slate-900"
   >
     <div class="mb-8 max-w-6xl">
-      <p class="text-[#07689F] font-bold text-2xl mb-2">My Reservations</p>
+      <p class="text-[#07689F] font-bold text-2xl mb-2">
+        {{ t("My Reservations") }}
+      </p>
       <p class="text-[#07689F]">
-        Manage and track all your bookings in one place.
+        {{ t("Manage and track all your bookings in one place.") }}
       </p>
     </div>
 
@@ -21,7 +23,7 @@
             : 'border-transparent text-gray-500 hover:text-[#07689F] hover:bg-white/60',
         ]"
       >
-        {{ tab.label }}
+        {{ t(tab.labelKey) }}
         <span
           v-if="tab.value === activeTab && reservationStore.totalCount > 0"
           class="ml-1.5 px-1.5 py-0.5 text-xs bg-[#07689F] text-white rounded-full"
@@ -30,19 +32,6 @@
         </span>
       </button>
     </div>
-
-    <!-- Sort -->
-    <!-- <div class="flex justify-end mb-4">
-      <Select
-        v-model="sortOption"
-        :options="sortOptions"
-        optionLabel="label"
-        optionValue="value"
-        placeholder="Sort by"
-        class="w-48 text-sm"
-        @change="fetchData"
-      />
-    </div> -->
 
     <!-- Loading -->
     <template v-if="reservationStore.isLoading">
@@ -74,16 +63,20 @@
         <i class="pi pi-calendar text-3xl text-[#07689F]" />
       </div>
       <p class="text-gray-600 font-semibold text-lg mb-1">
-        No reservations found
+        {{ t("No reservations found") }}
       </p>
       <p class="text-gray-400 text-sm">
-        You have no {{ activeTab !== "all" ? activeTab : "" }} bookings yet.
+        {{
+          activeTab !== "all"
+            ? t("You have no {status} bookings yet.", { status: t(activeTab) })
+            : t("You have no bookings yet.")
+        }}
       </p>
       <NuxtLink
         to="/"
         class="mt-6 px-6 py-2.5 bg-[#07689F] text-white rounded-lg text-sm font-semibold hover:bg-[#055a8a] transition-colors"
       >
-        Explore Hotels
+        {{ t("Explore Hotels") }}
       </NuxtLink>
     </div>
 
@@ -91,23 +84,27 @@
     <Dialog
       v-model:visible="showCancelDialog"
       modal
-      header="Cancel Reservation"
+      :header="t('Cancel Reservation')"
       :style="{ width: '420px' }"
     >
-      <p class="text-gray-600 mb-2">Are you sure you want to cancel booking</p>
+      <p class="text-gray-600 mb-2">
+        {{ t("Are you sure you want to cancel booking") }}
+      </p>
       <p class="font-semibold text-gray-800">
         {{ cancelTarget?.bookingCode }}?
       </p>
-      <p class="text-sm text-red-500 mt-3">This action cannot be undone.</p>
+      <p class="text-sm text-red-500 mt-3">
+        {{ t("This action cannot be undone.") }}
+      </p>
       <template #footer>
         <Button
-          label="Keep Booking"
+          :label="t('Keep Booking')"
           severity="secondary"
           @click="showCancelDialog = false"
           class="mr-2"
         />
         <Button
-          label="Yes, Cancel"
+          :label="t('Yes, Cancel')"
           severity="danger"
           :loading="reservationStore.isLoading"
           @click="confirmCancel"
@@ -131,10 +128,10 @@ const reservationStore = useReservationStore();
 const toast = useToast();
 
 const tabs = [
-  { label: "All", value: "all" },
-  { label: "Pending", value: "Pending" },
-  { label: "Confirmed", value: "Confirmed" },
-  { label: "Cancelled", value: "Cancelled" },
+  { labelKey: "All", value: "all" },
+  { labelKey: "Pending", value: "Pending" },
+  { labelKey: "Confirmed", value: "Confirmed" },
+  { labelKey: "Cancelled", value: "Cancelled" },
 ];
 
 const sortOptions = [
@@ -176,15 +173,15 @@ async function confirmCancel() {
   if (res?.success) {
     toast.add({
       severity: "success",
-      summary: "Cancelled",
-      detail: "Reservation cancelled successfully.",
+      summary: t("Cancelled"),
+      detail: t("Reservation cancelled successfully."),
       life: 3000,
     });
   } else {
     toast.add({
       severity: "error",
-      summary: "Error",
-      detail: reservationStore.error ?? "Failed to cancel.",
+      summary: t("Error"),
+      detail: reservationStore.error ?? t("Failed to cancel."),
       life: 3000,
     });
   }

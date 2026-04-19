@@ -218,63 +218,25 @@ const cancellationPolicy = computed(() => ({
 const specialRequest = ref("");
 const arrivalTime = ref("");
 
-async function handleVnpayReturn() {
-  const {
-    vnp_ResponseCode,
-    vnp_TxnRef,
-    vnp_TransactionNo,
-    vnp_OrderInfo,
-    vnp_Amount,
-  } = route.query as Record<string, string>;
-
-  if (!vnp_ResponseCode) return;
-
-  if (vnp_ResponseCode === "00") {
-    const result = await paymentStore.sendReceipt({
-      email: guestDetails.value.email,
-      name: `${guestDetails.value.firstName} ${guestDetails.value.lastName}`,
-      userId: authStore.userInfo?.userId ?? "",
-      roomId: roomId.value,
-      checkInDate: booking.value.checkInDate,
-      checkOutDate: booking.value.checkOutDate,
-      transactionId: vnp_TransactionNo ?? "",
-      orderId: vnp_TxnRef ?? "",
-      amount: Number(vnp_Amount ?? 0) / 100,
-      paymentMethod: "VNPAY",
-      orderDescription:
-        vnp_OrderInfo ?? roomStore.room?.roomType ?? "Room booking",
-    });
-
-    if (result?.success) {
-      currentStep.value = 3;
-      toast.add({
-        severity: "success",
-        summary: "Đặt phòng thành công!",
-        detail: result.message,
-        life: 5000,
-      });
-    } else {
-      toast.add({
-        severity: "warn",
-        summary: "Thanh toán thành công",
-        detail: "Nhưng không thể gửi email xác nhận. Vui lòng liên hệ hỗ trợ.",
-        life: 6000,
-      });
-    }
-  } else {
-    toast.add({
-      severity: "error",
-      summary: "Thanh toán thất bại",
-      detail: `Mã lỗi VNPAY: ${vnp_ResponseCode}`,
-      life: 5000,
-    });
-  }
-}
-
 const isRedirecting = ref(false);
 
 async function handleSubmit(method: "vnpay" | "cash") {
   if (method === "vnpay") {
+    sessionStorage.setItem(
+      "pendingBooking",
+      JSON.stringify({
+        guestDetails: guestDetails.value,
+        roomId: roomId.value,
+        hotelId: hotelId.value,
+        checkInDate: booking.value.checkInDate,
+        checkOutDate: booking.value.checkOutDate,
+        amount: price.value.total,
+        roomType: roomStore.room?.roomType ?? "",
+        userId: authStore.userInfo?.userId ?? "",
+        hotelName: hotel.value.name,
+        hotelAddress: hotel.value.address,
+      }),
+    );
     const amount = price.value.total;
     if (!amount || amount < 5000) {
       toast.add({
@@ -338,23 +300,18 @@ async function handleSubmit(method: "vnpay" | "cash") {
   }
 }
 
-// booking/index.vue — onMounted xử lý đầy đủ
 onMounted(async () => {
-  // Chặn user back về trang VNPAY sandbox
   history.pushState(null, "", location.href);
   window.addEventListener("popstate", () => {
     history.pushState(null, "", location.href);
-    // Redirect về hotel detail thay vì VNPAY
     const hId = searchStore.pendingHotelId;
     if (hId) router.replace(`/hotels/${hId}`);
   });
 
-  // Lấy từ query, fallback về searchStore nếu mất (khi back)
   const hId = hotelId.value || searchStore.pendingHotelId;
   const rId = roomId.value || searchStore.pendingRoomId;
 
   if (!hId || !rId) {
-    // Không có data gì cả → về trang chủ
     router.replace("/");
     return;
   }
@@ -363,8 +320,6 @@ onMounted(async () => {
     roomStore.fetchRoom(hId, rId),
     hotelStore.getHotelById(hId),
   ]);
-
-  await handleVnpayReturn();
 });
 
 onBeforeUnmount(() => {

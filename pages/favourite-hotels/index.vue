@@ -4,7 +4,7 @@
       <div class="max-w-6xl mx-auto px-4 md:px-8">
         <div class="flex items-center justify-between mb-1">
           <p class="text-[#07689F] font-bold text-2xl mb-2">
-            My Favourite Hotels
+            {{ t("My Favourite Hotels") }}
           </p>
         </div>
         <p class="text-sm text-slate-500 dark:text-slate-400">
@@ -12,7 +12,10 @@
             <span class="font-semibold text-blue-600 dark:text-blue-400">
               {{ store.totalCount }}
             </span>
-            saved propert{{ store.totalCount !== 1 ? "ies" : "y" }}
+            {{ store.totalCount }}
+            {{
+              t(store.totalCount !== 1 ? "saved properties" : "saved property")
+            }}
           </template>
           <Skeleton v-else width="80px" height="16px" class="inline-block" />
         </p>
@@ -37,7 +40,7 @@
           :options="locationOptions"
           option-label="label"
           option-value="value"
-          placeholder="All Locations"
+          :placeholder="t('All Locations')"
           show-clear
           class="w-full !text-sm"
         />
@@ -47,7 +50,7 @@
           :options="priceRanges"
           option-label="label"
           option-value="value"
-          placeholder="All Prices"
+          :placeholder="t('All Prices')"
           show-clear
           class="w-full !text-sm"
         />
@@ -57,7 +60,7 @@
           :options="ratingOptions"
           option-label="label"
           option-value="value"
-          placeholder="All Ratings"
+          :placeholder="t('All Ratings')"
           show-clear
           class="w-full !text-sm"
         />
@@ -67,7 +70,7 @@
           :options="sortOptions"
           option-label="label"
           option-value="value"
-          placeholder="Sort by"
+          :placeholder="t('Sort by')"
           show-clear
           class="w-full !text-sm"
         />
@@ -76,14 +79,14 @@
       <div v-if="hasActiveFilters" class="flex flex-wrap gap-2 -mt-1">
         <Chip
           v-if="filters.search"
-          :label="`Search: ${filters.search}`"
+          :label="`${t('Search')}: ${filters.search}`"
           removable
           class="!text-xs"
           @remove="filters.search = ''"
         />
         <Chip
           v-if="filters.location"
-          :label="filters.location"
+          :label="t(filters.location)"
           removable
           class="!text-xs"
           @remove="filters.location = null"
@@ -99,13 +102,13 @@
         />
         <Chip
           v-if="filters.rating"
-          :label="`${filters.rating}+ Stars`"
+          :label="`${filters.rating}+ ${t('Stars')}`"
           removable
           class="!text-xs"
           @remove="filters.rating = null"
         />
         <Button
-          label="Clear all"
+          :label="t('Clear all')"
           text
           severity="secondary"
           size="small"
@@ -145,23 +148,28 @@
         <h3 class="text-lg font-bold text-slate-800 dark:text-white mb-2">
           {{
             store.favourites.length === 0
-              ? "No favourites yet"
-              : "No results found"
+              ? t("No favourites yet")
+              : t("No results found")
           }}
         </h3>
+
         <p class="text-sm text-slate-500 dark:text-slate-400 max-w-xs mb-5">
           {{
             store.favourites.length === 0
-              ? "Save hotels you love and they'll appear here."
-              : "Try adjusting your filters to find what you're looking for."
+              ? t("Save hotels you love and they'll appear here.")
+              : t("Try adjusting your filters to find what you're looking for.")
           }}
         </p>
         <NuxtLink v-if="store.favourites.length === 0" to="/">
-          <Button label="Explore Hotels" icon="pi pi-search" size="small" />
+          <Button
+            :label="t('Explore Hotels')"
+            icon="pi pi-search"
+            size="small"
+          />
         </NuxtLink>
         <Button
           v-else
-          label="Clear Filters"
+          :label="t('Clear Filters')"
           icon="pi pi-filter-slash"
           severity="secondary"
           size="small"
@@ -234,32 +242,32 @@ const locationOptions = computed(() =>
     .map((c) => ({ label: c, value: c })),
 );
 
-const priceRanges = [
-  { label: "Under 1.000.000 VNĐ", value: [0, 1000000] as [number, number] },
+const priceRanges = computed(() => [
+  { label: t("Under 1.000.000 VNĐ"), value: [0, 1000000] as [number, number] },
   {
-    label: "1.000.000 – 1.500.000 VNĐ",
+    label: t("1.000.000 – 1.500.000 VNĐ"),
     value: [1000000, 1500000] as [number, number],
   },
   {
-    label: "1.500.000 – 2.000.000 VNĐ",
+    label: t("1.500.000 – 2.000.000 VNĐ"),
     value: [1500000, 2000000] as [number, number],
   },
-  { label: "2.000.000 + ", value: [2000000, 9999000] as [number, number] },
-];
+  { label: t("2.000.000+"), value: [2000000, 9999000] as [number, number] },
+]);
 
-const ratingOptions = [
-  { label: "4.5+ Stars", value: 4.5 },
-  { label: "4.0+ Stars", value: 4.0 },
-  { label: "3.5+ Stars", value: 3.5 },
-  { label: "3.0+ Stars", value: 3.0 },
-];
+const ratingOptions = computed(() => [
+  { label: t("4.5+ Stars"), value: 4.5 },
+  { label: t("4.0+ Stars"), value: 4.0 },
+  { label: t("3.5+ Stars"), value: 3.5 },
+  { label: t("3.0+ Stars"), value: 3.0 },
+]);
 
-const sortOptions = [
-  { label: "Price: Low to High", value: "price-asc" },
-  { label: "Price: High to Low", value: "price-desc" },
-  { label: "Rating: High to Low", value: "rating-desc" },
-  { label: "Name: A–Z", value: "name-asc" },
-];
+const sortOptions = computed(() => [
+  { label: t("Price: Low to High"), value: "price-asc" },
+  { label: t("Price: High to Low"), value: "price-desc" },
+  { label: t("Rating: High to Low"), value: "rating-desc" },
+  { label: t("Name: A–Z"), value: "name-asc" },
+]);
 
 const filtered = computed(() => {
   let list = [...store.favourites];

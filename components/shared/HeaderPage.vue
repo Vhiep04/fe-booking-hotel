@@ -2,13 +2,13 @@
   <header
     class="bg-white border-b border-gray-200 px-6 h-[300] z-50 sticky top-0"
   >
-    <div class="flex items-center justify-between h-16 gap-6">
+    <div class="flex items-center justify-between h-20 gap-6">
       <!-- Logo -->
       <div class="flex items-center shrink-0">
         <img
           src="../../assets/images/logo_easyset24.svg"
           alt="Logo"
-          class="h-10"
+          class="h-12"
         />
       </div>
 
@@ -18,8 +18,8 @@
           v-for="item in navItems"
           :key="item.name"
           :to="item.path"
-          class="px-4 py-1.5 rounded-full text-sm text-gray-500 hover:bg-gray-100 hover:text-gray-800 transition-colors whitespace-nowrap"
-          active-class="bg-gray-100 text-gray-900 font-medium"
+          class="px-5 py-2 rounded-full text-base text-gray-500 hover:bg-gray-200 hover:text-gray-800 transition-colors whitespace-nowrap"
+          active-class="!bg-[#07689F] !text-white font-medium"
         >
           {{ t(item.name) }}
         </NuxtLink>
@@ -35,7 +35,7 @@
           <img
             :src="currentFlag"
             alt="Language"
-            class="w-7 h-5 rounded-sm object-contain"
+            class="w-9 h-6 rounded-sm object-contain"
           />
         </button>
 
@@ -47,7 +47,7 @@
               @click="changeLanguage(lang.code)"
               class="flex items-center gap-3 px-4 py-2 cursor-pointer hover:bg-gray-100"
             >
-              <img :src="lang.flag" class="w-6 h-4 rounded-sm object-cover" />
+              <img :src="lang.flag" class="w-7 h-6 rounded-sm object-fit" />
               <span class="text-sm">{{ lang.label }}</span>
               <i
                 v-if="locale === lang.code"
@@ -58,17 +58,9 @@
         </OverlayPanel>
 
         <template v-if="authStore.isAuthenticated">
-          <!-- Favourite -->
-          <NuxtLink
-            to="/favourite-hotels"
-            class="w-9 h-9 flex items-center justify-center rounded-full text-gray-500 hover:bg-gray-100 hover:text-red-500 transition-colors"
-          >
-            <i class="pi pi-heart" style="font-size: 1.1rem"></i>
-          </NuxtLink>
-
           <!-- Notifications -->
           <button
-            class="w-9 h-9 flex items-center justify-center rounded-full text-gray-500 hover:bg-gray-100 hover:text-blue-600 transition-colors relative"
+            class="w-12 h-12 flex items-center justify-center rounded-full text-gray-500 hover:bg-gray-100 hover:text-blue-600 transition-colors relative"
             @click="toggleNotifications"
           >
             <i class="pi pi-bell" style="font-size: 1.1rem"></i>
@@ -80,16 +72,18 @@
             </span>
           </button>
 
-          <OverlayPanel ref="notificationsPanel" class="w-80">
+          <OverlayPanel ref="notificationsPanel" class="w-100">
             <div class="p-2">
               <div class="flex items-center justify-between mb-3">
-                <h4 class="font-semibold m-0 text-sm">Thông báo</h4>
+                <h4 class="font-semibold m-0 text-sm">
+                  {{ t("Notifications") }}
+                </h4>
                 <button
                   v-if="notificationCount > 0"
                   class="text-xs text-blue-600 hover:underline"
                   @click="handleMarkAllRead"
                 >
-                  Đánh dấu tất cả đã đọc
+                  {{ t("Mark all as read") }}
                 </button>
               </div>
 
@@ -135,7 +129,7 @@
                   v-if="notifications.length === 0"
                   class="text-center py-6 text-gray-400 text-sm"
                 >
-                  Không có thông báo
+                  {{ t("No notifications") }}
                 </div>
               </div>
             </div>
@@ -176,12 +170,11 @@
 </template>
 
 <script setup lang="ts">
-import { ref, reactive, computed, onMounted, onUnmounted } from "vue";
+import { ref, computed, onMounted, onUnmounted } from "vue";
 import { useRouter } from "vue-router";
 import UserProfile from "../UserProfile.vue";
 import { useAuthStore } from "@/stores/auth";
 import { useNotificationStore } from "@/stores/notification";
-import type { UserInfoResponse } from "~/stores/interface/response/getUserInfo";
 import { Button } from "primevue";
 import OverlayPanel from "primevue/overlaypanel";
 import { useI18n } from "vue-i18n";
@@ -198,10 +191,9 @@ const notificationStore = useNotificationStore();
 const langPanel = ref();
 const navItems = [
   { name: "Home", path: "/" },
-  // { name: "Hotel", path: "/hotel" },
-  // { name: "Flight", path: "/flight" },
   { name: "My reservation", path: "/reservation" },
   { name: "My favourite hotel", path: "/favourite-hotels" },
+  { name: "My reviews", path: "/feedback" },
 ];
 const languages: { code: LocaleCode; label: string; flag: string }[] = [
   { code: "en", label: "English", flag: enFlag },
@@ -264,11 +256,11 @@ function getNotificationColor(type: string): string {
 function formatTimeAgo(dateString: string): string {
   const diff = Date.now() - new Date(dateString).getTime();
   const mins = Math.floor(diff / 60000);
-  if (mins < 1) return "Vừa xong";
-  if (mins < 60) return `${mins} phút trước`;
+  if (mins < 1) return t("Just now");
+  if (mins < 60) return t("{n} minutes ago", { n: mins });
   const hours = Math.floor(mins / 60);
-  if (hours < 24) return `${hours} giờ trước`;
-  return `${Math.floor(hours / 24)} ngày trước`;
+  if (hours < 24) return t("{n} hours ago", { n: hours });
+  return t("{n} days ago", { n: Math.floor(hours / 24) });
 }
 
 const userData = computed(() => ({
@@ -292,11 +284,8 @@ function handleSignOut() {
 
 onMounted(async () => {
   authStore.initAuthFromCookie();
-
   if (authStore.isAuthenticated) {
     await authStore.fetchUserInfo();
-    const user = authStore.userInfo;
-
     await initHub();
   }
 });

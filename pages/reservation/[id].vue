@@ -5,7 +5,7 @@
       class="inline-flex items-center gap-2 text-[#07689F] text-sm font-semibold mb-6 hover:underline"
     >
       <i class="pi pi-arrow-left text-xs" />
-      Back to My Reservations
+      {{ t("Back to My Reservations") }}
     </NuxtLink>
 
     <!-- Loading -->
@@ -24,13 +24,13 @@
         <i class="pi pi-exclamation-triangle text-3xl text-[#07689F]" />
       </div>
       <p class="text-gray-600 font-semibold text-lg mb-1">
-        Reservation not found
+        {{ t("Reservation not found") }}
       </p>
       <NuxtLink
         to="/reservation"
         class="mt-4 px-6 py-2.5 bg-[#07689F] text-white rounded-lg text-sm font-semibold hover:bg-[#055a8a] transition-colors"
       >
-        Go Back
+        {{ t("Go Back") }}
       </NuxtLink>
     </div>
 
@@ -65,14 +65,14 @@
                   :class="statusClass(reservation.paymentStatus)"
                   class="px-3 py-1 rounded-full text-xs font-bold shadow"
                 >
-                  {{ reservation.paymentStatus }}
+                  {{ t(reservation.paymentStatus) }}
                 </span>
               </div>
             </div>
 
             <div class="p-5 grid grid-cols-3 gap-4">
               <div>
-                <p class="text-xs text-gray-400 mb-1">Room</p>
+                <p class="text-xs text-gray-400 mb-1">{{ t("Room") }}</p>
                 <p class="font-semibold text-gray-800">
                   {{ reservation.roomTypeName }}
                 </p>
@@ -81,16 +81,18 @@
                 </p>
               </div>
               <div>
-                <p class="text-xs text-gray-400 mb-1">Capacity</p>
+                <p class="text-xs text-gray-400 mb-1">{{ t("Capacity") }}</p>
                 <p class="font-semibold text-gray-800 flex items-center gap-1">
                   <i class="pi pi-user text-sm" />
-                  {{ reservation.capacity }} guests
+                  {{ reservation.capacity }} {{ t("guests") }}
                 </p>
               </div>
               <div>
-                <p class="text-xs text-gray-400 mb-1">Price per night</p>
+                <p class="text-xs text-gray-400 mb-1">
+                  {{ t("Price per night") }}
+                </p>
                 <p class="font-semibold text-[#07689F]">
-                  ${{ reservation.pricePerNight.toLocaleString() }}
+                  {{ reservation.pricePerNight.toLocaleString() }} VNĐ
                 </p>
               </div>
             </div>
@@ -100,14 +102,14 @@
           <div
             class="bg-white rounded-2xl p-5 shadow-sm border border-gray-100"
           >
-            <p class="font-bold text-gray-800 mb-4">Stay Details</p>
+            <p class="font-bold text-gray-800 mb-4">{{ t("Stay Details") }}</p>
             <div class="grid grid-cols-3 gap-6">
               <div class="text-center p-4 bg-[#F0F8FF] rounded-xl">
-                <p class="text-xs text-gray-400 mb-1">Check-in</p>
+                <p class="text-xs text-gray-400 mb-1">{{ t("Check-in") }}</p>
                 <p class="font-bold text-[#07689F] text-sm">
                   {{ formatDate(reservation.checkInDate) }}
                 </p>
-                <p class="text-xs text-gray-400 mt-1">From 14:00</p>
+                <p class="text-xs text-gray-400 mt-1">{{ t("From 14:00") }}</p>
               </div>
               <div
                 class="text-center p-4 flex flex-col items-center justify-center"
@@ -121,15 +123,15 @@
                   {{ reservation.nights }}
                 </p>
                 <p class="text-xs text-gray-400">
-                  night{{ reservation.nights > 1 ? "s" : "" }}
+                  {{ reservation.nights > 1 ? t("nights") : t("night") }}
                 </p>
               </div>
               <div class="text-center p-4 bg-[#F0F8FF] rounded-xl">
-                <p class="text-xs text-gray-400 mb-1">Check-out</p>
+                <p class="text-xs text-gray-400 mb-1">{{ t("Check-out") }}</p>
                 <p class="font-bold text-[#07689F] text-sm">
                   {{ formatDate(reservation.checkOutDate) }}
                 </p>
-                <p class="text-xs text-gray-400 mt-1">Until 12:00</p>
+                <p class="text-xs text-gray-400 mt-1">{{ t("Until 12:00") }}</p>
               </div>
             </div>
           </div>
@@ -138,16 +140,18 @@
           <div
             class="bg-white rounded-2xl p-5 shadow-sm border border-gray-100"
           >
-            <p class="font-bold text-gray-800 mb-4">Payment Information</p>
+            <p class="font-bold text-gray-800 mb-4">
+              {{ t("Payment Information") }}
+            </p>
             <div class="space-y-3">
               <div class="flex justify-between items-center text-sm">
-                <span class="text-gray-500">Payment Method</span>
+                <span class="text-gray-500">{{ t("Payment Method") }}</span>
                 <span class="font-medium text-gray-800 capitalize">{{
                   reservation.paymentMethod
                 }}</span>
               </div>
               <div class="flex justify-between items-center text-sm">
-                <span class="text-gray-500">Payment Date</span>
+                <span class="text-gray-500">{{ t("Payment Date") }}</span>
                 <span class="font-medium text-gray-800">{{
                   reservation.paymentDate
                     ? formatDate(reservation.paymentDate)
@@ -155,14 +159,16 @@
                 }}</span>
               </div>
               <div class="flex justify-between items-center text-sm">
-                <span class="text-gray-500">Booked On</span>
+                <span class="text-gray-500">{{ t("Booked On") }}</span>
                 <span class="font-medium text-gray-800">{{
                   formatDate(reservation.createdAt)
                 }}</span>
               </div>
               <div class="border-t border-dashed border-gray-200 my-2" />
               <div class="flex justify-between items-center">
-                <span class="font-semibold text-gray-700">Total Price</span>
+                <span class="font-semibold text-gray-700">{{
+                  t("Total Price")
+                }}</span>
                 <span class="font-bold text-[#07689F] text-lg"
                   >{{ reservation.totalPrice.toLocaleString() }} VNĐ</span
                 >
@@ -175,7 +181,7 @@
             class="bg-white rounded-2xl p-5 shadow-sm border border-gray-100"
           >
             <div class="flex justify-between items-center mb-4">
-              <p class="font-bold text-gray-800">Your Review</p>
+              <p class="font-bold text-gray-800">{{ t("Your Review") }}</p>
               <NuxtLink
                 v-if="
                   !reservation.hasFeedback &&
@@ -184,7 +190,7 @@
                 :to="`/reservation/${reservation.reservationId}/feedback`"
                 class="text-sm text-[#07689F] font-semibold hover:underline"
               >
-                + Write a review
+                {{ t("+ Write a review") }}
               </NuxtLink>
             </div>
 
@@ -212,8 +218,10 @@
               <p class="text-gray-400 text-sm">
                 {{
                   reservation.paymentStatus === "Confirmed"
-                    ? "Share your experience with this hotel."
-                    : "Reviews can be submitted after your stay is confirmed."
+                    ? t("Share your experience with this hotel.")
+                    : t(
+                        "Reviews can be submitted after your stay is confirmed.",
+                      )
                 }}
               </p>
             </template>
@@ -225,12 +233,14 @@
           <div
             class="bg-white rounded-2xl p-5 shadow-sm border border-gray-100"
           >
-            <p class="font-bold text-gray-800 mb-4">Booking Summary</p>
+            <p class="font-bold text-gray-800 mb-4">
+              {{ t("Booking Summary") }}
+            </p>
 
             <div class="flex items-center gap-2 mb-3">
               <i class="pi pi-hashtag text-[#07689F] text-sm" />
               <div>
-                <p class="text-xs text-gray-400">Booking Code</p>
+                <p class="text-xs text-gray-400">{{ t("Booking Code") }}</p>
                 <p class="font-bold text-gray-800 tracking-wider">
                   {{ reservation.bookingCode }}
                 </p>
@@ -240,7 +250,7 @@
             <div class="flex items-center gap-2 mb-3">
               <i class="pi pi-id-card text-[#07689F] text-sm" />
               <div>
-                <p class="text-xs text-gray-400">Reservation ID</p>
+                <p class="text-xs text-gray-400">{{ t("Reservation ID") }}</p>
                 <p class="font-medium text-gray-700">
                   #{{ reservation.reservationId }}
                 </p>
@@ -253,9 +263,9 @@
                 :class="statusDotClass(reservation.paymentStatus)"
               />
               <div>
-                <p class="text-xs text-gray-400">Status</p>
+                <p class="text-xs text-gray-400">{{ t("Status") }}</p>
                 <p class="font-semibold text-gray-800">
-                  {{ reservation.paymentStatus }}
+                  {{ t(reservation.paymentStatus) }}
                 </p>
               </div>
             </div>
@@ -266,7 +276,7 @@
               class="mt-5 w-full py-2.5 border border-[#07689F] text-[#07689F] rounded-lg text-sm font-semibold hover:bg-[#07689F] hover:text-white transition-all duration-200 flex items-center justify-center gap-2"
             >
               <i class="pi pi-copy text-sm" />
-              Copy Booking Code
+              {{ t("Copy Booking Code") }}
             </button>
           </div>
 
@@ -274,10 +284,10 @@
           <div
             class="bg-white rounded-2xl p-5 shadow-sm border border-gray-100 space-y-3"
           >
-            <p class="font-bold text-gray-800 mb-1">Actions</p>
+            <p class="font-bold text-gray-800 mb-1">{{ t("Actions") }}</p>
             <Button
               v-if="canCancel"
-              label="Cancel Reservation"
+              :label="t('Cancel Reservation')"
               severity="danger"
               outlined
               class="w-full text-sm"
@@ -288,7 +298,7 @@
               to="/reservation"
               class="block text-center py-2.5 bg-[#07689F] text-white rounded-lg text-sm font-semibold hover:bg-[#055a8a] transition-colors"
             >
-              All Reservations
+              {{ t("All Reservations") }}
             </NuxtLink>
           </div>
         </div>
@@ -299,23 +309,25 @@
     <Dialog
       v-model:visible="showCancelDialog"
       modal
-      header="Cancel Reservation"
+      :header="t('Cancel Reservation')"
       :style="{ width: '420px' }"
     >
       <p class="text-gray-600 mb-1">
-        Are you sure you want to cancel this reservation?
+        {{ t("Are you sure you want to cancel this reservation?") }}
       </p>
       <p class="font-semibold text-gray-800">{{ reservation?.bookingCode }}</p>
-      <p class="text-sm text-red-500 mt-3">This action cannot be undone.</p>
+      <p class="text-sm text-red-500 mt-3">
+        {{ t("This action cannot be undone.") }}
+      </p>
       <template #footer>
         <Button
-          label="Keep Booking"
+          :label="t('Keep Booking')"
           severity="secondary"
           @click="showCancelDialog = false"
           class="mr-2"
         />
         <Button
-          label="Yes, Cancel"
+          :label="t('Yes, Cancel')"
           severity="danger"
           :loading="reservationStore.isLoading"
           @click="confirmCancel"
@@ -379,8 +391,8 @@ async function copyCode() {
     await navigator.clipboard.writeText(reservation.value.bookingCode);
     toast.add({
       severity: "info",
-      summary: "Copied!",
-      detail: "Booking code copied to clipboard.",
+      summary: t("Copied!"),
+      detail: t("Booking code copied to clipboard."),
       life: 2000,
     });
   }
@@ -395,15 +407,15 @@ async function confirmCancel() {
   if (res?.success) {
     toast.add({
       severity: "success",
-      summary: "Cancelled",
-      detail: "Reservation cancelled.",
+      summary: t("Cancelled"),
+      detail: t("Reservation cancelled."),
       life: 3000,
     });
   } else {
     toast.add({
       severity: "error",
-      summary: "Error",
-      detail: reservationStore.error ?? "Failed to cancel.",
+      summary: t("Error"),
+      detail: reservationStore.error ?? t("Failed to cancel."),
       life: 3000,
     });
   }

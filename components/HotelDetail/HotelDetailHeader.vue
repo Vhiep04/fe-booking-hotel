@@ -43,7 +43,7 @@
             class="ml-2 text-blue-600 hover:underline text-sm font-medium"
             @click="$emit('showMap')"
           >
-            Vị trí xuất sắc - hiển thị bản đồ
+            {{ t("Excellent location - show map") }}
           </button>
         </div>
       </div>
@@ -99,7 +99,7 @@
             <div>
               <p class="font-semibold">{{ ratingLabel }}</p>
               <p class="text-sm text-gray-500">
-                {{ hotel.totalReviews }} đánh giá
+                {{ hotel.totalReviews }} {{ t("reviews") }}
               </p>
             </div>
             <div
@@ -110,7 +110,7 @@
           </div>
 
           <div class="mt-3 text-sm text-gray-600">
-            <p class="font-medium mb-1">Khách lưu trú ở đây thích điều gì?</p>
+            <p class="font-medium mb-1">{{ t("What do guests love here?") }}</p>
             <p class="italic text-gray-500 leading-relaxed text-xs">
               "{{ firstFeedbackComment }}"
             </p>
@@ -166,12 +166,12 @@ const starCount = computed(() => {
   return 0;
 });
 
-const breadcrumbs = [
-  { label: "Trang chủ", link: "/" },
-  { label: "Khách sạn", link: "/hotels" },
-  { label: "Việt Nam", link: "/hotels/vietnam" },
-  { label: props.hotel.name ?? "Khách sạn", link: null },
-];
+const breadcrumbs = computed(() => [
+  { label: t("Home"), link: "/" },
+  { label: t("Hotels"), link: "/hotels" },
+  { label: t("Vietnam"), link: "/hotels/vietnam" },
+  { label: props.hotel.name ?? t("Hotel"), link: null },
+]);
 
 const DEFAULT_IMAGE =
   "https://images.unsplash.com/photo-1566073771259-6a8506099945?w=800&q=80";
@@ -193,15 +193,15 @@ const ratingScore = computed(() => {
 
 const ratingLabel = computed(() => {
   const score = Number(props.hotel.averageRating ?? 0);
-  if (score >= 4.5) return "Xuất sắc";
-  if (score >= 4.0) return "Rất tốt";
-  if (score >= 3.0) return "Tốt";
-  return "Khá tốt";
+  if (score >= 4.5) return t("Excellent");
+  if (score >= 4.0) return t("Very Good");
+  if (score >= 3.0) return t("Good");
+  return t("Fairly Good");
 });
 
 const firstFeedbackComment = computed(() => {
   const first = props.hotel.recentFeedbacks?.[0];
-  if (!first) return "Chưa có đánh giá nào.";
+  if (!first) return t("No reviews yet.");
   return first.comment.length > 100
     ? first.comment.slice(0, 100) + "..."
     : first.comment;

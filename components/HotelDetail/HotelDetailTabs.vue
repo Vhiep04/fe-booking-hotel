@@ -34,7 +34,9 @@
               <span class="text-sm font-medium">{{ facility }}</span>
             </div>
           </div>
-          <div v-else class="text-gray-400 text-sm">No amenities listed.</div>
+          <div v-else class="text-gray-400 text-sm">
+            {{ t("No amenities listed.") }}
+          </div>
         </TabPanel>
 
         <!-- Place Rules Tab -->
@@ -42,52 +44,54 @@
           <div class="space-y-6">
             <div>
               <h3 class="text-lg font-semibold mb-3 text-gray-800">
-                Check-in/Check-out
+                {{ t("Check-in/Check-out") }}
               </h3>
               <div class="space-y-2 text-gray-700">
                 <div class="flex items-center gap-2">
                   <i class="pi pi-clock text-blue-600"></i>
-                  <span>Check-in: After 3:00 PM</span>
+                  <span>{{ t("Check-in: After 3:00 PM") }}</span>
                 </div>
                 <div class="flex items-center gap-2">
                   <i class="pi pi-clock text-blue-600"></i>
-                  <span>Check-out: Before 11:00 AM</span>
+                  <span>{{ t("Check-out: Before 11:00 AM") }}</span>
                 </div>
               </div>
             </div>
 
             <div>
               <h3 class="text-lg font-semibold mb-3 text-gray-800">
-                House Rules
+                {{ t("House Rules") }}
               </h3>
               <ul class="space-y-2 text-gray-700">
                 <li class="flex items-start gap-2">
                   <i class="pi pi-ban text-red-500 mt-1"></i>
-                  <span>No smoking in the property</span>
+                  <span>{{ t("No smoking in the property") }}</span>
                 </li>
                 <li class="flex items-start gap-2">
                   <i class="pi pi-ban text-red-500 mt-1"></i>
-                  <span>No parties or events allowed</span>
+                  <span>{{ t("No parties or events allowed") }}</span>
                 </li>
                 <li class="flex items-start gap-2">
                   <i class="pi pi-check text-green-600 mt-1"></i>
-                  <span>Pets allowed with prior approval</span>
+                  <span>{{ t("Pets allowed with prior approval") }}</span>
                 </li>
                 <li class="flex items-start gap-2">
                   <i class="pi pi-volume-off text-blue-600 mt-1"></i>
-                  <span>Quiet hours: 10:00 PM - 8:00 AM</span>
+                  <span>{{ t("Quiet hours: 10:00 PM - 8:00 AM") }}</span>
                 </li>
               </ul>
             </div>
 
             <div>
               <h3 class="text-lg font-semibold mb-3 text-gray-800">
-                Cancellation Policy
+                {{ t("Cancellation Policy") }}
               </h3>
               <p class="text-gray-700 leading-relaxed">
-                Free cancellation up to 48 hours before check-in. After that,
-                50% of the booking amount will be charged. No refund for
-                cancellations within 24 hours of check-in.
+                {{
+                  t(
+                    "Free cancellation up to 48 hours before check-in. After that, 50% of the booking amount will be charged. No refund for cancellations within 24 hours of check-in.",
+                  )
+                }}
               </p>
             </div>
           </div>
@@ -98,7 +102,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from "vue";
+import { computed } from "vue";
 import { Tabs, TabList, Tab, TabPanels, TabPanel } from "primevue";
 
 interface Props {
@@ -108,10 +112,12 @@ interface Props {
 
 defineProps<Props>();
 
-const tabs = ref([
-  { title: "Place Details", value: "0" },
-  { title: "Facilities", value: "1" },
-  { title: "Place Rules", value: "2" },
+const { t } = useI18n();
+
+const tabs = computed(() => [
+  { title: t("Place Details"), value: "0" },
+  { title: t("Facilities"), value: "1" },
+  { title: t("Place Rules"), value: "2" },
 ]);
 
 const getFacilityIcon = (name: string): string => {

@@ -29,4 +29,7 @@ export interface SendReceiptPayload {
   amount: number;
   paymentMethod: string;
   orderDescription: string;
+  phoneNumber?: string;
+  hotelName?: string;
+  hotelAddress?: string;
 }

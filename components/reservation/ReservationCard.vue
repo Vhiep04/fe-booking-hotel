@@ -27,32 +27,35 @@
             {{ reservation.hotelLocation }}, {{ reservation.cityName }}
           </p>
           <p class="text-xs text-gray-400 mt-1">
-            {{ reservation.roomTypeName }} · Room #{{ reservation.roomNumber }}
+            {{ reservation.roomTypeName }} · {{ t("Room #")
+            }}{{ reservation.roomNumber }}
           </p>
         </div>
         <span
           :class="statusClass"
           class="px-3 py-1 rounded-full text-xs font-bold shrink-0 ml-4"
         >
-          {{ reservation.paymentStatus }}
+          {{ t(reservation.paymentStatus) }}
         </span>
       </div>
 
       <!-- Dates -->
       <div class="flex items-center gap-6 mt-3 text-sm">
         <div>
-          <p class="text-xs text-gray-400">Check-in</p>
+          <p class="text-xs text-gray-400">{{ t("Check-in") }}</p>
           <p class="font-semibold text-gray-700">
             {{ formatDate(reservation.checkInDate) }}
           </p>
         </div>
         <div class="flex items-center gap-1 text-gray-300">
           <div class="h-px w-6 bg-gray-200" />
-          <span class="text-xs text-gray-400">{{ reservation.nights }}n</span>
+          <span class="text-xs text-gray-400"
+            >{{ reservation.nights }}{{ t("n") }}</span
+          >
           <div class="h-px w-6 bg-gray-200" />
         </div>
         <div>
-          <p class="text-xs text-gray-400">Check-out</p>
+          <p class="text-xs text-gray-400">{{ t("Check-out") }}</p>
           <p class="font-semibold text-gray-700">
             {{ formatDate(reservation.checkOutDate) }}
           </p>
@@ -64,18 +67,18 @@
         class="flex justify-between items-center mt-3 pt-3 border-t border-gray-100"
       >
         <div>
-          <span class="text-xs text-gray-400">Booking Code: </span>
+          <span class="text-xs text-gray-400">{{ t("Booking Code:") }} </span>
           <span class="text-xs font-bold text-gray-700 tracking-wider">{{
             reservation.bookingCode
           }}</span>
         </div>
         <div class="flex items-center gap-3">
           <p class="font-bold text-[#07689F]">
-            {{ reservation.totalPrice.toLocaleString() }}VNĐ
+            {{ reservation.totalPrice.toLocaleString() }} VNĐ
           </p>
           <Button
             v-if="canCancel"
-            label="Cancel"
+            :label="t('Cancel')"
             severity="danger"
             size="small"
             outlined
@@ -89,6 +92,8 @@
 </template>
 
 <script setup lang="ts">
+const { t } = useI18n();
+
 const props = defineProps<{ reservation: UserReservation }>();
 const emit = defineEmits<{ cancel: [r: UserReservation] }>();
 const router = useRouter();

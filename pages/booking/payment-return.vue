@@ -32,14 +32,19 @@ onMounted(async () => {
     return;
   }
 
-  const stored = sessionStorage.getItem("pendingBookingGuest");
-  const guest = stored ? JSON.parse(stored) : {};
+  const stored = sessionStorage.getItem("pendingBooking");
+  const guest = stored ? JSON.parse(stored) : null;
+
+  if (!guest) {
+    router.replace("/");
+    return;
+  }
 
   const result = await paymentStore.sendReceipt({
-    email: guest.email ?? "",
-    name: guest.name ?? "",
-    userId: guest.userId ?? "",
-    roomId: guest.roomId ?? 0,
+    email: guest.guestDetails?.email ?? "",
+    name: `${guest.guestDetails?.firstName ?? ""} ${guest.guestDetails?.lastName ?? ""}`.trim(),
+    userId: String(guest.userId ?? ""),
+    roomId: Number(guest.roomId ?? 0),
     checkInDate: guest.checkInDate ?? "",
     checkOutDate: guest.checkOutDate ?? "",
     transactionId: q.vnp_TransactionNo ?? "",
@@ -47,9 +52,13 @@ onMounted(async () => {
     amount: Number(q.vnp_Amount ?? 0) / 100,
     paymentMethod: q.vnp_CardType ?? "VnPay",
     orderDescription: q.vnp_OrderInfo ?? "",
+    // ✅ Thêm 3 field còn thiếu
+    phoneNumber: guest.guestDetails?.phone ?? "",
+    hotelName: guest.hotelName ?? "",
+    hotelAddress: guest.hotelAddress ?? "",
   });
 
-  sessionStorage.removeItem("pendingBookingGuest");
+  sessionStorage.removeItem("pendingBooking");
 
   sessionStorage.setItem(
     "paymentResponse",
@@ -64,6 +73,13 @@ onMounted(async () => {
       amount: Number(q.vnp_Amount ?? 0) / 100,
       paymentMethod: q.vnp_CardType ?? "VnPay",
       token: q.vnp_SecureHash ?? "",
+      hotelName: guest.hotelName ?? "",
+      hotelAddress: guest.hotelAddress ?? "",
+      checkInDate: guest.checkInDate ?? "",
+      checkOutDate: guest.checkOutDate ?? "",
+      guestName:
+        `${guest.guestDetails?.firstName ?? ""} ${guest.guestDetails?.lastName ?? ""}`.trim(),
+      phoneNumber: guest.guestDetails?.phone ?? "",
     }),
   );
 
