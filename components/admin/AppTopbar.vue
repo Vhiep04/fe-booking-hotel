@@ -27,16 +27,6 @@
     </div>
 
     <div class="layout-topbar-right">
-      <!-- Search Button -->
-      <button
-        type="button"
-        class="layout-topbar-button"
-        @click="toggleSearch"
-        aria-label="Search"
-      >
-        <i class="pi pi-search"></i>
-      </button>
-
       <!-- Dark Mode Toggle -->
       <button
         type="button"
@@ -49,21 +39,76 @@
         <i :class="isDarkMode ? 'pi pi-sun' : 'pi pi-moon'"></i>
       </button>
 
-      <!-- Notifications -->
-      <button
-        type="button"
-        class="layout-topbar-button relative"
-        @click="toggleNotifications"
-        aria-label="Notifications"
-      >
-        <i class="pi pi-bell"></i>
-        <span
-          v-if="notificationCount > 0"
-          class="absolute -top-1 -right-1 w-5 h-5 bg-red-500 text-white text-xs rounded-full flex items-center justify-center"
+      <div class="relative" ref="notificationsWrapper">
+        <button
+          type="button"
+          class="layout-topbar-button relative"
+          @click="toggleNotifications"
+          aria-label="Notifications"
         >
-          {{ notificationCount > 9 ? "9+" : notificationCount }}
-        </span>
-      </button>
+          <i class="pi pi-bell"></i>
+          <span
+            v-if="notificationCount > 0"
+            class="absolute -top-1 -right-1 w-5 h-5 bg-red-500 text-white text-xs rounded-full flex items-center justify-center"
+          >
+            {{ notificationCount > 9 ? "9+" : notificationCount }}
+          </span>
+        </button>
+
+        <div
+          v-if="showNotifications"
+          class="absolute right-0 top-full mt-2 w-100 bg-white dark:bg-gray-800 rounded-xl shadow-xl border border-gray-200 dark:border-gray-700 z-50"
+        >
+          <div
+            class="p-3 flex items-center justify-between border-b border-gray-100 dark:border-gray-700"
+          >
+            <h4 class="font-semibold m-0">Notifications</h4>
+            <Button
+              label="Mark all read"
+              link
+              size="small"
+              @click="markAllRead"
+            />
+          </div>
+          <div class="flex flex-col gap-2 max-h-120 overflow-y-auto p-2">
+            <div
+              v-for="notification in notifications"
+              :key="notification.id"
+              @click="onClickNotification(notification.id)"
+              class="p-3 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer"
+              :class="{
+                'bg-blue-50 dark:bg-blue-900/20': !notification.isRead,
+              }"
+            >
+              <div class="flex items-start gap-3">
+                <div class="flex-1">
+                  <p class="font-medium text-sm m-0">
+                    {{ notification.title }}
+                  </p>
+                  <p class="text-xs text-gray-500 m-0 mt-1">
+                    {{ notification.message }}
+                  </p>
+                  <p class="text-xs text-gray-400 m-0 mt-1">
+                    {{
+                      new Date(notification.createdAt).toLocaleString("vi-VN")
+                    }}
+                  </p>
+                </div>
+                <span
+                  v-if="!notification.isRead"
+                  class="w-2 h-2 rounded-full bg-blue-500 mt-1 shrink-0"
+                />
+              </div>
+            </div>
+            <div
+              v-if="notifications.length === 0"
+              class="text-center py-4 text-gray-500"
+            >
+              No notifications
+            </div>
+          </div>
+        </div>
+      </div>
 
       <UserProfile
         :full-name="userData.fullName"
@@ -74,7 +119,6 @@
       />
     </div>
 
-    <!-- Search Dialog -->
     <Dialog
       v-model:visible="searchVisible"
       modal
@@ -96,58 +140,12 @@
         <Button label="Search" @click="performSearch" />
       </div>
     </Dialog>
-
-    <OverlayPanel ref="notificationsPanel" class="w-80">
-      <div class="p-2">
-        <div class="flex items-center justify-between mb-3">
-          <h4 class="font-semibold m-0">Notifications</h4>
-          <Button
-            label="Mark all read"
-            link
-            size="small"
-            @click="markAllRead"
-          />
-        </div>
-        <div class="flex flex-col gap-2">
-          <div
-            v-for="notification in notifications"
-            :key="notification.id"
-            @click="onClickNotification(notification.id)"
-            class="p-3 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer"
-            :class="{ 'bg-blue-50 dark:bg-blue-900/20': !notification.isRead }"
-          >
-            <div class="flex items-start gap-3">
-              <div class="flex-1">
-                <p class="font-medium text-sm m-0">{{ notification.title }}</p>
-                <p class="text-xs text-gray-500 m-0 mt-1">
-                  {{ notification.message }}
-                </p>
-                <p class="text-xs text-gray-400 m-0 mt-1">
-                  {{ new Date(notification.createdAt).toLocaleString("vi-VN") }}
-                </p>
-              </div>
-              <!-- Chấm xanh nếu chưa đọc -->
-              <span
-                v-if="!notification.isRead"
-                class="w-2 h-2 rounded-full bg-blue-500 mt-1 shrink-0"
-              />
-            </div>
-          </div>
-          <div
-            v-if="notifications.length === 0"
-            class="text-center py-4 text-gray-500"
-          >
-            No notifications
-          </div>
-        </div>
-      </div>
-    </OverlayPanel>
   </div>
 </template>
 
 <script setup lang="ts">
+import { onClickOutside } from "@vueuse/core";
 import Dialog from "primevue/dialog";
-import OverlayPanel from "primevue/overlaypanel";
 import InputText from "primevue/inputtext";
 import IconField from "primevue/iconfield";
 import InputIcon from "primevue/inputicon";
@@ -165,10 +163,10 @@ const userStore = useAuthStore();
 const route = useRoute();
 const router = useRouter();
 
-const profileMenu = ref();
-const notificationsPanel = ref();
 const searchVisible = ref(false);
 const searchQuery = ref("");
+const showNotifications = ref(false);
+const notificationsWrapper = ref<HTMLElement | null>(null);
 
 const isDarkMode = computed(() => layoutStore.isDarkMode);
 
@@ -213,6 +211,11 @@ const { init: initHub, stop: stopHub } = useNotificationHub();
 const notifications = computed(() => notificationStore.notifications);
 const notificationCount = computed(() => notificationStore.unreadCount);
 
+// Click outside để đóng dropdown
+onClickOutside(notificationsWrapper, () => {
+  showNotifications.value = false;
+});
+
 async function markAllRead() {
   await notificationStore.markAllRead();
 }
@@ -220,7 +223,7 @@ async function markAllRead() {
 async function onClickNotification(id: number) {
   await notificationStore.markOneRead(id);
 }
-// Methods
+
 function onMenuToggle() {
   layoutStore.onMenuToggle();
 }
@@ -235,14 +238,13 @@ function toggleSearch() {
 
 function performSearch() {
   if (searchQuery.value.trim()) {
-    // TODO: Implement global search
     console.log("Searching for:", searchQuery.value);
     searchVisible.value = false;
   }
 }
 
-function toggleNotifications(event: Event) {
-  notificationsPanel.value.toggle(event);
+function toggleNotifications() {
+  showNotifications.value = !showNotifications.value;
 }
 
 function handleSignOut() {

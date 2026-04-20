@@ -1,5 +1,9 @@
 <template>
-  <li class="layout-menu-item" :class="{ 'active-menuitem': isActiveMenu }">
+  <li
+    v-if="item.visible !== false"
+    class="layout-menu-item"
+    :class="{ 'active-menuitem': isActiveMenu }"
+  >
     <NuxtLink
       v-if="item.to && !item.items"
       :to="item.to"

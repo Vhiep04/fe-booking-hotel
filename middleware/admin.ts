@@ -1,4 +1,3 @@
-// middleware/admin.ts
 export default defineNuxtRouteMiddleware(() => {
   const authStore = useAuthStore();
 
@@ -10,7 +9,7 @@ export default defineNuxtRouteMiddleware(() => {
     return navigateTo("/login");
   }
 
-  if (!authStore.isAuthenticated || !authStore.isAdmin) {
+  if (!authStore.isAdminOrManager) {
     return navigateTo("/");
   }
 });

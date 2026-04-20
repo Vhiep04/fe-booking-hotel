@@ -28,53 +28,65 @@
       <!-- Right side -->
       <div class="flex items-center gap-3 shrink-0">
         <!-- Language -->
-        <button
-          @click="toggleLangPanel"
-          class="hover:opacity-80 transition-opacity"
-        >
-          <img
-            :src="currentFlag"
-            alt="Language"
-            class="w-9 h-6 rounded-sm object-contain"
-          />
-        </button>
+        <div class="relative overflow-visible" ref="langWrapper">
+          <button
+            @click="toggleLangPanel"
+            class="hover:opacity-80 transition-opacity"
+          >
+            <img
+              :src="currentFlag"
+              alt="Language"
+              class="w-9 h-6 rounded-sm object-contain"
+            />
+          </button>
 
-        <OverlayPanel ref="langPanel">
-          <ul class="min-w-40">
-            <li
-              v-for="lang in languages"
-              :key="lang.code"
-              @click="changeLanguage(lang.code)"
-              class="flex items-center gap-3 px-4 py-2 cursor-pointer hover:bg-gray-100"
-            >
-              <img :src="lang.flag" class="w-7 h-6 rounded-sm object-fit" />
-              <span class="text-sm">{{ lang.label }}</span>
-              <i
-                v-if="locale === lang.code"
-                class="pi pi-check text-blue-600 ml-auto"
-              ></i>
-            </li>
-          </ul>
-        </OverlayPanel>
+          <!-- Language Dropdown -->
+          <div
+            v-if="showLangPanel"
+            class="absolute right-0 top-full mt-2 bg-white rounded-xl shadow-xl border border-gray-200 z-50"
+          >
+            <ul class="min-w-45 py-1">
+              <li
+                v-for="lang in languages"
+                :key="lang.code"
+                @click="changeLanguage(lang.code)"
+                class="flex items-center rounded-xl gap-3 px-4 py-2 h-14 cursor-pointer hover:bg-gray-100"
+              >
+                <img :src="lang.flag" class="w-7 h-6 rounded-sm object-fit" />
+                <span class="text-sm">{{ lang.label }}</span>
+                <i
+                  v-if="locale === lang.code"
+                  class="pi pi-check text-blue-600 ml-auto"
+                ></i>
+              </li>
+            </ul>
+          </div>
+        </div>
 
         <template v-if="authStore.isAuthenticated">
           <!-- Notifications -->
-          <button
-            class="w-12 h-12 flex items-center justify-center rounded-full text-gray-500 hover:bg-gray-100 hover:text-blue-600 transition-colors relative"
-            @click="toggleNotifications"
-          >
-            <i class="pi pi-bell" style="font-size: 1.1rem"></i>
-            <span
-              v-if="notificationCount > 0"
-              class="absolute top-0.5 right-0.5 w-4 h-4 bg-red-500 text-white text-[10px] rounded-full flex items-center justify-center font-medium"
+          <div class="relative overflow-visible" ref="notificationsWrapper">
+            <button
+              class="w-12 h-12 flex items-center justify-center rounded-full text-gray-500 hover:bg-gray-100 hover:text-blue-600 transition-colors relative"
+              @click="toggleNotifications"
             >
-              {{ notificationCount > 9 ? "9+" : notificationCount }}
-            </span>
-          </button>
+              <i class="pi pi-bell" style="font-size: 1.1rem"></i>
+              <span
+                v-if="notificationCount > 0"
+                class="absolute top-0.5 right-0.5 w-4 h-4 bg-red-500 text-white text-[10px] rounded-full flex items-center justify-center font-medium"
+              >
+                {{ notificationCount > 9 ? "9+" : notificationCount }}
+              </span>
+            </button>
 
-          <OverlayPanel ref="notificationsPanel" class="w-100">
-            <div class="p-2">
-              <div class="flex items-center justify-between mb-3">
+            <!-- Notifications Dropdown -->
+            <div
+              v-if="showNotifications"
+              class="absolute right-0 top-full mt-2 bg-white rounded-xl shadow-xl border border-gray-200 z-50"
+            >
+              <div
+                class="p-3 flex items-center justify-between border-b border-gray-100"
+              >
                 <h4 class="font-semibold m-0 text-sm">
                   {{ t("Notifications") }}
                 </h4>
@@ -91,7 +103,7 @@
                 <i class="pi pi-spin pi-spinner text-gray-400"></i>
               </div>
 
-              <div v-else class="flex flex-col gap-1 max-h-80 overflow-y-auto">
+              <div v-else class="overflow-y-auto max-h-120 w-100 p-2">
                 <div
                   v-for="n in notifications"
                   :key="n.id"
@@ -133,7 +145,7 @@
                 </div>
               </div>
             </div>
-          </OverlayPanel>
+          </div>
 
           <UserProfile
             :full-name="userData.fullName"
@@ -171,12 +183,12 @@
 
 <script setup lang="ts">
 import { ref, computed, onMounted, onUnmounted } from "vue";
+import { onClickOutside } from "@vueuse/core";
 import { useRouter } from "vue-router";
 import UserProfile from "../UserProfile.vue";
 import { useAuthStore } from "@/stores/auth";
 import { useNotificationStore } from "@/stores/notification";
 import { Button } from "primevue";
-import OverlayPanel from "primevue/overlaypanel";
 import { useI18n } from "vue-i18n";
 import enFlag from "@/assets/images/england-flag.svg";
 import viFlag from "@/assets/images/vietnam-flag.svg";
@@ -188,7 +200,6 @@ const router = useRouter();
 const authStore = useAuthStore();
 const notificationStore = useNotificationStore();
 
-const langPanel = ref();
 const navItems = [
   { name: "Home", path: "/" },
   { name: "My reservation", path: "/reservation" },
@@ -201,21 +212,37 @@ const languages: { code: LocaleCode; label: string; flag: string }[] = [
 ];
 const currentFlag = computed(() => (locale.value === "vi" ? viFlag : enFlag));
 
-const toggleLangPanel = (event: Event) => langPanel.value.toggle(event);
+// Language panel
+const showLangPanel = ref(false);
+const langWrapper = ref<HTMLElement | null>(null);
+
+const toggleLangPanel = () => {
+  showLangPanel.value = !showLangPanel.value;
+};
 const changeLanguage = async (code: LocaleCode) => {
   if (locale.value !== code) await setLocale(code);
-  langPanel.value.hide();
+  showLangPanel.value = false;
 };
 
-const notificationsPanel = ref();
+onClickOutside(langWrapper, () => {
+  showLangPanel.value = false;
+});
+
+// Notifications
+const showNotifications = ref(false);
+const notificationsWrapper = ref<HTMLElement | null>(null);
 const { init: initHub, stop: stopHub } = useNotificationHub();
 
 const notifications = computed(() => notificationStore.notifications);
 const notificationCount = computed(() => notificationStore.unreadCount);
 
-const toggleNotifications = (event: Event) => {
-  notificationsPanel.value.toggle(event);
+const toggleNotifications = () => {
+  showNotifications.value = !showNotifications.value;
 };
+
+onClickOutside(notificationsWrapper, () => {
+  showNotifications.value = false;
+});
 
 const handleMarkAllRead = async () => {
   await notificationStore.markAllRead();

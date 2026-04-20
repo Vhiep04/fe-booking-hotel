@@ -30,7 +30,9 @@
 import AppMenu from "./AppMenu.vue";
 import type { MenuItem, MenuEntry } from "./AppMenu.vue";
 import { useDashboardStore } from "~/stores/admin/dashboard";
+import { useAuthStore } from "~/stores/auth";
 
+const authStore = useAuthStore();
 const dashboardStore = useDashboardStore();
 
 const data = computed(() => dashboardStore.dashboardData);
@@ -90,6 +92,7 @@ const menuItems = computed<MenuEntry[]>(() => [
     label: "Users",
     icon: "pi pi-users",
     to: "/admin/users",
+    visible: authStore.isAdmin,
     ...badge(data.value?.totalUsers, "bg-blue-500"),
   },
   {
