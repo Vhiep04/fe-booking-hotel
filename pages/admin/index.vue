@@ -1,10 +1,23 @@
 <template>
   <div>
-    <div class="admin-page-header">
-      <h1 class="admin-page-title">Dashboard</h1>
-      <p class="admin-page-subtitle">
-        Welcome back! Here's what's happening with your bookings.
-      </p>
+    <div
+      class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6"
+    >
+      <div>
+        <h1 class="admin-page-title">Dashboard</h1>
+        <p class="admin-page-subtitle">
+          Welcome back! Here's what's happening with your bookings.
+        </p>
+      </div>
+      <Button
+        label="Export"
+        icon="pi pi-download"
+        severity="secondary"
+        outlined
+        :loading="dashboardStore.isExporting"
+        :disabled="dashboardStore.isExporting"
+        @click="exportData"
+      />
     </div>
 
     <div
@@ -29,7 +42,7 @@
           title="Total Revenue"
           :value="data.totalRevenue"
           :change="12.5"
-          icon="pi pi-dollar"
+          icon="pi pi-wallet"
           color="blue"
           format="currency"
           period="month"
@@ -297,6 +310,10 @@ function getActivityStyle(type: string | undefined): {
     },
   };
   return styles[type ?? ""] ?? styles["booking"]!;
+}
+
+async function exportData() {
+  await dashboardStore.exportDashboard();
 }
 
 onMounted(() => {

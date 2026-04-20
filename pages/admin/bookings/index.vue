@@ -7,13 +7,6 @@
         <h1 class="admin-page-title">Bookings Management</h1>
         <p class="admin-page-subtitle">View and manage all bookings</p>
       </div>
-      <Button
-        label="Export"
-        icon="pi pi-download"
-        severity="secondary"
-        outlined
-        @click="exportData"
-      />
     </div>
 
     <BookingStatCard
@@ -40,6 +33,8 @@
       :booking="selectedBooking"
       @print="printInvoice"
     />
+
+    <Toast />
   </div>
 </template>
 
@@ -53,6 +48,7 @@ import BookingDetailDialog from "./BookingDetailDialog.vue";
 import BookingTable from "./BookingTable.vue";
 import BookingFilter from "./BookingFilter.vue";
 import BookingStatCard from "./BookingStatCard.vue";
+import { Toast } from "primevue";
 
 definePageMeta({
   layout: "admin",
@@ -178,15 +174,6 @@ function printInvoice(booking: Reservation | null) {
     severity: "info",
     summary: "Printing",
     detail: `Invoice for booking #${booking.reservationId}`,
-    life: 3000,
-  });
-}
-
-function exportData() {
-  toast.add({
-    severity: "info",
-    summary: "Export",
-    detail: "Exporting bookings data...",
     life: 3000,
   });
 }
