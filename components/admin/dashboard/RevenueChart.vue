@@ -47,6 +47,34 @@ const periodOptions = [
 
 const filledChartData = computed(() => {
   const now = new Date();
+  const period = selectedPeriod.value;
+
+  if (period === "7days") {
+    return Array.from({ length: 7 }, (_, i) => {
+      const d = new Date(now);
+      d.setDate(now.getDate() - 6 + i);
+      const dayName = d.toLocaleString("en-US", {
+        month: "short",
+        day: "numeric",
+      });
+
+      return { monthName: dayName, revenue: 0, reservationCount: 0 };
+    });
+  }
+
+  if (period === "30days") {
+    return Array.from({ length: 30 }, (_, i) => {
+      const d = new Date(now);
+      d.setDate(now.getDate() - 29 + i);
+      const dayName = d.toLocaleString("en-US", {
+        month: "short",
+        day: "numeric",
+      });
+      return { monthName: dayName, revenue: 0, reservationCount: 0 };
+    });
+  }
+
+  // Default: 12months
   return Array.from({ length: 12 }, (_, i) => {
     const d = new Date(now.getFullYear(), now.getMonth() - 11 + i, 1);
     const year = d.getFullYear();

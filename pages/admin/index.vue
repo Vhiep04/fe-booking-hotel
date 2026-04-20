@@ -193,7 +193,15 @@
         </div>
       </div>
 
-      <RecentBookings :bookings="data.recentBookings" />
+      <RecentBookings
+        :bookings="data.recentBookings"
+        @view="openDashboardBookingDialog"
+      />
+
+      <DashboardBookingDetailDialog
+        v-model="dashboardBookingDialog"
+        :booking="dashboardSelectedBooking"
+      />
     </template>
   </div>
 </template>
@@ -207,6 +215,8 @@ import RevenueChart from "~/components/admin/dashboard/RevenueChart.vue";
 import BookingChart from "~/components/admin/dashboard/BookingChart.vue";
 import RecentBookings from "~/components/admin/dashboard/RecentBookings.vue";
 import { useDashboardStore } from "~/stores/admin/dashboard";
+import DashboardBookingDetailDialog from "~/components/admin/dashboard/DashboardBookingDetailDialog.vue";
+import type { RecentBooking } from "~/stores/admin/interfaces/dashboard";
 
 definePageMeta({
   layout: "admin",
@@ -224,10 +234,13 @@ const data = computed(
       typeof dashboardStore.dashboardData
     >,
 );
+const dashboardBookingDialog = ref(false);
+const dashboardSelectedBooking = ref<RecentBooking | null>(null);
 
-onMounted(() => {
-  dashboardStore.fetchDashboard();
-});
+function openDashboardBookingDialog(booking: RecentBooking) {
+  dashboardSelectedBooking.value = booking;
+  dashboardBookingDialog.value = true;
+}
 
 function formatCurrency(value: number): string {
   if (value === 0) return "$0";
@@ -285,4 +298,8 @@ function getActivityStyle(type: string | undefined): {
   };
   return styles[type ?? ""] ?? styles["booking"]!;
 }
+
+onMounted(() => {
+  dashboardStore.fetchDashboard();
+});
 </script>

@@ -43,7 +43,8 @@
       <Column field="name" header="Hotel" sortable style="min-width: 280px">
         <template #body="{ data }">
           <div class="flex items-center gap-3">
-            <img
+            <Image
+              preview
               :src="getPrimaryImage(data)"
               :alt="data.name"
               class="w-14 h-14 rounded-lg object-cover bg-(--admin-surface-hover)"
@@ -151,6 +152,7 @@ import DataTable from "primevue/datatable";
 import Column from "primevue/column";
 import Button from "primevue/button";
 import type { Hotel } from "~/stores/admin/interfaces/hotels";
+import { Image } from "primevue";
 
 const FALLBACK_IMAGE =
   "https://images.unsplash.com/photo-1566073771259-6a8506099945?w=200&h=200&fit=crop";

@@ -7,7 +7,7 @@
     <template #content>
       <div class="flex gap-6 p-0">
         <!-- Left - Image Section -->
-        <div class="relative w-64 flex-shrink-0">
+        <div class="relative w-64 shrink-0">
           <img
             :alt="hotel.name"
             :src="

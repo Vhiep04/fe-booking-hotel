@@ -4,7 +4,7 @@
       <h3 class="admin-card-title">Recent Bookings</h3>
       <NuxtLink
         to="/admin/bookings"
-        class="text-sm text-[var(--admin-primary)] hover:underline"
+        class="text-sm text-(--admin-primary) hover:underline"
       >
         View All
       </NuxtLink>
@@ -19,12 +19,8 @@
         <!-- Empty state -->
         <template #empty>
           <div class="flex flex-col items-center justify-center py-10 gap-2">
-            <i
-              class="pi pi-calendar text-3xl text-[var(--admin-text-muted)]"
-            ></i>
-            <p class="text-[var(--admin-text-muted)] text-sm">
-              No recent bookings
-            </p>
+            <i class="pi pi-calendar text-3xl text-(--admin-text-muted)"></i>
+            <p class="text-(--admin-text-muted) text-sm">No recent bookings</p>
           </div>
         </template>
 
@@ -34,7 +30,7 @@
           style="min-width: 120px"
         >
           <template #body="{ data }">
-            <span class="font-medium text-[var(--admin-primary)]">
+            <span class="font-medium text-(--admin-primary)">
               #{{ data.bookingCode }}
             </span>
           </template>
@@ -43,23 +39,24 @@
         <Column field="hotelName" header="Hotel" style="min-width: 200px">
           <template #body="{ data }">
             <div class="flex items-center gap-3">
-              <img
+              <Image
+                preview
                 v-if="data.hotelImage"
                 :src="data.hotelImage"
                 :alt="data.hotelName"
-                class="w-10 h-10 rounded-lg object-cover"
+                class="w-10 h-10 rounded-lg! object-cover"
               />
               <div
                 v-else
-                class="w-10 h-10 rounded-lg bg-[var(--admin-surface-hover)] flex items-center justify-center"
+                class="w-10 h-10 rounded-lg bg-(--admin-surface-hover) flex items-center justify-center"
               >
-                <i class="pi pi-building text-[var(--admin-text-muted)]"></i>
+                <i class="pi pi-building text-(--admin-text-muted)"></i>
               </div>
               <div>
-                <p class="font-medium text-[var(--admin-text-color)]">
+                <p class="font-medium text-(--admin-text-color)">
                   {{ data.hotelName }}
                 </p>
-                <p class="text-xs text-[var(--admin-text-muted)]">
+                <p class="text-xs text-(--admin-text-muted)">
                   {{ data.cityName }}
                 </p>
               </div>
@@ -118,7 +115,7 @@
 
         <Column header="Actions" style="min-width: 100px">
           <template #body="{ data }">
-            <div class="flex items-center gap-2">
+            <div class="flex justify-center">
               <Button
                 icon="pi pi-eye"
                 severity="secondary"
@@ -127,16 +124,7 @@
                 size="small"
                 @click="viewBooking(data)"
               />
-              <Button
-                icon="pi pi-ellipsis-v"
-                severity="secondary"
-                text
-                rounded
-                size="small"
-                @click="toggleMenu($event, data)"
-              />
             </div>
-            <Menu ref="menu" :model="menuItems" popup />
           </template>
         </Column>
       </DataTable>
@@ -152,10 +140,20 @@ import Avatar from "primevue/avatar";
 import Button from "primevue/button";
 import Menu from "primevue/menu";
 import type { RecentBooking } from "~/stores/admin/interfaces/dashboard";
+import { Image } from "primevue";
 
 defineProps<{
   bookings: RecentBooking[];
 }>();
+
+const emit = defineEmits<{
+  (e: "view", booking: RecentBooking): void;
+}>();
+
+// Sửa viewBooking:
+function viewBooking(booking: RecentBooking) {
+  emit("view", booking);
+}
 
 const menu = ref();
 const selectedBooking = ref<RecentBooking | null>(null);
@@ -199,10 +197,6 @@ function getStatusSeverity(status: string) {
     cancelled: "danger",
   };
   return map[status] ?? "secondary";
-}
-
-function viewBooking(booking: RecentBooking) {
-  navigateTo(`/admin/bookings/${booking.reservationId}`);
 }
 
 function editBooking(booking: RecentBooking) {
