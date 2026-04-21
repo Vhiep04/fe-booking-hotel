@@ -155,6 +155,36 @@
             </div>
           </div>
         </div>
+        <div class="md:col-span-2 flex flex-col gap-1">
+          <label class="text-sm font-medium">Room Type Image</label>
+          <div
+            v-if="roomTypePreview"
+            class="relative w-full h-40 rounded-lg overflow-hidden border"
+          >
+            <img :src="roomTypePreview" class="w-full h-full object-cover" />
+            <button
+              class="absolute top-2 right-2 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center"
+              @click="removeRoomTypeImage"
+            >
+              <i class="pi pi-times text-xs" />
+            </button>
+          </div>
+          <div
+            v-else
+            class="w-full h-40 border-2 border-dashed rounded-lg flex flex-col items-center justify-center cursor-pointer hover:border-primary transition-colors"
+            @click="triggerRoomTypeFileInput"
+          >
+            <i class="pi pi-image text-2xl text-gray-400 mb-2" />
+            <span class="text-sm text-gray-400">Click to upload image</span>
+          </div>
+          <input
+            ref="roomTypeFileInput"
+            type="file"
+            accept="image/*"
+            class="hidden"
+            @change="onRoomTypeFileChange"
+          />
+        </div>
       </div>
     </div>
 
@@ -178,6 +208,7 @@
 </template>
 
 <script setup lang="ts">
+import { ref, computed, watch } from "vue";
 import Dialog from "primevue/dialog";
 import InputText from "primevue/inputtext";
 import InputNumber from "primevue/inputnumber";
@@ -185,21 +216,22 @@ import Textarea from "primevue/textarea";
 import MultiSelect from "primevue/multiselect";
 import Divider from "primevue/divider";
 import Button from "primevue/button";
+import { useUploadStore } from "~/stores/admin/uploadImage";
 import type { RoomDto, RoomPayload } from "~/stores/admin/interfaces/rooms";
 import type {
   RoomTypeDto,
   RoomTypePayload,
 } from "~/stores/admin/interfaces/room-type";
+import { storeToRefs } from "pinia";
 
 export interface CombinedFormData {
-  // RoomType fields
   typeName: string;
   description: string;
   pricePerNight: number;
   capacity: number;
   roomCount: number;
   facilityIds: number[];
-  // Room fields
+  imgUrl: string;
   roomNumber: string;
   status: string;
 }
@@ -215,11 +247,8 @@ const props = defineProps<{
   modelValue: boolean;
   hotelId: number;
   saving: boolean;
-  /** Pass when editing an existing room (+ its room type) */
   editingRoom?: RoomDto | null;
   editingRoomType?: RoomTypeDto | null;
-  /** For MultiSelect */
-  facilities?: { facilityId: number; name: string }[];
 }>();
 
 const emit = defineEmits<{
@@ -228,7 +257,17 @@ const emit = defineEmits<{
   (e: "save", payload: CombinedSavePayload): void;
 }>();
 
+const uploadStore = useUploadStore();
 const submitted = ref(false);
+const uploadingImage = ref(false);
+
+const facilityStore = useFacilityStore();
+const { facilities } = storeToRefs(facilityStore);
+
+const roomTypeFileInput = ref<HTMLInputElement | null>(null);
+const roomTypePreview = ref<string | null>(null);
+const roomTypeFile = ref<File | null>(null);
+const oldImgUrl = ref<string | null>(null);
 
 const statusOptions = [
   { value: "Available", label: "Available", dotClass: "bg-green-500" },
@@ -244,6 +283,7 @@ const defaultForm = (): CombinedFormData => ({
   capacity: 1,
   roomCount: 1,
   facilityIds: [],
+  imgUrl: "",
   roomNumber: "",
   status: "Available",
 });
@@ -259,11 +299,12 @@ const isEditing = computed(
   () => !!props.editingRoom || !!props.editingRoomType,
 );
 
-// Populate form when editing
 watch(
   () => props.modelValue,
   (open) => {
     if (open) {
+      facilityStore.getFacilities();
+      roomTypeFile.value = null;
       if (props.editingRoomType || props.editingRoom) {
         const rt = props.editingRoomType;
         const r = props.editingRoom;
@@ -274,11 +315,16 @@ watch(
           capacity: rt?.capacity ?? 1,
           roomCount: rt?.roomCount ?? 1,
           facilityIds: rt?.facilities?.map((f) => f.facilityId) ?? [],
+          imgUrl: rt?.imgUrl ?? "",
           roomNumber: r?.roomNumber ?? "",
           status: r?.status ?? "Available",
         };
+        oldImgUrl.value = rt?.imgUrl ?? null;
+        roomTypePreview.value = rt?.imgUrl ?? null;
       } else {
         form.value = defaultForm();
+        oldImgUrl.value = null;
+        roomTypePreview.value = null;
       }
       submitted.value = false;
     }
@@ -286,7 +332,28 @@ watch(
   { immediate: true },
 );
 
-function handleSave() {
+function triggerRoomTypeFileInput() {
+  roomTypeFileInput.value?.click();
+}
+
+async function onRoomTypeFileChange(e: Event) {
+  const file = (e.target as HTMLInputElement).files?.[0];
+  if (!file) return;
+  roomTypeFile.value = file;
+  const reader = new FileReader();
+  reader.onload = (ev) => {
+    roomTypePreview.value = ev.target?.result as string;
+  };
+  reader.readAsDataURL(file);
+}
+
+function removeRoomTypeImage() {
+  roomTypeFile.value = null;
+  roomTypePreview.value = null;
+  form.value.imgUrl = "";
+}
+
+async function handleSave() {
   submitted.value = true;
   if (
     !form.value.typeName ||
@@ -296,19 +363,47 @@ function handleSave() {
   )
     return;
 
+  // Upload ảnh mới nếu có, đồng thời xóa ảnh cũ trên Cloudinary
+  let finalImgUrl = form.value.imgUrl;
+
+  if (roomTypeFile.value) {
+    uploadingImage.value = true;
+    try {
+      // Xóa ảnh cũ nếu đang edit và có ảnh cũ
+      if (isEditing.value && oldImgUrl.value) {
+        // Extract publicId từ Cloudinary URL
+        // URL dạng: https://res.cloudinary.com/.../upload/v123/folder/publicId.ext
+        const publicId = extractCloudinaryPublicId(oldImgUrl.value);
+        if (publicId) {
+          await uploadStore.deleteImage(publicId);
+        }
+      }
+
+      const up = await uploadStore.uploadImage(
+        roomTypeFile.value,
+        "room-types",
+      );
+      if (up?.success && up.data) {
+        finalImgUrl = up.data.url;
+      }
+    } finally {
+      uploadingImage.value = false;
+    }
+  }
+
   const roomTypePayload: RoomTypePayload = {
     hotelId: props.hotelId,
     typeName: form.value.typeName,
     description: form.value.description,
     pricePerNight: form.value.pricePerNight,
     capacity: form.value.capacity,
-    roomCount: form.value.roomCount,
+    imgUrl: finalImgUrl,
     facilityIds: form.value.facilityIds,
   };
 
   const roomPayload: RoomPayload = {
     hotelId: props.hotelId,
-    roomTypeId: props.editingRoomType?.roomTypeId ?? 0, // will be replaced by parent after roomType is saved
+    roomTypeId: props.editingRoomType?.roomTypeId ?? 0, // parent sẽ replace sau khi tạo roomType
     roomNumber: form.value.roomNumber,
     status: form.value.status,
   };
@@ -319,5 +414,17 @@ function handleSave() {
     roomTypeId: props.editingRoomType?.roomTypeId,
     roomId: props.editingRoom?.roomId,
   });
+}
+
+// Helper: lấy publicId từ Cloudinary URL
+function extractCloudinaryPublicId(url: string): string | null {
+  try {
+    // https://res.cloudinary.com/cloud/image/upload/v1234/folder/name.jpg
+    // → "folder/name"
+    const match = url.match(/\/upload\/(?:v\d+\/)?(.+)\.[a-z]+$/i);
+    return match?.[1] ?? null;
+  } catch {
+    return null;
+  }
 }
 </script>

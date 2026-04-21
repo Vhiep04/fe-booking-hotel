@@ -12,13 +12,6 @@
         </div>
         <div class="flex gap-2">
           <Button
-            label="Bulk Add"
-            icon="pi pi-copy"
-            severity="secondary"
-            outlined
-            @click="$emit('openBulkRoomDialog')"
-          />
-          <Button
             label="Add Room"
             icon="pi pi-plus"
             @click="$emit('openCombinedDialog')"

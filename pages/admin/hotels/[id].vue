@@ -57,7 +57,6 @@
           <HotelRoomsTab
             :rooms="rooms"
             :loading-rooms="loadingRooms"
-            @open-bulk-room-dialog="openBulkRoomDialog"
             @open-combined-dialog="openCombinedDialog()"
             @edit-room="(room) => openCombinedDialog(room)"
             @delete-room="confirmDeleteRoom"
@@ -72,18 +71,8 @@
       :saving="savingRoom || savingRoomType"
       :editing-room="editingRoom"
       :editing-room-type="editingRoomType"
-      :facilities="allFacilities"
       @save="handleCombinedSave"
       @hide="combinedDialogVisible = false"
-    />
-
-    <BulkRoomDialog
-      v-model="bulkRoomDialogVisible"
-      :hotel-id="hotelId"
-      :room-types="roomTypes"
-      :saving="savingRoom"
-      @save="handleBulkCreateRooms"
-      @hide="bulkRoomDialogVisible = false"
     />
 
     <ConfirmDialog />
@@ -161,30 +150,24 @@ const form = ref<HotelPayload>({
   longitude: 0,
 });
 
-// Images
 const primaryPreview = ref<string | null>(null);
 const primaryFile = ref<File | null>(null);
 const galleryPreviews = ref<string[]>([]);
 const galleryFiles = ref<File[]>([]);
 
-// Data
 const cities = ref<{ cityId: number; name: string }[]>([]);
 const rooms = ref<RoomDto[]>([]);
 const roomTypes = ref<RoomTypeDto[]>([]);
-const allFacilities = ref<{ facilityId: number; name: string }[]>([]);
 
-// Dialogs
 const combinedDialogVisible = ref(false);
 const editingRoom = ref<RoomDto | null>(null);
 const editingRoomType = ref<RoomTypeDto | null>(null);
-const bulkRoomDialogVisible = ref(false);
 
 onMounted(async () => {
   await Promise.all([fetchHotel(), fetchCities()]);
   await Promise.all([fetchRoomTypes(), fetchRooms()]);
 });
 
-// ── Fetch ──────────────────────────────────────────────────────
 async function fetchHotel() {
   loading.value = true;
   try {
@@ -264,7 +247,6 @@ async function fetchRoomTypes() {
   }
 }
 
-// ── Image helpers ──────────────────────────────────────────────
 function toPreview(file: File): Promise<string> {
   return new Promise((res) => {
     const r = new FileReader();
@@ -294,7 +276,36 @@ async function addGalleryFiles(files: File[]) {
   }
 }
 
-function removeGalleryItem(i: number) {
+function extractCloudinaryPublicId(url: string): string | null {
+  try {
+    // https://res.cloudinary.com/cloud/image/upload/v1234/folder/name.jpg
+    // → "folder/name"
+    const match = url.match(/\/upload\/(?:v\d+\/)?(.+)\.[a-z]+$/i);
+    return match?.[1] ?? null;
+  } catch {
+    return null;
+  }
+}
+
+// Thêm hàm này trong [id].vue
+async function removeGalleryItem(i: number) {
+  const urlToDelete = galleryPreviews.value[i];
+
+  // Nếu là URL từ server (không phải blob preview), gọi delete
+  if (urlToDelete && urlToDelete.startsWith("https://res.cloudinary.com")) {
+    const publicId = extractCloudinaryPublicId(urlToDelete);
+    if (publicId) await uploadStore.deleteImage(publicId);
+
+    // Xóa image record trên server
+    const hotel = await hotelStore.fetchHotelById(hotelId.value);
+    const imgRecord = hotel?.data?.images?.find(
+      (img: any) => img.imageUrl === urlToDelete,
+    );
+    if (imgRecord) {
+      await hotelStore.deleteHotelImage(hotelId.value, imgRecord.imageId);
+    }
+  }
+
   galleryFiles.value.splice(i, 1);
   galleryPreviews.value.splice(i, 1);
 }
@@ -303,7 +314,6 @@ function resetForm() {
   fetchHotel();
 }
 
-// ── Save hotel ─────────────────────────────────────────────────
 async function handleSave() {
   submitted.value = true;
   if (!form.value.name || !form.value.cityId || !form.value.location) {
@@ -328,6 +338,11 @@ async function handleSave() {
       return;
     }
     if (primaryFile.value) {
+      // Xóa ảnh cũ trên Cloudinary nếu có publicId
+      const oldPrimaryImg = h.images?.find((img: any) => img.isPrimary);
+      if (oldPrimaryImg?.publicId) {
+        await uploadStore.deleteImage(oldPrimaryImg.publicId); // ← thêm dòng này
+      }
       const up = await uploadStore.uploadImage(primaryFile.value, "hotels");
       if (up?.success && up.data) {
         await hotelStore.addHotelImage(hotelId.value, {
@@ -368,7 +383,6 @@ async function handleSave() {
   }
 }
 
-// ── Delete hotel ───────────────────────────────────────────────
 function confirmDelete() {
   confirm.require({
     message:
@@ -404,12 +418,33 @@ function confirmDelete() {
   });
 }
 
-// ── Combined Room Dialog ───────────────────────────────────────
-function openCombinedDialog(room?: RoomDto) {
-  editingRoom.value = room ?? null;
-  editingRoomType.value = room
-    ? (roomTypes.value.find((rt) => rt.roomTypeId === room.roomTypeId) ?? null)
-    : null;
+async function openCombinedDialog(room?: RoomDto) {
+  editingRoom.value = null;
+  editingRoomType.value = null;
+
+  if (room) {
+    loadingRooms.value = true;
+    try {
+      const [roomRes, roomTypeRes] = await Promise.all([
+        roomStore.getRoomById(room.roomId),
+        roomTypeStore.getRoomTypeById(room.roomTypeId),
+      ]);
+
+      if (roomRes?.success) editingRoom.value = roomRes.data;
+      if (roomTypeRes?.success) editingRoomType.value = roomTypeRes.data;
+    } catch {
+      toast.add({
+        severity: "error",
+        summary: "Error",
+        detail: "Failed to load room details",
+        life: 3000,
+      });
+      return;
+    } finally {
+      loadingRooms.value = false;
+    }
+  }
+
   combinedDialogVisible.value = true;
 }
 
@@ -474,44 +509,6 @@ async function handleCombinedSave(payload: CombinedSavePayload) {
     });
   } finally {
     savingRoomType.value = false;
-    savingRoom.value = false;
-  }
-}
-
-// ── Bulk Room ──────────────────────────────────────────────────
-function openBulkRoomDialog() {
-  bulkRoomDialogVisible.value = true;
-}
-
-async function handleBulkCreateRooms(payload: BulkCreateRoomPayload) {
-  savingRoom.value = true;
-  try {
-    const res = await roomStore.bulkCreateRooms(payload);
-    if (res?.success) {
-      toast.add({
-        severity: "success",
-        summary: "Success",
-        detail: `${res.data?.length ?? 0} rooms created`,
-        life: 3000,
-      });
-      bulkRoomDialogVisible.value = false;
-      await fetchRooms();
-    } else {
-      toast.add({
-        severity: "error",
-        summary: "Error",
-        detail: res?.message ?? "Failed to bulk create rooms",
-        life: 3000,
-      });
-    }
-  } catch {
-    toast.add({
-      severity: "error",
-      summary: "Error",
-      detail: "Unexpected error",
-      life: 3000,
-    });
-  } finally {
     savingRoom.value = false;
   }
 }

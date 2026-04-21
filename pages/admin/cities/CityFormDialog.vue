@@ -279,17 +279,14 @@ async function handleSave() {
   if (primaryFile.value) {
     uploading.value = true;
 
-    // Upload ảnh mới trước
     const res = await uploadStore.uploadImage(primaryFile.value, "cities");
     uploading.value = false;
 
     if (!res?.success || !res.data) return;
     imageUrl = res.data.url;
 
-    // Nếu đang edit và có ảnh cũ → delete ảnh cũ
     if (props.isEditing && existingImagePublicId.value) {
       await uploadStore.deleteImage(existingImagePublicId.value);
-      // Fire-and-forget, không cần block nếu delete lỗi
     }
   }
 

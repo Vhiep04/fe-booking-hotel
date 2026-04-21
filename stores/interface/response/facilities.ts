@@ -6,6 +6,6 @@ export interface FacilityData {
 export interface FacilityResponse {
   success: boolean;
   message: string;
-  data: FacilityData;
-  totalCount: number;
+  data: FacilityData[];
+  errors: string[] | null;
 }

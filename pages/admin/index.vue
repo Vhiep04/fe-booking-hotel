@@ -12,8 +12,6 @@
       <Button
         label="Export"
         icon="pi pi-download"
-        severity="secondary"
-        outlined
         :loading="dashboardStore.isExporting"
         :disabled="dashboardStore.isExporting"
         @click="exportData"
