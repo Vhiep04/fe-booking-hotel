@@ -163,20 +163,22 @@
     </div>
 
     <template #footer>
-      <Button
-        label="Cancel"
-        icon="pi pi-times"
-        severity="secondary"
-        outlined
-        :disabled="saving || uploading"
-        @click="emit('hide')"
-      />
-      <Button
-        :label="isEditing ? 'Update City' : 'Add City'"
-        :icon="isEditing ? 'pi pi-check' : 'pi pi-plus'"
-        :loading="saving || uploading"
-        @click="handleSave"
-      />
+      <div class="pt-4 gap-4 w-full flex justify-end items-center">
+        <Button
+          label="Cancel"
+          icon="pi pi-times"
+          severity="secondary"
+          outlined
+          :disabled="saving || uploading"
+          @click="emit('hide')"
+        />
+        <Button
+          :label="isEditing ? 'Update City' : 'Add City'"
+          :icon="isEditing ? 'pi pi-check' : 'pi pi-plus'"
+          :loading="saving || uploading"
+          @click="handleSave"
+        />
+      </div>
     </template>
   </Dialog>
 </template>

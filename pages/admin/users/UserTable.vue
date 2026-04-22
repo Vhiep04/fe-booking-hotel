@@ -17,7 +17,7 @@
     >
       <template #header>
         <div class="flex items-center justify-between">
-          <span class="text-[var(--admin-text-secondary)]">
+          <span class="text-(--admin-text-secondary)">
             {{ totalCount }} users found
           </span>
           <div class="flex items-center gap-2" v-if="selectedUsers.length > 0">
@@ -48,13 +48,13 @@
               :label="getInitial(data)"
               shape="circle"
               size="large"
-              class="bg-[var(--admin-primary)] text-white"
+              class="bg-(--admin-primary) text-white"
             />
             <div>
-              <p class="font-semibold text-[var(--admin-text-color)]">
+              <p class="font-semibold text-(--admin-text-color)">
                 {{ data.fullName }}
               </p>
-              <p class="text-sm text-[var(--admin-text-muted)]">
+              <p class="text-sm text-(--admin-text-muted)">
                 {{ data.email }}
               </p>
             </div>
@@ -90,7 +90,7 @@
 
       <Column field="phoneNumber" header="Phone" style="min-width: 140px">
         <template #body="{ data }">
-          <span class="text-[var(--admin-text-muted)]">
+          <span class="text-(--admin-text-muted)">
             {{ data.phoneNumber || "—" }}
           </span>
         </template>
@@ -110,15 +110,6 @@
       <Column header="Actions" style="min-width: 120px">
         <template #body="{ data }">
           <div class="flex items-center gap-1">
-            <Button
-              icon="pi pi-eye"
-              severity="info"
-              text
-              rounded
-              size="small"
-              v-tooltip.top="'View'"
-              @click="emit('view', data)"
-            />
             <Button
               icon="pi pi-pencil"
               severity="secondary"
@@ -160,7 +151,6 @@ const props = defineProps<{
 }>();
 
 const emit = defineEmits<{
-  (e: "view", user: UserDto): void;
   (e: "edit", user: UserDto): void;
   (e: "delete", user: UserDto): void;
   (e: "delete-selected", users: UserDto[]): void;

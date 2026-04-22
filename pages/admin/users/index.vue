@@ -28,7 +28,6 @@
       :totalCount="pagination.totalCount"
       :pageSize="pagination.pageSize"
       :loading="loading"
-      @view="viewUser"
       @edit="openEditDialog"
       @delete="openDeleteDialog"
       @delete-selected="confirmDeleteSelected"
@@ -191,10 +190,6 @@ function closeUserDialog() {
 function openDeleteDialog(user: UserDto) {
   userToDelete.value = user;
   deleteDialog.value = true;
-}
-
-function viewUser(user: UserDto) {
-  navigateTo(`/admin/users/${user.id}`);
 }
 
 async function handleCreate(payload: CreateUserPayload) {

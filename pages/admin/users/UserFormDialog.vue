@@ -196,6 +196,7 @@ const selectedRole = ref<string>("Customer");
 const roleOptions = [
   { label: "Admin", value: "Admin" },
   { label: "Customer", value: "Customer" },
+  { label: "Manager", value: "Manager" },
 ];
 
 watch(
@@ -211,7 +212,11 @@ watch(
           phoneNumber: user.phoneNumber ?? "",
         }
       : { ...defaultForm };
-    selectedRole.value = user?.roles?.[0] ?? "Customer";
+    selectedRole.value = user?.roles?.[0]
+      ? (roleOptions.find(
+          (r) => r.value.toLowerCase() === user.roles[0]!.toLowerCase(),
+        )?.value ?? "Customer")
+      : "Customer";
     submitted.value = false;
   },
   { immediate: true },
