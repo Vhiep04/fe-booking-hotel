@@ -174,9 +174,7 @@ function onPageChange({ page, rows }: { page: number; rows: number }) {
 }
 
 function openCreateDialog() {
-  editingHotel.value = null;
-  isEditing.value = false;
-  hotelDialog.value = true;
+  navigateTo("/admin/hotels/create");
 }
 
 function openEditDialog(hotel: Hotel) {

@@ -103,7 +103,6 @@ import { useUploadStore } from "~/stores/admin/uploadImage";
 import HotelBasicInfoTab from "~/components/admin/hotel/HotelBasicInfoTab.vue";
 import HotelRoomsTab from "~/components/admin/hotel/HotelRoomsTab.vue";
 import CombinedRoomDialog from "~/components/admin/room/CombinedRoomDialog.vue";
-import BulkRoomDialog from "~/components/admin/room/BulkRoomDialog.vue";
 
 import type { Hotel, HotelPayload } from "~/stores/admin/interfaces/hotels";
 import type {
@@ -125,7 +124,7 @@ const roomTypeStore = useRoomTypeStore();
 const citiesStore = useCitiesStore();
 const uploadStore = useUploadStore();
 
-const MAX_GALLERY = 3;
+const MAX_GALLERY = 4;
 const hotelId = computed(() => Number(route.params.id));
 const activeTab = ref("0");
 
@@ -163,10 +162,8 @@ const combinedDialogVisible = ref(false);
 const editingRoom = ref<RoomDto | null>(null);
 const editingRoomType = ref<RoomTypeDto | null>(null);
 
-onMounted(async () => {
-  await Promise.all([fetchHotel(), fetchCities()]);
-  await Promise.all([fetchRoomTypes(), fetchRooms()]);
-});
+// Track ảnh cần xóa khi Save (imageId để xóa DB, publicId để xóa Cloudinary)
+const pendingDeleteImages = ref<{ imageId: number; publicId: string }[]>([]);
 
 async function fetchHotel() {
   loading.value = true;
@@ -260,7 +257,25 @@ async function setPrimaryFile(file: File) {
   primaryPreview.value = await toPreview(file);
 }
 
+const pendingDeletePrimary = ref<{ imageId: number; publicId: string } | null>(
+  null,
+);
+
 function removePrimary() {
+  if (primaryPreview.value?.startsWith("https://res.cloudinary.com")) {
+    const imgRecord = hotelStore.selectedHotel?.images?.find(
+      (img: any) => img.isPrimary,
+    );
+    if (imgRecord) {
+      const publicId = extractCloudinaryPublicId(primaryPreview.value);
+      if (publicId) {
+        pendingDeletePrimary.value = {
+          imageId: imgRecord.imageId,
+          publicId,
+        };
+      }
+    }
+  }
   primaryPreview.value = null;
   primaryFile.value = null;
 }
@@ -287,22 +302,23 @@ function extractCloudinaryPublicId(url: string): string | null {
   }
 }
 
-// Thêm hàm này trong [id].vue
-async function removeGalleryItem(i: number) {
+function removeGalleryItem(i: number) {
   const urlToDelete = galleryPreviews.value[i];
 
-  // Nếu là URL từ server (không phải blob preview), gọi delete
-  if (urlToDelete && urlToDelete.startsWith("https://res.cloudinary.com")) {
-    const publicId = extractCloudinaryPublicId(urlToDelete);
-    if (publicId) await uploadStore.deleteImage(publicId);
-
-    // Xóa image record trên server
-    const hotel = await hotelStore.fetchHotelById(hotelId.value);
-    const imgRecord = hotel?.data?.images?.find(
+  if (urlToDelete?.startsWith("https://res.cloudinary.com")) {
+    // Tìm imageId từ selectedHotel
+    const imgRecord = hotelStore.selectedHotel?.images?.find(
       (img: any) => img.imageUrl === urlToDelete,
     );
     if (imgRecord) {
-      await hotelStore.deleteHotelImage(hotelId.value, imgRecord.imageId);
+      const publicId = extractCloudinaryPublicId(urlToDelete);
+      if (publicId) {
+        // Chỉ mark lại, chưa gọi API
+        pendingDeleteImages.value.push({
+          imageId: imgRecord.imageId,
+          publicId,
+        });
+      }
     }
   }
 
@@ -311,6 +327,8 @@ async function removeGalleryItem(i: number) {
 }
 
 function resetForm() {
+  pendingDeleteImages.value = [];
+  pendingDeletePrimary.value = null;
   fetchHotel();
 }
 
@@ -327,6 +345,7 @@ async function handleSave() {
   }
   saving.value = true;
   try {
+    // 1. Update thông tin cơ bản
     const res = await hotelStore.updateHotel(hotelId.value, form.value);
     if (!res?.success) {
       toast.add({
@@ -337,12 +356,36 @@ async function handleSave() {
       });
       return;
     }
+
+    // 2. Xóa gallery items đã mark (Cloudinary + DB)
+    for (const item of pendingDeleteImages.value) {
+      await uploadStore.deleteImage(item.publicId);
+      await hotelStore.deleteHotelImage(hotelId.value, item.imageId);
+    }
+    pendingDeleteImages.value = [];
+
+    // 3. Xử lý primary image
+    if (pendingDeletePrimary.value) {
+      // User đã xóa primary cũ (không upload mới)
+      await uploadStore.deleteImage(pendingDeletePrimary.value.publicId);
+      await hotelStore.deleteHotelImage(
+        hotelId.value,
+        pendingDeletePrimary.value.imageId,
+      );
+      pendingDeletePrimary.value = null;
+    }
+
     if (primaryFile.value) {
-      // Xóa ảnh cũ trên Cloudinary nếu có publicId
-      const oldPrimaryImg = h.images?.find((img: any) => img.isPrimary);
-      if (oldPrimaryImg?.publicId) {
-        await uploadStore.deleteImage(oldPrimaryImg.publicId); // ← thêm dòng này
+      // User upload primary mới → xóa cũ nếu chưa xóa
+      const oldPrimary = hotelStore.selectedHotel?.images?.find(
+        (img: any) => img.isPrimary,
+      );
+      if (oldPrimary && !pendingDeletePrimary.value) {
+        const publicId = extractCloudinaryPublicId(oldPrimary.imageUrl);
+        if (publicId) await uploadStore.deleteImage(publicId);
+        await hotelStore.deleteHotelImage(hotelId.value, oldPrimary.imageId);
       }
+
       const up = await uploadStore.uploadImage(primaryFile.value, "hotels");
       if (up?.success && up.data) {
         await hotelStore.addHotelImage(hotelId.value, {
@@ -354,6 +397,8 @@ async function handleSave() {
         primaryFile.value = null;
       }
     }
+
+    // 4. Upload gallery mới
     if (galleryFiles.value.length) {
       const up = await uploadStore.uploadImages(galleryFiles.value, "hotels");
       if (up?.success && up.data?.uploaded?.length) {
@@ -364,6 +409,7 @@ async function handleSave() {
         galleryFiles.value = [];
       }
     }
+
     toast.add({
       severity: "success",
       summary: "Success",
@@ -371,6 +417,7 @@ async function handleSave() {
       life: 3000,
     });
     submitted.value = false;
+    await fetchHotel(); // sync lại với server
   } catch (e: any) {
     toast.add({
       severity: "error",
@@ -550,4 +597,9 @@ function confirmDeleteRoom(room: RoomDto) {
     },
   });
 }
+
+onMounted(async () => {
+  await Promise.all([fetchHotel(), fetchCities()]);
+  await Promise.all([fetchRoomTypes(), fetchRooms()]);
+});
 </script>

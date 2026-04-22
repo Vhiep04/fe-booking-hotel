@@ -24,9 +24,8 @@ export const useUploadStore = defineStore("upload", () => {
 
   async function deleteImage(publicId: string) {
     return await apiStore.apiRequest<DeleteResponse>({
-      endpoint: "/upload/image",
+      endpoint: `/upload/image?publicId=${encodeURIComponent(publicId)}`,
       method: "DELETE",
-      params: { publicId },
       auth: true,
     });
   }
