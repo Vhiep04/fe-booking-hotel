@@ -203,7 +203,7 @@ const handleLogin = async () => {
 
       // Sau (login.vue)
       if (authStore.isAuthenticated) {
-        if (authStore.isAdmin) {
+        if (authStore.isAdmin || authStore.isManager) {
           router.push({ path: "/admin" });
         } else {
           router.push({ path: "/" });

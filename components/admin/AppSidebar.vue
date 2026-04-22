@@ -7,7 +7,7 @@
           alt="Booking Admin"
           class="h-8"
         />
-        <span>Booking Admin</span>
+        <span>{{ appTitle }}</span>
       </NuxtLink>
     </div>
 
@@ -34,6 +34,11 @@ import { useAuthStore } from "~/stores/auth";
 
 const authStore = useAuthStore();
 const dashboardStore = useDashboardStore();
+
+const appTitle = computed(() => {
+  if (authStore.isAdmin) return "Booking Admin";
+  return "Booking Staff";
+});
 
 const data = computed(() => dashboardStore.dashboardData);
 

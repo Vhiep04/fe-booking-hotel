@@ -1,4 +1,3 @@
-// stores/notification.ts
 import { defineStore } from "pinia";
 import { useApiStore } from "./api";
 import { useAuthStore } from "./auth";
@@ -7,7 +6,7 @@ export interface Notification {
   id: number;
   title: string;
   message: string;
-  type: string;
+  type: number;
   isRead: boolean;
   createdAt: string;
   reservationId?: number;
@@ -29,16 +28,27 @@ export const useNotificationStore = defineStore("notification", () => {
     authStore.isAdmin ? "/notifications/admin" : "/notifications",
   );
 
+  // stores/notification.ts
   async function fetchNotifications() {
     try {
       loading.value = true;
-      const res = await apiStore.apiRequest<Notification[]>({
+      const res = await apiStore.apiRequest<any[]>({
         method: "GET",
         endpoint: endpoint.value,
         auth: true,
         proxy: false,
       });
-      notifications.value = res ?? [];
+
+      // Map notificationId → id
+      notifications.value = (res ?? []).map((n) => ({
+        id: n.notificationId,
+        title: n.title,
+        message: n.message,
+        type: n.type,
+        isRead: n.isRead,
+        createdAt: n.createdAt,
+        reservationId: n.reservationId ?? undefined,
+      }));
     } catch (e) {
       console.error("fetchNotifications error:", e);
     } finally {
@@ -83,8 +93,16 @@ export const useNotificationStore = defineStore("notification", () => {
   }
 
   // SignalR push vào đầu danh sách
-  function addRealtimeNotification(noti: Notification) {
-    notifications.value.unshift(noti);
+  function addRealtimeNotification(noti: any) {
+    notifications.value.unshift({
+      id: noti.notificationId ?? noti.id,
+      title: noti.title,
+      message: noti.message,
+      type: noti.type,
+      isRead: noti.isRead,
+      createdAt: noti.createdAt,
+      reservationId: noti.reservationId ?? undefined,
+    });
   }
 
   return {

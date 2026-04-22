@@ -107,7 +107,7 @@
                 <div
                   v-for="n in notifications"
                   :key="n.id"
-                  @click="handleClickNotification(n.id)"
+                  @click="handleClickNotification(n)"
                   class="p-3 rounded-lg cursor-pointer transition-colors hover:bg-gray-100"
                   :class="{ 'bg-blue-50': !n.isRead }"
                 >
@@ -187,7 +187,7 @@ import { onClickOutside } from "@vueuse/core";
 import { useRouter } from "vue-router";
 import UserProfile from "../UserProfile.vue";
 import { useAuthStore } from "@/stores/auth";
-import { useNotificationStore } from "@/stores/notification";
+import { useNotificationStore, type Notification } from "@/stores/notification";
 import { Button } from "primevue";
 import { useI18n } from "vue-i18n";
 import enFlag from "@/assets/images/england-flag.svg";
@@ -248,34 +248,55 @@ const handleMarkAllRead = async () => {
   await notificationStore.markAllRead();
 };
 
-const handleClickNotification = async (id: number) => {
-  await notificationStore.markOneRead(id);
+const handleClickNotification = async (n: Notification) => {
+  await notificationStore.markOneRead(n.id);
+  showNotifications.value = false;
+
+  const REDIRECT_MAP: Record<number, () => string> = {
+    1: () =>
+      n.reservationId ? `/reservation/${n.reservationId}` : "/reservation",
+    2: () =>
+      n.reservationId ? `/reservation/${n.reservationId}` : "/reservation",
+    3: () =>
+      n.reservationId ? `/reservation/${n.reservationId}` : "/reservation",
+    4: () =>
+      n.reservationId ? `/reservation/${n.reservationId}` : "/reservation",
+    5: () =>
+      n.reservationId ? `/reservation/${n.reservationId}` : "/reservation",
+    6: () =>
+      n.reservationId ? `/reservation/${n.reservationId}` : "/reservation",
+  };
+
+  const getRoute = REDIRECT_MAP[Number(n.type)];
+  if (getRoute) {
+    await router.push(getRoute());
+  }
 };
 
-function getNotificationIcon(type: string): string {
-  const map: Record<string, string> = {
-    NewBooking: "pi pi-calendar-plus",
-    BookingConfirmed: "pi pi-check-circle",
-    BookingRejected: "pi pi-times-circle",
-    BookingCancelled: "pi pi-ban",
-    BookingCompleted: "pi pi-star",
-    PaymentSuccess: "pi pi-credit-card",
-    PaymentFailed: "pi pi-exclamation-circle",
-    NewUser: "pi pi-user-plus",
+function getNotificationIcon(type: number): string {
+  const map: Record<number, string> = {
+    0: "pi pi-user-plus",
+    1: "pi pi-calendar-plus",
+    2: "pi pi-check-circle",
+    3: "pi pi-ban",
+    4: "pi pi-times-circle",
+    5: "pi pi-star",
+    6: "pi pi-credit-card",
+    7: "pi pi-exclamation-circle",
   };
   return map[type] ?? "pi pi-bell";
 }
 
-function getNotificationColor(type: string): string {
-  const map: Record<string, string> = {
-    NewBooking: "text-blue-500",
-    BookingConfirmed: "text-green-500",
-    BookingRejected: "text-red-500",
-    BookingCancelled: "text-orange-500",
-    BookingCompleted: "text-purple-500",
-    PaymentSuccess: "text-green-600",
-    PaymentFailed: "text-red-600",
-    NewUser: "text-purple-500",
+function getNotificationColor(type: number): string {
+  const map: Record<number, string> = {
+    0: "text-purple-500", // NewUser
+    1: "text-blue-500", // NewBooking
+    2: "text-green-500", // BookingConfirmed
+    3: "text-orange-500", // BookingCancelled
+    4: "text-red-500", // BookingRejected
+    5: "text-purple-500", // BookingCompleted
+    6: "text-green-600", // PaymentSuccess
+    7: "text-red-600", // PaymentFailed
   };
   return map[type] ?? "text-gray-500";
 }

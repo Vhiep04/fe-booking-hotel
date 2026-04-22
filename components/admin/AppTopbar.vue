@@ -74,7 +74,7 @@
             <div
               v-for="notification in notifications"
               :key="notification.id"
-              @click="onClickNotification(notification.id)"
+              @click="onClickNotification(notification)"
               class="p-3 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer"
               :class="{
                 'bg-blue-50 dark:bg-blue-900/20': !notification.isRead,
@@ -154,7 +154,7 @@ import { useAdminLayoutStore } from "~/stores/admin/layout";
 import { useAdminAuthStore } from "~/stores/admin/auth";
 import type { UserInfoResponse } from "~/stores/interface/response/getUserInfo";
 import UserProfile from "../UserProfile.vue";
-import { useNotificationStore } from "~/stores/notification";
+import { useNotificationStore, type Notification } from "~/stores/notification";
 import { useNotificationHub } from "~/composables/useNotificationHub";
 
 const layoutStore = useAdminLayoutStore();
@@ -220,8 +220,21 @@ async function markAllRead() {
   await notificationStore.markAllRead();
 }
 
-async function onClickNotification(id: number) {
-  await notificationStore.markOneRead(id);
+const NOTIFICATION_ROUTES: Record<number, (n: Notification) => string> = {
+  0: () => "/admin/users",
+  1: () => "/admin/bookings",
+  3: () => "/admin/bookings",
+  6: () => "/admin/bookings",
+};
+
+async function onClickNotification(notification: Notification) {
+  await notificationStore.markOneRead(notification.id);
+  showNotifications.value = false;
+
+  const getRoute = NOTIFICATION_ROUTES[Number(notification.type)];
+  if (getRoute) {
+    await router.push(getRoute(notification));
+  }
 }
 
 function onMenuToggle() {
