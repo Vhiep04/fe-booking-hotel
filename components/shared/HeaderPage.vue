@@ -3,16 +3,16 @@
     class="bg-white border-b border-gray-200 px-6 h-[300] z-50 sticky top-0"
   >
     <div class="flex items-center justify-between h-20 gap-6">
-      <!-- Logo -->
       <div class="flex items-center shrink-0">
-        <img
-          src="../../assets/images/logo_easyset24.svg"
-          alt="Logo"
-          class="h-12"
-        />
+        <NuxtLink to="/">
+          <img
+            src="../../assets/images/logo_easyset24.svg"
+            alt="Logo"
+            class="h-12"
+          />
+        </NuxtLink>
       </div>
 
-      <!-- Nav items (center) -->
       <nav class="flex items-center gap-1 flex-1 justify-center">
         <NuxtLink
           v-for="item in navItems"
@@ -25,13 +25,13 @@
         </NuxtLink>
       </nav>
 
-      <!-- Right side -->
       <div class="flex items-center gap-3 shrink-0">
-        <!-- Language -->
+        <!-- Language Switcher -->
         <div class="relative overflow-visible" ref="langWrapper">
           <button
             @click="toggleLangPanel"
-            class="hover:opacity-80 transition-opacity"
+            class="hover:opacity-80 transition-opacity flex justify-center"
+            :aria-label="t('Language')"
           >
             <img
               :src="currentFlag"
@@ -40,7 +40,6 @@
             />
           </button>
 
-          <!-- Language Dropdown -->
           <div
             v-if="showLangPanel"
             class="absolute right-0 top-full mt-2 bg-white rounded-xl shadow-xl border border-gray-200 z-50"
@@ -69,6 +68,7 @@
             <button
               class="w-12 h-12 flex items-center justify-center rounded-full text-gray-500 hover:bg-gray-100 hover:text-blue-600 transition-colors relative"
               @click="toggleNotifications"
+              :aria-label="t('Notifications')"
             >
               <i class="pi pi-bell" style="font-size: 1.1rem"></i>
               <span
@@ -206,19 +206,21 @@ const navItems = [
   { name: "My favourite hotel", path: "/favourite-hotels" },
   { name: "My reviews", path: "/feedback" },
 ];
+
 const languages: { code: LocaleCode; label: string; flag: string }[] = [
   { code: "en", label: "English", flag: enFlag },
   { code: "vi", label: "Tiếng Việt", flag: viFlag },
 ];
+
 const currentFlag = computed(() => (locale.value === "vi" ? viFlag : enFlag));
 
-// Language panel
 const showLangPanel = ref(false);
 const langWrapper = ref<HTMLElement | null>(null);
 
 const toggleLangPanel = () => {
   showLangPanel.value = !showLangPanel.value;
 };
+
 const changeLanguage = async (code: LocaleCode) => {
   if (locale.value !== code) await setLocale(code);
   showLangPanel.value = false;
@@ -228,7 +230,6 @@ onClickOutside(langWrapper, () => {
   showLangPanel.value = false;
 });
 
-// Notifications
 const showNotifications = ref(false);
 const notificationsWrapper = ref<HTMLElement | null>(null);
 const { init: initHub, stop: stopHub } = useNotificationHub();
@@ -268,9 +269,7 @@ const handleClickNotification = async (n: Notification) => {
   };
 
   const getRoute = REDIRECT_MAP[Number(n.type)];
-  if (getRoute) {
-    await router.push(getRoute());
-  }
+  if (getRoute) await router.push(getRoute());
 };
 
 function getNotificationIcon(type: number): string {
@@ -289,14 +288,14 @@ function getNotificationIcon(type: number): string {
 
 function getNotificationColor(type: number): string {
   const map: Record<number, string> = {
-    0: "text-purple-500", // NewUser
-    1: "text-blue-500", // NewBooking
-    2: "text-green-500", // BookingConfirmed
-    3: "text-orange-500", // BookingCancelled
-    4: "text-red-500", // BookingRejected
-    5: "text-purple-500", // BookingCompleted
-    6: "text-green-600", // PaymentSuccess
-    7: "text-red-600", // PaymentFailed
+    0: "text-purple-500",
+    1: "text-blue-500",
+    2: "text-green-500",
+    3: "text-orange-500",
+    4: "text-red-500",
+    5: "text-purple-500",
+    6: "text-green-600",
+    7: "text-red-600",
   };
   return map[type] ?? "text-gray-500";
 }

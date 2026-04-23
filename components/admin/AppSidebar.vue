@@ -19,7 +19,7 @@
       <div class="flex items-center gap-3 text-(--admin-sidebar-text)">
         <i class="pi pi-info-circle text-sm"></i>
         <span class="text-xs text-(--admin-sidebar-text-muted)">
-          v1.0.0 - Booking Admin
+          v1.0.0 - {{ appTitle }}
         </span>
       </div>
     </div>
@@ -32,12 +32,13 @@ import type { MenuItem, MenuEntry } from "./AppMenu.vue";
 import { useDashboardStore } from "~/stores/admin/dashboard";
 import { useAuthStore } from "~/stores/auth";
 
+const { t } = useI18n();
 const authStore = useAuthStore();
 const dashboardStore = useDashboardStore();
 
 const appTitle = computed(() => {
-  if (authStore.isAdmin) return "Booking Admin";
-  return "Booking Staff";
+  if (authStore.isAdmin) return t("Booking Admin");
+  return t("Booking Staff");
 });
 
 const data = computed(() => dashboardStore.dashboardData);
@@ -47,40 +48,40 @@ const badge = (count: number | undefined, cls: string): Partial<MenuItem> =>
 
 const menuItems = computed<MenuEntry[]>(() => [
   {
-    label: "Dashboard",
+    label: t("Dashboard"),
     icon: "pi pi-home",
     to: "/admin",
   },
   {
-    label: "Bookings",
+    label: t("Bookings"),
     icon: "pi pi-calendar",
     items: [
       {
-        label: "All Bookings",
+        label: t("All Bookings"),
         icon: "pi pi-list",
         to: "/admin/bookings",
         ...badge(data.value?.totalReservations, "bg-blue-500"),
       },
       {
-        label: "Pending",
+        label: t("Pending"),
         icon: "pi pi-clock",
         to: "/admin/bookings?status=pending",
         ...badge(data.value?.pendingReservations, "bg-yellow-500"),
       },
       {
-        label: "Confirmed",
+        label: t("Confirmed"),
         icon: "pi pi-check-circle",
         to: "/admin/bookings?status=confirmed",
         ...badge(data.value?.confirmedReservations, "bg-purple-500"),
       },
       {
-        label: "Completed",
+        label: t("Completed"),
         icon: "pi pi-verified",
         to: "/admin/bookings?status=completed",
         ...badge(data.value?.completedReservations, "bg-green-500"),
       },
       {
-        label: "Cancelled",
+        label: t("Cancelled"),
         icon: "pi pi-times-circle",
         to: "/admin/bookings?status=cancelled",
         ...badge(data.value?.cancelledReservations, "bg-red-500"),
@@ -88,77 +89,34 @@ const menuItems = computed<MenuEntry[]>(() => [
     ],
   },
   {
-    label: "Hotels",
+    label: t("Hotels"),
     icon: "pi pi-building",
     to: "/admin/hotels",
     ...badge(data.value?.totalHotels, "bg-blue-500"),
   },
   {
-    label: "Users",
+    label: t("Users"),
     icon: "pi pi-users",
     to: "/admin/users",
     visible: authStore.isAdmin,
     ...badge(data.value?.totalUsers, "bg-blue-500"),
   },
   {
-    label: "Cities",
+    label: t("Cities"),
     icon: "pi pi-map-marker",
     to: "/admin/cities",
     ...badge(data.value?.totalCities, "bg-blue-500"),
   },
   {
-    label: "Facilities",
+    label: t("Facilities"),
     icon: "pi pi-th-large",
     to: "/admin/facilities",
   },
   {
-    label: "Rooms",
+    label: t("Rooms"),
     icon: "pi pi-inbox",
     to: "/admin/rooms",
     ...badge(data.value?.totalRooms, "bg-blue-500"),
   },
-  // { separator: true },
-  // {
-  //   label: "Reports",
-  //   icon: "pi pi-chart-bar",
-  //   items: [
-  //     {
-  //       label: "Revenue Report",
-  //       icon: "pi pi-dollar",
-  //       to: "/admin/reports/revenue",
-  //     },
-  //     {
-  //       label: "Booking Report",
-  //       icon: "pi pi-calendar",
-  //       to: "/admin/reports/bookings",
-  //     },
-  //     {
-  //       label: "User Report",
-  //       icon: "pi pi-users",
-  //       to: "/admin/reports/users",
-  //     },
-  //   ],
-  // },
-  // {
-  //   label: "Settings",
-  //   icon: "pi pi-cog",
-  //   items: [
-  //     {
-  //       label: "General",
-  //       icon: "pi pi-sliders-h",
-  //       to: "/admin/settings/general",
-  //     },
-  //     {
-  //       label: "Payment",
-  //       icon: "pi pi-credit-card",
-  //       to: "/admin/settings/payment",
-  //     },
-  //     {
-  //       label: "Email Templates",
-  //       icon: "pi pi-envelope",
-  //       to: "/admin/settings/email",
-  //     },
-  //   ],
-  // },
 ]);
 </script>

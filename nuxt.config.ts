@@ -22,7 +22,7 @@ export default defineNuxtConfig({
   modules: ["@pinia/nuxt", "@nuxtjs/i18n"],
 
   i18n: {
-    defaultLocale: "en",
+    defaultLocale: "vi",
 
     strategy: "no_prefix",
 
@@ -32,13 +32,13 @@ export default defineNuxtConfig({
       {
         code: "en",
         iso: "en-US",
-        file: "en.json",
+        files: ["en.json", "admin-en.json"],
         name: "English",
       },
       {
         code: "vi",
         iso: "vi-VN",
-        file: "vi.json",
+        files: ["vi.json", "admin-vi.json"],
         name: "Tiếng Việt",
       },
     ],
