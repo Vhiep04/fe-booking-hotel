@@ -93,6 +93,13 @@ const menuItems = computed<MenuEntry[]>(() => [
     icon: "pi pi-building",
     to: "/admin/hotels",
     ...badge(data.value?.totalHotels, "bg-blue-500"),
+    items: [
+      {
+        label: t("Add Hotel"),
+        icon: "pi pi-plus",
+        to: "/admin/hotels/create",
+      },
+    ],
   },
   {
     label: t("Users"),
@@ -116,6 +123,12 @@ const menuItems = computed<MenuEntry[]>(() => [
     label: t("Rooms"),
     icon: "pi pi-inbox",
     to: "/admin/rooms",
+    ...badge(data.value?.totalRooms, "bg-blue-500"),
+  },
+  {
+    label: t("Feedbacks"),
+    icon: "pi pi-comments",
+    to: "/admin/feedbacks",
     ...badge(data.value?.totalRooms, "bg-blue-500"),
   },
 ]);

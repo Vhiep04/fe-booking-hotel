@@ -263,8 +263,8 @@ import Textarea from "primevue/textarea";
 import Tag from "primevue/tag";
 import Message from "primevue/message";
 import { useToast } from "primevue/usetoast";
-import FeedbackCardSkeleton from "~/components/admin/feedback/FeedbackCardSkeleton.vue";
-import FeedbackCard from "~/components/admin/feedback/FeedbackCard.vue";
+import FeedbackCardSkeleton from "~/components/feedback/FeedbackCardSkeleton.vue";
+import FeedbackCard from "~/components/feedback/FeedbackCard.vue";
 
 const { t } = useI18n();
 useHead({ title: t("My Reviews") });

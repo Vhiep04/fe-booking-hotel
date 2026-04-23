@@ -25,8 +25,8 @@
         class="absolute bottom-0 left-1/2 transform -translate-x-1/2 w-full max-w-6xl px-4 z-10"
       >
         <p class="text-white text-7xl font-bold mb-10">
-          Discover Your Trips <br />
-          Worldwide !
+          {{ t("Discover Your Trips") }}<br />
+          {{ t("Worldwide")! }}
         </p>
         <SearchForm :loading="cityStore.isLoading" @search="handleSearch" />
       </div>
