@@ -130,9 +130,9 @@ import InputIcon from "primevue/inputicon";
 import Paginator from "primevue/paginator";
 import { useToast } from "primevue/usetoast";
 
-import CityCard from "./CityCard.vue";
-import CityFormDialog from "./CityFormDialog.vue";
-import CityDeleteDialog from "./CityDeleteDialog.vue";
+import CityCard from "../../../components/admin/city/CityCard.vue";
+import CityFormDialog from "../../../components/admin/city/CityFormDialog.vue";
+import CityDeleteDialog from "../../../components/admin/city/CityDeleteDialog.vue";
 import {
   useCitiesStore,
   type AddCityImagePayload,

@@ -56,11 +56,13 @@
 <script setup lang="ts">
 import Button from "primevue/button";
 import { useToast } from "primevue/usetoast";
-import UserStatsCard from "./UserStatsCard.vue";
-import UserFilter, { type UserFiltersModel } from "./UserFilter.vue";
-import UserTable from "./UserTable.vue";
-import UserFormDialog from "./UserFormDialog.vue";
-import DeleteConfirmDialog from "./DeleteConfirmDialog.vue";
+import UserStatsCard from "../../../components/admin/user/UserStatsCard.vue";
+import UserFilter, {
+  type UserFiltersModel,
+} from "../../../components/admin/user/UserFilter.vue";
+import UserTable from "../../../components/admin/user/UserTable.vue";
+import UserFormDialog from "../../../components/admin/user/UserFormDialog.vue";
+import DeleteConfirmDialog from "../../../components/admin/user/DeleteConfirmDialog.vue";
 import { useUsersStore } from "~/stores/admin/users";
 import type {
   CreateUserPayload,

@@ -43,11 +43,11 @@ import Button from "primevue/button";
 import { useToast } from "primevue/usetoast";
 import type { Reservation } from "~/stores/admin/interfaces/reservations";
 import { useReservationsStore } from "~/stores/admin/reservations";
-import type { BookingFiltersModel } from "./BookingFilter.vue";
-import BookingDetailDialog from "./BookingDetailDialog.vue";
-import BookingTable from "./BookingTable.vue";
-import BookingFilter from "./BookingFilter.vue";
-import BookingStatCard from "./BookingStatCard.vue";
+import type { BookingFiltersModel } from "../../../components/admin/booking/BookingFilter.vue";
+import BookingDetailDialog from "../../../components/admin/booking/BookingDetailDialog.vue";
+import BookingTable from "../../../components/admin/booking/BookingTable.vue";
+import BookingFilter from "../../../components/admin/booking/BookingFilter.vue";
+import BookingStatCard from "../../../components/admin/booking/BookingStatCard.vue";
 import { Toast } from "primevue";
 
 definePageMeta({

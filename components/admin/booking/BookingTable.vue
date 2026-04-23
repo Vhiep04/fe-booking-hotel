@@ -15,7 +15,7 @@
       @page="onPage"
     >
       <template #header>
-        <span class="text-[var(--admin-text-secondary)]">
+        <span class="text-(--admin-text-secondary)">
           {{ totalCount }} bookings found
         </span>
       </template>
@@ -27,7 +27,7 @@
         style="min-width: 130px"
       >
         <template #body="{ data }">
-          <span class="font-semibold text-[var(--admin-primary)]"
+          <span class="font-semibold text-(--admin-primary)"
             >#{{ data.reservationId }}</span
           >
         </template>
@@ -40,10 +40,10 @@
         style="min-width: 220px"
       >
         <template #body="{ data }">
-          <p class="font-medium text-[var(--admin-text-color)]">
+          <p class="font-medium text-(--admin-text-color)">
             {{ data.hotelName }}
           </p>
-          <p class="text-xs text-[var(--admin-text-muted)]">
+          <p class="text-xs text-(--admin-text-muted)]">
             {{ data.roomType }} · {{ data.cityName }}
           </p>
         </template>
@@ -56,7 +56,7 @@
         style="min-width: 100px"
       >
         <template #body="{ data }">
-          <span class="font-medium text-[var(--admin-text-color)]">
+          <span class="font-medium text-(--admin-text-color)">
             #{{ data.roomId }}
           </span>
         </template>
@@ -71,13 +71,13 @@
               "
               shape="circle"
               size="normal"
-              class="bg-[var(--admin-primary)] text-white"
+              class="bg-(--admin-primary)] text-white"
             />
             <div>
-              <p class="font-medium text-[var(--admin-text-color)]">
+              <p class="font-medium text-(--admin-text-color)">
                 {{ data.userName }}
               </p>
-              <p class="text-xs text-[var(--admin-text-muted)]">
+              <p class="text-xs text-(--admin-text-muted)">
                 {{ data.userEmail }}
               </p>
             </div>
@@ -120,7 +120,7 @@
         style="min-width: 130px"
       >
         <template #body="{ data }">
-          <p class="font-bold text-[var(--admin-text-color)]">
+          <p class="font-bold text-(--admin-text-color)">
             ${{ data.totalPrice.toLocaleString() }}
           </p>
           <Tag
