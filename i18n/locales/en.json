@@ -244,7 +244,6 @@
   "Reviews can be submitted after your stay is confirmed.": "Reviews can be submitted after your stay is confirmed.",
   "Booking Summary": "Booking Summary",
   "Booking Code": "Booking Code",
-  "Reservation ID": "Reservation ID",
   "Status": "Status",
   "Copy Booking Code": "Copy Booking Code",
   "Actions": "Actions",
@@ -388,5 +387,9 @@
   "Prefer not to say": "Prefer not to say",
   "Address": "Address",
   "Add your address": "Add your address",
-  "Enter your address": "Enter your address"
+  "Enter your address": "Enter your address",
+  "Keep booking": "Keep booking",
+  "Cancel reservation": "Cancel reservation",
+  "Yes, cancel": "Yes, cancel",
+  "This action cannot be undone. Once cancelled, your booking will be permanently removed.": "This action cannot be undone. Once cancelled, your booking will be permanently removed."
 }

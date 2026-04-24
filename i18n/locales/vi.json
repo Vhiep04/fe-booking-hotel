@@ -245,7 +245,6 @@
   "Reviews can be submitted after your stay is confirmed.": "Bạn có thể đánh giá sau khi lưu trú được xác nhận.",
   "Booking Summary": "Tóm tắt đặt phòng",
   "Booking Code": "Mã đặt phòng",
-  "Reservation ID": "Mã đơn đặt",
   "Status": "Trạng thái",
   "Copy Booking Code": "Sao chép mã đặt phòng",
   "Actions": "Thao tác",
@@ -388,5 +387,9 @@
   "Prefer not to say": "Không muốn tiết lộ",
   "Address": "Địa chỉ",
   "Add your address": "Thêm địa chỉ của bạn",
-  "Enter your address": "Nhập địa chỉ của bạn"
+  "Enter your address": "Nhập địa chỉ của bạn",
+  "Keep booking": "Giữ đặt phòng",
+  "Cancel reservation": "Hủy đặt phòng",
+  "Yes, cancel": "Xác nhận hủy",
+  "This action cannot be undone. Once cancelled, your booking will be permanently removed.": "Hành động này không thể hoàn tác. Sau khi hủy, đặt phòng của bạn sẽ bị xóa vĩnh viễn."
 }

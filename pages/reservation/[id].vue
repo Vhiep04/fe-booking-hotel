@@ -50,7 +50,7 @@
                 class="w-full h-full object-cover"
               />
               <div
-                class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"
+                class="absolute inset-0 bg-linear-to-t from-black/60 to-transparent"
               />
               <div class="absolute bottom-4 left-5 text-white">
                 <p class="text-xl font-bold">{{ reservation.hotelName }}</p>
@@ -247,16 +247,6 @@
               </div>
             </div>
 
-            <div class="flex items-center gap-2 mb-3">
-              <i class="pi pi-id-card text-[#07689F] text-sm" />
-              <div>
-                <p class="text-xs text-gray-400">{{ t("Reservation ID") }}</p>
-                <p class="font-medium text-gray-700">
-                  #{{ reservation.reservationId }}
-                </p>
-              </div>
-            </div>
-
             <div class="flex items-center gap-2">
               <i
                 class="pi pi-circle-fill text-xs"
@@ -285,15 +275,21 @@
             class="bg-white rounded-2xl p-5 shadow-sm border border-gray-100 space-y-3"
           >
             <p class="font-bold text-gray-800 mb-1">{{ t("Actions") }}</p>
-            <Button
+
+            <button
               v-if="canCancel"
-              :label="t('Cancel Reservation')"
-              severity="danger"
-              outlined
-              class="w-full text-sm"
-              :loading="reservationStore.isLoading"
+              :disabled="reservationStore.isLoading"
               @click="showCancelDialog = true"
-            />
+              class="w-full flex items-center justify-center gap-2 py-2.5 rounded-lg border border-red-300 bg-red-50 text-red-600 text-sm font-semibold hover:bg-red-100 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              <i
+                v-if="!reservationStore.isLoading"
+                class="pi pi-times-circle text-sm"
+              />
+              <i v-else class="pi pi-spin pi-spinner text-sm" />
+              {{ t("Cancel Reservation") }}
+            </button>
+
             <NuxtLink
               to="/reservation"
               class="block text-center py-2.5 bg-[#07689F] text-white rounded-lg text-sm font-semibold hover:bg-[#055a8a] transition-colors"
@@ -305,33 +301,69 @@
       </div>
     </template>
 
-    <!-- Cancel Dialog -->
     <Dialog
       v-model:visible="showCancelDialog"
       modal
-      :header="t('Cancel Reservation')"
+      :header="t('Cancel reservation')"
       :style="{ width: '420px' }"
+      :closable="!reservationStore.isLoading"
     >
-      <p class="text-gray-600 mb-1">
-        {{ t("Are you sure you want to cancel this reservation?") }}
-      </p>
-      <p class="font-semibold text-gray-800">{{ reservation?.bookingCode }}</p>
-      <p class="text-sm text-red-500 mt-3">
-        {{ t("This action cannot be undone.") }}
-      </p>
+      <div
+        class="bg-gray-100 rounded-lg px-4 py-3 mb-4 flex items-center justify-between"
+      >
+        <div>
+          <p class="text-[11px] text-gray-400 mb-0.5">
+            {{ t("Booking code") }}
+          </p>
+          <p class="text-sm font-semibold tracking-wider text-gray-800">
+            {{ reservation?.bookingCode }}
+          </p>
+        </div>
+        <div class="text-right">
+          <p class="text-[11px] text-gray-400 mb-0.5">{{ t("Nhận phòng") }}</p>
+          <p class="text-sm font-medium text-gray-800">
+            {{ formatDate(reservation?.checkInDate ?? "") }}
+          </p>
+        </div>
+      </div>
+
+      <div
+        class="flex items-start gap-2 bg-red-50 border border-red-100 rounded-lg px-3 py-2.5 mb-5"
+      >
+        <i
+          class="pi pi-info-circle text-red-400 text-sm mt-0.5 flex-shrink-0"
+        />
+        <p class="text-xs text-red-600 leading-relaxed">
+          {{
+            t(
+              "This action cannot be undone. Once cancelled, your booking will be permanently removed.",
+            )
+          }}
+        </p>
+      </div>
+
       <template #footer>
-        <Button
-          :label="t('Keep Booking')"
-          severity="secondary"
-          @click="showCancelDialog = false"
-          class="mr-2"
-        />
-        <Button
-          :label="t('Yes, Cancel')"
-          severity="danger"
-          :loading="reservationStore.isLoading"
-          @click="confirmCancel"
-        />
+        <div class="flex gap-2 w-full">
+          <button
+            :disabled="reservationStore.isLoading"
+            @click="showCancelDialog = false"
+            class="flex-1 py-2.5 border border-gray-200 rounded-lg text-sm font-semibold text-gray-600 hover:bg-gray-50 transition-colors disabled:opacity-50"
+          >
+            {{ t("Keep booking") }}
+          </button>
+          <button
+            :disabled="reservationStore.isLoading"
+            @click="confirmCancel"
+            class="flex-1 py-2.5 border border-red-200 bg-red-50 rounded-lg text-sm font-semibold text-red-600 hover:bg-red-100 transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
+          >
+            <i
+              v-if="reservationStore.isLoading"
+              class="pi pi-spin pi-spinner text-xs"
+            />
+            <i v-else class="pi pi-times-circle text-xs" />
+            {{ t("Yes, cancel") }}
+          </button>
+        </div>
       </template>
     </Dialog>
 
@@ -342,6 +374,7 @@
 <script setup lang="ts">
 import ReservationDetailSkeleton from "~/components/reservation/ReservationDetailSkeleton.vue";
 import { useToast } from "primevue/usetoast";
+import { Dialog } from "primevue";
 
 const { t } = useI18n();
 useHead({ title: t("Reservation Detail") });
@@ -353,11 +386,22 @@ const toast = useToast();
 
 const showCancelDialog = ref(false);
 const reservation = computed(() => reservationStore.selectedReservation);
-const canCancel = computed(
-  () =>
-    reservation.value?.paymentStatus === "Pending" ||
-    reservation.value?.paymentStatus === "Confirmed",
-);
+
+const canCancel = computed(() => {
+  const r = reservation.value;
+  if (!r) return false;
+
+  const isAllowedStatus =
+    r.paymentStatus === "Pending" || r.paymentStatus === "Confirmed";
+
+  const checkInDate = new Date(r.checkInDate);
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+
+  const isFutureCheckIn = checkInDate > today;
+
+  return isAllowedStatus && isFutureCheckIn;
+});
 
 function formatDate(dateStr: string) {
   if (!dateStr) return "—";
