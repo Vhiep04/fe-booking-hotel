@@ -1,12 +1,12 @@
 <template>
   <div class="admin-card">
     <div class="admin-card-header flex items-center justify-between">
-      <h3 class="admin-card-title">Recent Bookings</h3>
+      <h3 class="admin-card-title">{{ t("Recent Bookings") }}</h3>
       <NuxtLink
         to="/admin/bookings"
         class="text-sm text-(--admin-primary) hover:underline"
       >
-        View All
+        {{ t("View All") }}
       </NuxtLink>
     </div>
     <div class="overflow-x-auto">
@@ -16,17 +16,18 @@
         responsiveLayout="scroll"
         class="p-datatable-sm"
       >
-        <!-- Empty state -->
         <template #empty>
           <div class="flex flex-col items-center justify-center py-10 gap-2">
             <i class="pi pi-calendar text-3xl text-(--admin-text-muted)"></i>
-            <p class="text-(--admin-text-muted) text-sm">No recent bookings</p>
+            <p class="text-(--admin-text-muted) text-sm">
+              {{ t("No recent bookings") }}
+            </p>
           </div>
         </template>
 
         <Column
           field="bookingCode"
-          header="Booking ID"
+          :header="t('Booking ID')"
           style="min-width: 120px"
         >
           <template #body="{ data }">
@@ -36,7 +37,7 @@
           </template>
         </Column>
 
-        <Column field="hotelName" header="Hotel" style="min-width: 200px">
+        <Column field="hotelName" :header="t('Hotel')" style="min-width: 200px">
           <template #body="{ data }">
             <div class="flex items-center gap-3">
               <Image
@@ -64,7 +65,7 @@
           </template>
         </Column>
 
-        <Column field="guestName" header="Guest" style="min-width: 150px">
+        <Column field="guestName" :header="t('Guest')" style="min-width: 150px">
           <template #body="{ data }">
             <div class="flex items-center gap-2">
               <Avatar
@@ -80,7 +81,11 @@
           </template>
         </Column>
 
-        <Column field="checkInDate" header="Check-in" style="min-width: 120px">
+        <Column
+          field="checkInDate"
+          :header="t('Check-in')"
+          style="min-width: 120px"
+        >
           <template #body="{ data }">
             <span>{{ formatDate(data.checkInDate) }}</span>
           </template>
@@ -88,7 +93,7 @@
 
         <Column
           field="checkOutDate"
-          header="Check-out"
+          :header="t('Check-out')"
           style="min-width: 120px"
         >
           <template #body="{ data }">
@@ -96,24 +101,24 @@
           </template>
         </Column>
 
-        <Column field="amount" header="Amount" style="min-width: 100px">
+        <Column field="amount" :header="t('Amount')" style="min-width: 100px">
           <template #body="{ data }">
-            <span class="font-semibold">
-              ${{ data.amount.toLocaleString() }}
-            </span>
+            <span class="font-semibold"
+              >${{ data.amount.toLocaleString() }}</span
+            >
           </template>
         </Column>
 
-        <Column field="status" header="Status" style="min-width: 120px">
+        <Column field="status" :header="t('Status')" style="min-width: 120px">
           <template #body="{ data }">
             <Tag
-              :value="data.status"
+              :value="t(data.status)"
               :severity="getStatusSeverity(data.status)"
             />
           </template>
         </Column>
 
-        <Column header="Actions" style="min-width: 100px">
+        <Column :header="t('Actions')" style="min-width: 100px">
           <template #body="{ data }">
             <div class="flex justify-center">
               <Button
@@ -138,44 +143,21 @@ import Column from "primevue/column";
 import Tag from "primevue/tag";
 import Avatar from "primevue/avatar";
 import Button from "primevue/button";
-import Menu from "primevue/menu";
 import type { RecentBooking } from "~/stores/admin/interfaces/dashboard";
 import { Image } from "primevue";
 
-defineProps<{
-  bookings: RecentBooking[];
-}>();
+const { t } = useI18n();
 
-const emit = defineEmits<{
-  (e: "view", booking: RecentBooking): void;
-}>();
+defineProps<{ bookings: RecentBooking[] }>();
 
-// Sửa viewBooking:
-function viewBooking(booking: RecentBooking) {
-  emit("view", booking);
-}
+const emit = defineEmits<{ (e: "view", booking: RecentBooking): void }>();
 
 const menu = ref();
 const selectedBooking = ref<RecentBooking | null>(null);
 
-const menuItems = [
-  {
-    label: "View Details",
-    icon: "pi pi-eye",
-    command: () => viewBooking(selectedBooking.value!),
-  },
-  {
-    label: "Edit",
-    icon: "pi pi-pencil",
-    command: () => editBooking(selectedBooking.value!),
-  },
-  { separator: true },
-  {
-    label: "Cancel Booking",
-    icon: "pi pi-times",
-    command: () => cancelBooking(selectedBooking.value!),
-  },
-];
+function viewBooking(booking: RecentBooking) {
+  emit("view", booking);
+}
 
 function formatDate(dateString: string) {
   return new Date(dateString).toLocaleDateString("en-US", {

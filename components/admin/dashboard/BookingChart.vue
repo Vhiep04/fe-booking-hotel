@@ -1,7 +1,7 @@
 <template>
   <div class="admin-card h-full">
     <div class="admin-card-header">
-      <h3 class="admin-card-title">Booking Status</h3>
+      <h3 class="admin-card-title">{{ t("Booking Status") }}</h3>
     </div>
     <div class="admin-card-body">
       <div class="flex flex-col lg:flex-row items-center gap-6">
@@ -18,22 +18,22 @@
             <div
               v-for="(item, index) in statusItems"
               :key="index"
-              class="flex items-center justify-between p-3 rounded-lg bg-[var(--admin-surface-hover)]"
+              class="flex items-center justify-between p-3 rounded-lg bg-(--admin-surface-hover)"
             >
               <div class="flex items-center gap-3">
                 <span
                   class="w-3 h-3 rounded-full"
                   :style="{ backgroundColor: item.color }"
                 ></span>
-                <span class="text-[var(--admin-text-color)] font-medium">
+                <span class="text-(--admin-text-color) font-medium">
                   {{ item.label }}
                 </span>
               </div>
               <div class="text-right">
-                <p class="font-bold text-[var(--admin-text-color)]">
+                <p class="font-bold text-(--admin-text-color)">
                   {{ item.count }}
                 </p>
-                <p class="text-xs text-[var(--admin-text-muted)]">
+                <p class="text-xs text-(--admin-text-muted)">
                   {{ item.percentage }}%
                 </p>
               </div>
@@ -47,6 +47,8 @@
 
 <script setup lang="ts">
 import Chart from "primevue/chart";
+
+const { t } = useI18n();
 
 const props = defineProps<{
   confirmed: number;
@@ -64,25 +66,25 @@ const pct = (val: number) =>
 
 const statusItems = computed(() => [
   {
-    label: "Completed",
+    label: t("Completed"),
     count: props.completed,
     percentage: pct(props.completed),
     color: "#22c55e",
   },
   {
-    label: "Confirmed",
+    label: t("Confirmed"),
     count: props.confirmed,
     percentage: pct(props.confirmed),
     color: "#3b82f6",
   },
   {
-    label: "Pending",
+    label: t("Pending"),
     count: props.pending,
     percentage: pct(props.pending),
     color: "#f59e0b",
   },
   {
-    label: "Cancelled",
+    label: t("Cancelled"),
     count: props.cancelled,
     percentage: pct(props.cancelled),
     color: "#ef4444",

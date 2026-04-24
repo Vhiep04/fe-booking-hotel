@@ -2,7 +2,7 @@
   <Dialog
     v-model:visible="visible"
     :style="{ width: '700px' }"
-    header="Booking Details"
+    :header="t('Booking Details')"
     :modal="true"
     @show="onOpen"
   >
@@ -19,7 +19,7 @@
       <i class="pi pi-exclamation-circle text-3xl text-(--admin-danger)"></i>
       <p class="text-(--admin-danger) text-sm">{{ error }}</p>
       <Button
-        label="Retry"
+        :label="t('Retry')"
         icon="pi pi-refresh"
         size="small"
         @click="loadDetail"
@@ -32,8 +32,9 @@
         <div>
           <label
             class="text-xs text-(--admin-text-muted) uppercase tracking-wider"
-            >Booking ID</label
           >
+            {{ t("Booking ID") }}
+          </label>
           <p class="font-semibold text-(--admin-primary) mt-1">
             #{{ detail.reservationId }}
           </p>
@@ -41,18 +42,19 @@
         <div>
           <label
             class="text-xs text-(--admin-text-muted) uppercase tracking-wider"
-            >Created At</label
           >
+            {{ t("Created At") }}
+          </label>
           <p class="font-medium mt-1">{{ formatDate(detail.createdAt) }}</p>
         </div>
       </div>
 
       <Divider />
 
-      <!-- Thay phần Hotel Information -->
+      <!-- Hotel Information -->
       <div>
         <h4 class="font-semibold mb-3 text-(--admin-text-color)">
-          Hotel Information
+          {{ t("Hotel Information") }}
         </h4>
         <div class="flex items-center gap-4">
           <img
@@ -72,7 +74,7 @@
               {{ detail.hotelName }}
             </p>
             <p class="text-(--admin-text-muted) text-sm mt-0.5">
-              {{ detail.roomType }} · Room #{{ detail.roomId }}
+              {{ detail.roomType }} · {{ t("Room #") }}{{ detail.roomId }}
             </p>
             <p class="text-sm text-(--admin-text-muted) mt-1">
               <i class="pi pi-map-marker mr-1 text-xs"></i>{{ detail.cityName }}
@@ -83,17 +85,22 @@
 
       <Divider />
 
+      <!-- Guest Information -->
       <div>
         <h4 class="font-semibold mb-3 text-(--admin-text-color)">
-          Guest Information
+          {{ t("Guest Information") }}
         </h4>
         <div class="grid grid-cols-2 gap-4">
           <div>
-            <label class="text-xs text-(--admin-text-muted)">Name</label>
+            <label class="text-xs text-(--admin-text-muted)">{{
+              t("Name")
+            }}</label>
             <p class="font-medium mt-1">{{ detail.userName }}</p>
           </div>
           <div>
-            <label class="text-xs text-(--admin-text-muted)">Email</label>
+            <label class="text-xs text-(--admin-text-muted)">{{
+              t("Email")
+            }}</label>
             <p class="font-medium mt-1 truncate">{{ detail.userEmail }}</p>
           </div>
         </div>
@@ -101,50 +108,60 @@
 
       <Divider />
 
+      <!-- Stay Information -->
       <div>
         <h4 class="font-semibold mb-3 text-(--admin-text-color)">
-          Stay Information
+          {{ t("Stay Information") }}
         </h4>
         <div class="grid grid-cols-3 gap-4">
           <div>
-            <label class="text-xs text-(--admin-text-muted)">Check-in</label>
+            <label class="text-xs text-(--admin-text-muted)">{{
+              t("Check-in")
+            }}</label>
             <p class="font-medium mt-1">{{ formatDate(detail.checkInDate) }}</p>
           </div>
           <div>
-            <label class="text-xs text-(--admin-text-muted)">Check-out</label>
+            <label class="text-xs text-(--admin-text-muted)">{{
+              t("Check-out")
+            }}</label>
             <p class="font-medium mt-1">
               {{ formatDate(detail.checkOutDate) }}
             </p>
           </div>
           <div>
-            <label class="text-xs text-(--admin-text-muted)">Duration</label>
-            <p class="font-medium mt-1">{{ detail.nights }} nights</p>
+            <label class="text-xs text-(--admin-text-muted)">{{
+              t("Duration")
+            }}</label>
+            <p class="font-medium mt-1">
+              {{ t("{n} nights", { n: detail.nights }) }}
+            </p>
           </div>
         </div>
       </div>
 
       <Divider />
 
+      <!-- Payment Information -->
       <div>
         <h4 class="font-semibold mb-3 text-(--admin-text-color)">
-          Payment Information
+          {{ t("Payment Information") }}
         </h4>
         <div class="grid grid-cols-2 gap-4 mb-4">
           <div>
-            <label class="text-xs text-(--admin-text-muted)"
-              >Total Amount</label
-            >
+            <label class="text-xs text-(--admin-text-muted)">{{
+              t("Total Amount")
+            }}</label>
             <p class="font-bold text-2xl mt-1">
               ${{ detail.totalPrice.toLocaleString() }}
             </p>
           </div>
           <div>
-            <label class="text-xs text-(--admin-text-muted)"
-              >Payment Status</label
-            >
+            <label class="text-xs text-(--admin-text-muted)">{{
+              t("Payment Status")
+            }}</label>
             <div class="mt-2">
               <Tag
-                :value="detail.paymentStatus"
+                :value="t(detail.paymentStatus)"
                 :severity="getStatusSeverity(detail.paymentStatus)"
               />
             </div>
@@ -155,7 +172,7 @@
           <label
             class="text-xs text-(--admin-text-muted) uppercase tracking-wider mb-2 block"
           >
-            Payment History
+            {{ t("Payment History") }}
           </label>
           <div class="space-y-2">
             <div
@@ -174,7 +191,7 @@
                   ${{ payment.amount.toLocaleString() }}
                 </p>
                 <Tag
-                  :value="payment.status"
+                  :value="t(payment.status)"
                   :severity="getStatusSeverity(payment.status)"
                   class="text-xs mt-1"
                 />
@@ -187,7 +204,7 @@
 
     <template #footer>
       <Button
-        label="Close"
+        :label="t('Close')"
         severity="secondary"
         outlined
         @click="visible = false"
@@ -205,6 +222,8 @@ import ProgressSpinner from "primevue/progressspinner";
 import { useReservationsStore } from "~/stores/admin/reservations";
 import type { RecentBooking } from "~/stores/admin/interfaces/dashboard";
 import type { Reservation } from "~/stores/admin/interfaces/reservations";
+
+const { t } = useI18n();
 
 const props = defineProps<{
   modelValue: boolean;
@@ -238,10 +257,10 @@ async function loadDetail() {
     if (res?.success) {
       detail.value = res.data;
     } else {
-      error.value = res?.message ?? "Failed to load booking detail";
+      error.value = res?.message ?? t("Failed to load booking detail");
     }
   } catch {
-    error.value = "Unexpected error. Please try again.";
+    error.value = t("Unexpected error. Please try again.");
   } finally {
     loading.value = false;
   }

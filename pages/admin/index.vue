@@ -4,13 +4,13 @@
       class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6"
     >
       <div>
-        <h1 class="admin-page-title">Dashboard</h1>
+        <h1 class="admin-page-title">{{ t("Dashboard") }}</h1>
         <p class="admin-page-subtitle">
-          Welcome back! Here's what's happening with your bookings.
+          {{ t("Welcome back! Here's what's happening with your bookings.") }}
         </p>
       </div>
       <Button
-        label="Export"
+        :label="t('Export')"
         icon="pi pi-download"
         :loading="dashboardStore.isExporting"
         :disabled="dashboardStore.isExporting"
@@ -28,7 +28,7 @@
     <div v-else-if="dashboardStore.error" class="admin-card p-6 text-center">
       <p class="text-(--admin-danger) mb-4">{{ dashboardStore.error }}</p>
       <Button
-        label="Retry"
+        :label="t('Retry')"
         icon="pi pi-refresh"
         @click="dashboardStore.fetchDashboard()"
       />
@@ -37,37 +37,37 @@
     <template v-else-if="data">
       <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
         <KpiCard
-          title="Total Revenue"
+          :title="t('Total Revenue')"
           :value="data.totalRevenue"
           :change="12.5"
           icon="pi pi-wallet"
           color="blue"
           format="currency"
-          period="month"
+          :period="t('month')"
         />
         <KpiCard
-          title="Total Bookings"
+          :title="t('Total Bookings')"
           :value="data.totalReservations"
           :change="8.2"
           icon="pi pi-calendar"
           color="purple"
-          period="month"
+          :period="t('month')"
         />
         <KpiCard
-          title="Active Hotels"
+          :title="t('Active Hotels')"
           :value="data.totalHotels"
           :change="3.1"
           icon="pi pi-building"
           color="orange"
-          period="month"
+          :period="t('month')"
         />
         <KpiCard
-          title="Total Users"
+          :title="t('Total Users')"
           :value="data.totalUsers"
           :change="15.3"
           icon="pi pi-users"
           color="pink"
-          period="month"
+          :period="t('month')"
         />
       </div>
 
@@ -89,7 +89,7 @@
         <!-- Top Hotels -->
         <div class="admin-card">
           <div class="admin-card-header">
-            <h3 class="admin-card-title">Top Hotels</h3>
+            <h3 class="admin-card-title">{{ t("Top Hotels") }}</h3>
           </div>
           <div class="admin-card-body">
             <div class="space-y-4">
@@ -115,7 +115,7 @@
                     {{ hotel.name }}
                   </p>
                   <p class="text-sm text-(--admin-text-muted)">
-                    {{ hotel.reservationCount }} bookings · ⭐
+                    {{ hotel.reservationCount }} {{ t("bookings") }} · ⭐
                     {{ hotel.averageRating.toFixed(1) }}
                   </p>
                 </div>
@@ -129,9 +129,10 @@
           </div>
         </div>
 
+        <!-- Recent Activities -->
         <div class="admin-card flex flex-col">
           <div class="admin-card-header">
-            <h3 class="admin-card-title">Recent Activities</h3>
+            <h3 class="admin-card-title">{{ t("Recent Activities") }}</h3>
           </div>
           <div class="admin-card-body flex-1 overflow-y-auto max-h-72">
             <div v-if="data.recentActivities.length" class="space-y-4">
@@ -154,7 +155,7 @@
                 </template>
                 <div class="flex-1 min-w-0">
                   <p class="text-sm text-(--admin-text-color)">
-                    {{ activity.message }}
+                    {{ translateActivity(activity.message, activity.type) }}
                   </p>
                   <p class="text-xs text-(--admin-text-muted) mt-1">
                     {{ formatTimeAgo(activity.time) }}
@@ -166,7 +167,7 @@
               v-else
               class="text-sm text-(--admin-text-muted) text-center py-4"
             >
-              No recent activities
+              {{ t("No recent activities") }}
             </p>
           </div>
         </div>
@@ -174,7 +175,7 @@
         <!-- Popular Cities -->
         <div class="admin-card">
           <div class="admin-card-header">
-            <h3 class="admin-card-title">Popular Cities</h3>
+            <h3 class="admin-card-title">{{ t("Popular Cities") }}</h3>
           </div>
           <div class="admin-card-body">
             <div class="space-y-3">
@@ -189,7 +190,7 @@
                       {{ city.name }}
                     </span>
                     <span class="text-sm text-(--admin-text-muted)">
-                      {{ city.hotelCount }} hotels
+                      {{ city.hotelCount }} {{ t("hotels") }}
                     </span>
                   </div>
                   <ProgressBar
@@ -234,9 +235,9 @@ definePageMeta({
   middleware: ["admin"],
 });
 
-useHead({
-  title: "Admin",
-});
+const { t } = useI18n();
+
+useHead({ title: t("Admin") });
 
 const dashboardStore = useDashboardStore();
 const data = computed(
@@ -254,10 +255,11 @@ function openDashboardBookingDialog(booking: RecentBooking) {
 }
 
 function formatCurrency(value: number): string {
-  if (value === 0) return "$0";
-  return new Intl.NumberFormat("en-US", {
+  if (value === 0) return "0 đ";
+
+  return new Intl.NumberFormat("vi-VN", {
     style: "currency",
-    currency: "USD",
+    currency: "VND",
     minimumFractionDigits: 0,
     maximumFractionDigits: 0,
   }).format(value);
@@ -268,11 +270,40 @@ function formatTimeAgo(dateString: string): string {
   const now = new Date();
   const diffMs = now.getTime() - date.getTime();
   const diffMins = Math.floor(diffMs / 60000);
-  if (diffMins < 1) return "just now";
-  if (diffMins < 60) return `${diffMins} minutes ago`;
+  if (diffMins < 1) return t("just now");
+  if (diffMins < 60) return t("{n} minutes ago", { n: diffMins });
   const diffHours = Math.floor(diffMins / 60);
-  if (diffHours < 24) return `${diffHours} hours ago`;
-  return `${Math.floor(diffHours / 24)} days ago`;
+  if (diffHours < 24) return t("{n} hours ago", { n: diffHours });
+  return t("{n} days ago", { n: Math.floor(diffHours / 24) });
+}
+
+function translateActivity(message: string, type: string): string {
+  // "Payment received - $4000000.00"
+  const paymentMatch = message.match(/^Payment received - (.+)$/);
+  if (paymentMatch) {
+    return t("Payment received - {amount}", { amount: paymentMatch[1] });
+  }
+
+  // "New booking at The Savoy"
+  const bookingMatch = message.match(/^New booking at (.+)$/);
+  if (bookingMatch) {
+    return t("New booking at {hotel}", { hotel: bookingMatch[1] });
+  }
+
+  // "New user registered: example@email.com"
+  const userMatch = message.match(/^New user registered: (.+)$/);
+  if (userMatch) {
+    return t("New user registered: {email}", { email: userMatch[1] });
+  }
+
+  // "Booking cancelled at The Savoy"
+  const cancelMatch = message.match(/^Booking cancelled at (.+)$/);
+  if (cancelMatch) {
+    return t("Booking cancelled at {hotel}", { hotel: cancelMatch[1] });
+  }
+
+  // fallback
+  return message;
 }
 
 function getActivityStyle(type: string | undefined): {

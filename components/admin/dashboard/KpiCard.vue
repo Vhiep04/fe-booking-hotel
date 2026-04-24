@@ -18,7 +18,7 @@
               {{ Math.abs(change) }}%
             </span>
             <span class="text-xs text-(--admin-text-muted)">
-              vs last {{ period }}
+              {{ t("vs last {period}", { period: period ?? t("month") }) }}
             </span>
           </div>
         </div>
@@ -34,6 +34,8 @@
 </template>
 
 <script setup lang="ts">
+const { t } = useI18n();
+
 const props = defineProps<{
   title: string;
   value: number;
@@ -61,13 +63,13 @@ const formattedValue = computed(() => {
   }
 });
 
-const changeColorClass = computed(() => {
-  return props.change >= 0 ? "text-(--admin-success)" : "text-(--admin-danger)";
-});
+const changeColorClass = computed(() =>
+  props.change >= 0 ? "text-(--admin-success)" : "text-(--admin-danger)",
+);
 
-const changeIcon = computed(() => {
-  return props.change >= 0 ? "pi pi-arrow-up" : "pi pi-arrow-down";
-});
+const changeIcon = computed(() =>
+  props.change >= 0 ? "pi pi-arrow-up" : "pi pi-arrow-down",
+);
 
 const colorMap = {
   blue: {

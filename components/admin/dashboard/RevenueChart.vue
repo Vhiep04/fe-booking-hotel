@@ -1,7 +1,7 @@
 <template>
   <div class="admin-card h-full">
     <div class="admin-card-header flex items-center justify-between">
-      <h3 class="admin-card-title">Revenue Overview</h3>
+      <h3 class="admin-card-title">{{ t("Revenue Overview") }}</h3>
       <Dropdown
         v-model="selectedPeriod"
         :options="periodOptions"
@@ -22,7 +22,7 @@
       <div v-else class="h-80 flex flex-col items-center justify-center gap-2">
         <i class="pi pi-chart-line text-4xl text-(--admin-text-muted)"></i>
         <p class="text-(--admin-text-muted) text-sm">
-          No revenue data available
+          {{ t("No revenue data available") }}
         </p>
       </div>
     </div>
@@ -34,16 +34,19 @@ import Chart from "primevue/chart";
 import Dropdown from "primevue/dropdown";
 import type { RevenueChart } from "~/stores/admin/interfaces/dashboard";
 
+const { t } = useI18n();
+
 const props = defineProps<{
   chartData: RevenueChart[];
 }>();
 
 const selectedPeriod = ref("12months");
-const periodOptions = [
-  { label: "Last 7 days", value: "7days" },
-  { label: "Last 30 days", value: "30days" },
-  { label: "Last 12 months", value: "12months" },
-];
+
+const periodOptions = computed(() => [
+  { label: t("Last 7 days"), value: "7days" },
+  { label: t("Last 30 days"), value: "30days" },
+  { label: t("Last 12 months"), value: "12months" },
+]);
 
 const filledChartData = computed(() => {
   const now = new Date();
@@ -57,7 +60,6 @@ const filledChartData = computed(() => {
         month: "short",
         day: "numeric",
       });
-
       return { monthName: dayName, revenue: 0, reservationCount: 0 };
     });
   }
@@ -74,7 +76,6 @@ const filledChartData = computed(() => {
     });
   }
 
-  // Default: 12months
   return Array.from({ length: 12 }, (_, i) => {
     const d = new Date(now.getFullYear(), now.getMonth() - 11 + i, 1);
     const year = d.getFullYear();
@@ -100,7 +101,7 @@ const chartData = computed(() => ({
   labels: filledChartData.value.map((i) => i.monthName),
   datasets: [
     {
-      label: "Revenue ($)",
+      label: t("Revenue (đ)"),
       data: filledChartData.value.map((i) => i.revenue),
       fill: true,
       borderColor: "#3b82f6",
@@ -110,7 +111,7 @@ const chartData = computed(() => ({
       pointHoverRadius: 6,
     },
     {
-      label: "Bookings",
+      label: t("Bookings"),
       data: filledChartData.value.map((i) => i.reservationCount),
       fill: false,
       borderColor: "#22c55e",
@@ -151,7 +152,13 @@ const chartOptions = computed(() => ({
       grid: { color: "rgba(0, 0, 0, 0.05)" },
       ticks: {
         color: "#64748b",
-        callback: (value: number) => "$" + value.toLocaleString(),
+        callback: (value: number) =>
+          new Intl.NumberFormat("vi-VN", {
+            style: "currency",
+            currency: "VND",
+            minimumFractionDigits: 0,
+            maximumFractionDigits: 0,
+          }).format(value),
       },
     },
     y1: {
