@@ -4,23 +4,28 @@
       class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6"
     >
       <div>
-        <h1 class="admin-page-title">Hotels Management</h1>
-        <p class="admin-page-subtitle">Manage all hotels in your platform</p>
+        <h1 class="admin-page-title">{{ t("Hotels Management") }}</h1>
+        <p class="admin-page-subtitle">
+          {{ t("Manage all hotels in your platform") }}
+        </p>
       </div>
       <div class="flex items-center gap-3">
         <Button
-          label="Export"
+          :label="t('Export')"
           icon="pi pi-download"
           severity="secondary"
           outlined
           @click="exportData"
         />
-        <Button label="Add Hotel" icon="pi pi-plus" @click="openCreateDialog" />
+        <Button
+          :label="t('Add Hotel')"
+          icon="pi pi-plus"
+          @click="openCreateDialog"
+        />
       </div>
     </div>
 
     <HotelFilter v-model="filters" :cities="cityOptions" />
-
     <HotelTable
       :hotels="hotels"
       :totalCount="pagination.totalCount"
@@ -68,6 +73,7 @@ import type { Hotel, HotelPayload } from "~/stores/admin/interfaces/hotels";
 definePageMeta({ layout: "admin", middleware: ["admin"] });
 useHead({ title: "Hotel Management" });
 
+const { t } = useI18n();
 const toast = useToast();
 const hotelStore = useAdminHotelStore();
 const citiesStore = useCitiesStore();
@@ -84,15 +90,12 @@ const editingHotel = ref<Hotel | null>(null);
 const hotelToDelete = ref<Hotel | null>(null);
 
 const pagination = ref({ page: 1, pageSize: 10, totalCount: 0 });
-
 const filters = ref<HotelFiltersModel>({
   search: "",
   cityId: null,
   status: null,
   rating: null,
 });
-
-// City options loaded from API for filter + form dropdown
 const cityOptions = ref<{ cityId: number; name: string }[]>([]);
 
 onMounted(async () => {
@@ -102,15 +105,12 @@ onMounted(async () => {
 async function fetchCities() {
   try {
     const res = await citiesStore.getCities({ pageSize: 200 });
-    if (res.success) {
+    if (res.success)
       cityOptions.value = res.data.items.map((c) => ({
         cityId: c.cityId,
         name: c.name,
       }));
-    }
-  } catch {
-    // non-critical — filters just won't have city options
-  }
+  } catch {}
 }
 
 async function fetchHotels() {
@@ -122,33 +122,27 @@ async function fetchHotels() {
       search: filters.value.search || undefined,
       cityId: filters.value.cityId ?? undefined,
     });
-
     if (res?.success) {
-      // API doesn't support status/rating filter — apply client-side
       let items = res.data.items;
-      if (filters.value.status) {
-        // Hotel model has no status field from API — skip for now
-      }
-      if (filters.value.rating !== null) {
+      if (filters.value.rating !== null)
         items = items.filter(
           (h) => Math.floor(h.averageRating ?? 0) === filters.value.rating,
         );
-      }
       hotels.value = items;
       pagination.value.totalCount = res.data.totalCount;
     } else {
       toast.add({
         severity: "error",
-        summary: "Error",
-        detail: res?.message ?? "Failed to load hotels",
+        summary: t("Error"),
+        detail: res?.message ?? t("Failed to load hotels"),
         life: 3000,
       });
     }
   } catch {
     toast.add({
       severity: "error",
-      summary: "Error",
-      detail: "Unexpected error loading hotels",
+      summary: t("Error"),
+      detail: t("Unexpected error loading hotels"),
       life: 3000,
     });
   } finally {
@@ -172,27 +166,22 @@ function onPageChange({ page, rows }: { page: number; rows: number }) {
   pagination.value.pageSize = rows;
   fetchHotels();
 }
-
 function openCreateDialog() {
   navigateTo("/admin/hotels/create");
 }
-
 function openEditDialog(hotel: Hotel) {
   editingHotel.value = hotel;
   isEditing.value = true;
   hotelDialog.value = true;
 }
-
 function openDeleteDialog(hotel: Hotel) {
   hotelToDelete.value = hotel;
   deleteDialog.value = true;
 }
-
 function closeHotelDialog() {
   hotelDialog.value = false;
   editingHotel.value = null;
 }
-
 function viewHotel(hotel: Hotel) {
   navigateTo(`/admin/hotels/${hotel.hotelId}`);
 }
@@ -204,8 +193,8 @@ async function handleCreate(payload: HotelPayload) {
     if (res?.success) {
       toast.add({
         severity: "success",
-        summary: "Success",
-        detail: "Hotel created successfully",
+        summary: t("Success"),
+        detail: t("Hotel created successfully"),
         life: 3000,
       });
       closeHotelDialog();
@@ -213,16 +202,16 @@ async function handleCreate(payload: HotelPayload) {
     } else {
       toast.add({
         severity: "error",
-        summary: "Error",
-        detail: res?.message ?? "Failed to create hotel",
+        summary: t("Error"),
+        detail: res?.message ?? t("Failed to create hotel"),
         life: 3000,
       });
     }
   } catch {
     toast.add({
       severity: "error",
-      summary: "Error",
-      detail: "Unexpected error",
+      summary: t("Error"),
+      detail: t("Unexpected error"),
       life: 3000,
     });
   } finally {
@@ -237,8 +226,8 @@ async function handleUpdate(id: number, payload: HotelPayload) {
     if (res?.success) {
       toast.add({
         severity: "success",
-        summary: "Success",
-        detail: "Hotel updated successfully",
+        summary: t("Success"),
+        detail: t("Hotel updated successfully"),
         life: 3000,
       });
       closeHotelDialog();
@@ -246,16 +235,16 @@ async function handleUpdate(id: number, payload: HotelPayload) {
     } else {
       toast.add({
         severity: "error",
-        summary: "Error",
-        detail: res?.message ?? "Failed to update hotel",
+        summary: t("Error"),
+        detail: res?.message ?? t("Failed to update hotel"),
         life: 3000,
       });
     }
   } catch {
     toast.add({
       severity: "error",
-      summary: "Error",
-      detail: "Unexpected error",
+      summary: t("Error"),
+      detail: t("Unexpected error"),
       life: 3000,
     });
   } finally {
@@ -271,8 +260,8 @@ async function handleDelete() {
     if (res?.success) {
       toast.add({
         severity: "success",
-        summary: "Success",
-        detail: "Hotel deleted successfully",
+        summary: t("Success"),
+        detail: t("Hotel deleted successfully"),
         life: 3000,
       });
       deleteDialog.value = false;
@@ -281,16 +270,16 @@ async function handleDelete() {
     } else {
       toast.add({
         severity: "error",
-        summary: "Error",
-        detail: res?.message ?? "Failed to delete hotel",
+        summary: t("Error"),
+        detail: res?.message ?? t("Failed to delete hotel"),
         life: 3000,
       });
     }
   } catch {
     toast.add({
       severity: "error",
-      summary: "Error",
-      detail: "Unexpected error",
+      summary: t("Error"),
+      detail: t("Unexpected error"),
       life: 3000,
     });
   } finally {
@@ -298,11 +287,11 @@ async function handleDelete() {
   }
 }
 
-function confirmDeleteSelected(selected: Hotel[]) {
+function confirmDeleteSelected(_selected: Hotel[]) {
   toast.add({
     severity: "warn",
-    summary: "Not implemented",
-    detail: "Bulk delete coming soon",
+    summary: t("Not implemented"),
+    detail: t("Bulk delete coming soon"),
     life: 3000,
   });
 }
@@ -310,8 +299,8 @@ function confirmDeleteSelected(selected: Hotel[]) {
 function exportData() {
   toast.add({
     severity: "info",
-    summary: "Export",
-    detail: "Exporting data...",
+    summary: t("Export"),
+    detail: t("Exporting data..."),
     life: 3000,
   });
 }

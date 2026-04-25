@@ -4,8 +4,10 @@
       class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6"
     >
       <div>
-        <h1 class="admin-page-title">Bookings Management</h1>
-        <p class="admin-page-subtitle">View and manage all bookings</p>
+        <h1 class="admin-page-title">{{ t("Bookings Management") }}</h1>
+        <p class="admin-page-subtitle">
+          {{ t("View and manage all bookings") }}
+        </p>
       </div>
     </div>
 
@@ -39,7 +41,6 @@
 </template>
 
 <script setup lang="ts">
-import Button from "primevue/button";
 import { useToast } from "primevue/usetoast";
 import type { Reservation } from "~/stores/admin/interfaces/reservations";
 import { useReservationsStore } from "~/stores/admin/reservations";
@@ -55,9 +56,9 @@ definePageMeta({
   middleware: ["admin"],
 });
 
-useHead({
-  title: "Reservation Management",
-});
+const { t } = useI18n();
+
+useHead({ title: t("Reservation Management") });
 
 const toast = useToast();
 const reservationsStore = useReservationsStore();
@@ -94,16 +95,16 @@ async function fetchReservations() {
     } else {
       toast.add({
         severity: "error",
-        summary: "Error",
-        detail: res?.message ?? "Failed to load bookings",
+        summary: t("Error"),
+        detail: res?.message ?? t("Failed to load bookings"),
         life: 3000,
       });
     }
   } catch {
     toast.add({
       severity: "error",
-      summary: "Error",
-      detail: "Unexpected error loading bookings",
+      summary: t("Error"),
+      detail: t("Unexpected error loading bookings"),
       life: 3000,
     });
   } finally {
@@ -142,15 +143,18 @@ async function onStatusChange(booking: Reservation) {
     if (res?.success) {
       toast.add({
         severity: "success",
-        summary: "Status Updated",
-        detail: `Booking #${booking.reservationId} → ${booking.paymentStatus}`,
+        summary: t("Status Updated"),
+        detail: t("Booking #{id} → {status}", {
+          id: booking.reservationId,
+          status: t(booking.paymentStatus),
+        }),
         life: 3000,
       });
     } else {
       toast.add({
         severity: "error",
-        summary: "Error",
-        detail: res?.message ?? "Failed to update status",
+        summary: t("Error"),
+        detail: res?.message ?? t("Failed to update status"),
         life: 3000,
       });
       await fetchReservations();
@@ -158,8 +162,8 @@ async function onStatusChange(booking: Reservation) {
   } catch {
     toast.add({
       severity: "error",
-      summary: "Error",
-      detail: "Unexpected error",
+      summary: t("Error"),
+      detail: t("Unexpected error"),
       life: 3000,
     });
     await fetchReservations();
@@ -172,8 +176,8 @@ function printInvoice(booking: Reservation | null) {
   if (!booking) return;
   toast.add({
     severity: "info",
-    summary: "Printing",
-    detail: `Invoice for booking #${booking.reservationId}`,
+    summary: t("Printing"),
+    detail: t("Invoice for booking #{id}", { id: booking.reservationId }),
     life: 3000,
   });
 }

@@ -10,24 +10,26 @@
       dataKey="roomId"
       :rowsPerPageOptions="[10, 20, 50]"
       paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
-      currentPageReportTemplate="Showing {first} to {last} of {totalRecords} rooms"
+      :currentPageReportTemplate="
+        t('Showing {first} to {last} of {totalRecords} rooms')
+      "
       class="p-datatable-sm"
       @page="onPage"
     >
       <template #header>
         <span class="text-(--admin-text-secondary)">
-          {{ totalCount }} rooms found
+          {{ t("{n} rooms found", { n: totalCount }) }}
         </span>
       </template>
 
       <template #empty>
         <div class="text-center py-8 text-(--admin-text-muted)">
           <i class="pi pi-inbox text-4xl mb-2 block" />
-          <p>No rooms found</p>
+          <p>{{ t("No rooms found") }}</p>
         </div>
       </template>
 
-      <Column field="roomId" header="ID" style="width: 80px">
+      <Column field="roomId" :header="t('ID')" style="width: 80px">
         <template #body="{ data }">
           <span class="font-medium text-(--admin-text-muted)"
             >#{{ data.roomId }}</span
@@ -35,7 +37,11 @@
         </template>
       </Column>
 
-      <Column field="roomNumber" header="Room No." style="min-width: 100px">
+      <Column
+        field="roomNumber"
+        :header="t('Room No.')"
+        style="min-width: 100px"
+      >
         <template #body="{ data }">
           <span class="font-semibold text-(--admin-primary)">{{
             data.roomNumber
@@ -43,7 +49,7 @@
         </template>
       </Column>
 
-      <Column field="hotelName" header="Hotel" style="min-width: 160px">
+      <Column field="hotelName" :header="t('Hotel')" style="min-width: 160px">
         <template #body="{ data }">
           <div class="flex items-center gap-2">
             <i class="pi pi-building text-(--admin-primary)" />
@@ -54,7 +60,7 @@
         </template>
       </Column>
 
-      <Column field="roomType" header="Type" style="min-width: 120px">
+      <Column field="roomType" :header="t('Type')" style="min-width: 120px">
         <template #body="{ data }">
           <Tag
             :value="data.roomType"
@@ -63,7 +69,7 @@
         </template>
       </Column>
 
-      <Column field="capacity" header="Capacity" style="min-width: 100px">
+      <Column field="capacity" :header="t('Capacity')" style="min-width: 100px">
         <template #body="{ data }">
           <div class="flex items-center gap-1">
             <i class="pi pi-users text-(--admin-text-muted)" />
@@ -74,7 +80,7 @@
 
       <Column
         field="pricePerNight"
-        header="Price/Night"
+        :header="t('Price/Night')"
         style="min-width: 120px"
       >
         <template #body="{ data }">
@@ -84,16 +90,20 @@
         </template>
       </Column>
 
-      <Column field="status" header="Status" style="min-width: 120px">
+      <Column field="status" :header="t('Status')" style="min-width: 120px">
         <template #body="{ data }">
           <Tag
-            :value="data.status"
+            :value="t(data.status)"
             :severity="getStatusSeverity(data.status)"
           />
         </template>
       </Column>
 
-      <Column field="facilities" header="Facilities" style="min-width: 160px">
+      <Column
+        field="facilities"
+        :header="t('Facilities')"
+        style="min-width: 160px"
+      >
         <template #body="{ data }">
           <div class="flex flex-wrap gap-1">
             <Tag
@@ -115,7 +125,7 @@
         </template>
       </Column>
 
-      <Column header="Actions" style="width: 120px">
+      <Column :header="t('Actions')" style="width: 120px">
         <template #body="{ data }">
           <div class="flex items-center gap-1">
             <Button
@@ -124,7 +134,7 @@
               text
               rounded
               size="small"
-              v-tooltip.top="'View'"
+              v-tooltip.top="t('View')"
               @click="emit('view', data)"
             />
             <Button
@@ -133,7 +143,7 @@
               text
               rounded
               size="small"
-              v-tooltip.top="'Edit'"
+              v-tooltip.top="t('Edit')"
               @click="emit('edit', data)"
             />
             <Button
@@ -142,7 +152,7 @@
               text
               rounded
               size="small"
-              v-tooltip.top="'Delete'"
+              v-tooltip.top="t('Delete')"
               @click="emit('delete', data)"
             />
           </div>
@@ -158,6 +168,8 @@ import Column from "primevue/column";
 import Button from "primevue/button";
 import Tag from "primevue/tag";
 import type { RoomDto } from "~/stores/admin/interfaces/rooms";
+
+const { t } = useI18n();
 
 const props = defineProps<{
   rooms: RoomDto[];

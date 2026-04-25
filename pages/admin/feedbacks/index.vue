@@ -4,21 +4,18 @@
       class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6"
     >
       <div>
-        <h1 class="admin-page-title">Feedbacks Management</h1>
-        <p class="admin-page-subtitle">View and moderate guest reviews</p>
+        <h1 class="admin-page-title">{{ t("Feedbacks Management") }}</h1>
+        <p class="admin-page-subtitle">
+          {{ t("View and moderate guest reviews") }}
+        </p>
       </div>
     </div>
 
-    <!-- Stats -->
     <FeedbackStatsCard
       :feedbacks="feedbacks"
       :totalCount="pagination.totalCount"
     />
-
-    <!-- Filters -->
     <FeedbackFilter v-model="filters" @reset="resetFilters" />
-
-    <!-- Table -->
     <FeedbackTable
       :feedbacks="feedbacks"
       :totalCount="pagination.totalCount"
@@ -30,14 +27,11 @@
       @page="onPageChange"
     />
 
-    <!-- Detail Dialog -->
     <FeedbackDetailDialog
       v-model="detailDialog"
       :feedback="selectedFeedback"
       @edit="openEditDialog"
     />
-
-    <!-- Edit Dialog -->
     <FeedbackEditDialog
       v-model="editDialog"
       :feedback="editingFeedback"
@@ -45,8 +39,6 @@
       @hide="closeEditDialog"
       @save="handleUpdate"
     />
-
-    <!-- Delete Dialog -->
     <FeedbackDeleteDialog
       v-model="deleteDialog"
       :feedback="feedbackToDelete"
@@ -74,6 +66,7 @@ import type { UpdateFeedbackPayload } from "~/stores/interface/request/feedback"
 definePageMeta({ layout: "admin", middleware: ["admin"] });
 useHead({ title: "Feedback Management" });
 
+const { t } = useI18n();
 const toast = useToast();
 const feedbackStore = useAdminFeedbackStore();
 
@@ -91,7 +84,6 @@ const editingFeedback = ref<AdminFeedbackDto | null>(null);
 const feedbackToDelete = ref<AdminFeedbackDto | null>(null);
 
 const pagination = ref({ page: 1, pageSize: 10, totalCount: 0 });
-
 const filters = ref<FeedbackFiltersModel>({ search: "", rating: null });
 
 async function fetchFeedbacks() {
@@ -110,16 +102,16 @@ async function fetchFeedbacks() {
     } else {
       toast.add({
         severity: "error",
-        summary: "Error",
-        detail: res?.message ?? "Failed to load feedbacks",
+        summary: t("Error"),
+        detail: res?.message ?? t("Failed to load feedbacks"),
         life: 3000,
       });
     }
   } catch {
     toast.add({
       severity: "error",
-      summary: "Error",
-      detail: "Unexpected error loading feedbacks",
+      summary: t("Error"),
+      detail: t("Unexpected error loading feedbacks"),
       life: 3000,
     });
   } finally {
@@ -149,23 +141,19 @@ function onPageChange({ page, rows }: { page: number; rows: number }) {
 function resetFilters() {
   filters.value = { search: "", rating: null };
 }
-
 function openDetailDialog(feedback: AdminFeedbackDto) {
   selectedFeedback.value = feedback;
   detailDialog.value = true;
 }
-
 function openEditDialog(feedback: AdminFeedbackDto) {
   editingFeedback.value = feedback;
   editDialog.value = true;
   detailDialog.value = false;
 }
-
 function openDeleteDialog(feedback: AdminFeedbackDto) {
   feedbackToDelete.value = feedback;
   deleteDialog.value = true;
 }
-
 function closeEditDialog() {
   editDialog.value = false;
   editingFeedback.value = null;
@@ -178,27 +166,26 @@ async function handleUpdate(id: number, payload: UpdateFeedbackPayload) {
     if (res?.success) {
       toast.add({
         severity: "success",
-        summary: "Success",
-        detail: "Feedback updated successfully",
+        summary: t("Success"),
+        detail: t("Feedback updated successfully"),
         life: 3000,
       });
       closeEditDialog();
-      // Update in-place — no need to re-fetch full list
       const idx = feedbacks.value.findIndex((f) => f.feedbackId === id);
       if (idx !== -1) feedbacks.value[idx] = res.data;
     } else {
       toast.add({
         severity: "error",
-        summary: "Error",
-        detail: res?.message ?? "Failed to update feedback",
+        summary: t("Error"),
+        detail: res?.message ?? t("Failed to update feedback"),
         life: 3000,
       });
     }
   } catch {
     toast.add({
       severity: "error",
-      summary: "Error",
-      detail: "Unexpected error",
+      summary: t("Error"),
+      detail: t("Unexpected error"),
       life: 3000,
     });
   } finally {
@@ -216,14 +203,11 @@ async function handleDelete() {
     if (res?.success) {
       toast.add({
         severity: "success",
-        summary: "Success",
-        detail: "Feedback deleted successfully",
+        summary: t("Success"),
+        detail: t("Feedback deleted successfully"),
         life: 3000,
       });
       deleteDialog.value = false;
-      fetchFeedbacks();
-      feedbackToDelete.value = null;
-      // Remove from list instantly
       feedbacks.value = feedbacks.value.filter(
         (f) => f.feedbackId !== feedbackToDelete.value?.feedbackId,
       );
@@ -231,19 +215,21 @@ async function handleDelete() {
         0,
         pagination.value.totalCount - 1,
       );
+      feedbackToDelete.value = null;
+      fetchFeedbacks();
     } else {
       toast.add({
         severity: "error",
-        summary: "Error",
-        detail: res?.message ?? "Failed to delete feedback",
+        summary: t("Error"),
+        detail: res?.message ?? t("Failed to delete feedback"),
         life: 3000,
       });
     }
   } catch {
     toast.add({
       severity: "error",
-      summary: "Error",
-      detail: "Unexpected error",
+      summary: t("Error"),
+      detail: t("Unexpected error"),
       life: 3000,
     });
   } finally {

@@ -2,18 +2,20 @@
   <div class="admin-layout">
     <div class="flex items-center justify-between mb-6">
       <div>
-        <h1 class="admin-page-title">Hotel Details</h1>
-        <p class="admin-page-subtitle">Manage hotel information and rooms</p>
+        <h1 class="admin-page-title">{{ t("Hotel Details") }}</h1>
+        <p class="admin-page-subtitle">
+          {{ t("Manage hotel information and rooms") }}
+        </p>
       </div>
       <div class="flex gap-3">
         <Button
-          label="Back"
+          :label="t('Back')"
           icon="pi pi-arrow-left"
           severity="secondary"
           @click="navigateTo('/admin/hotels')"
         />
         <Button
-          label="Delete Hotel"
+          :label="t('Delete Hotel')"
           icon="pi pi-trash"
           severity="danger"
           :loading="deleting"
@@ -29,11 +31,10 @@
     <Tabs v-else v-model:value="activeTab" class="mb-6">
       <TabList>
         <Tab value="0"
-          ><i class="pi pi-info-circle mr-2" />Basic Information</Tab
+          ><i class="pi pi-info-circle mr-2" />{{ t("Basic Information") }}</Tab
         >
-        <Tab value="1"><i class="pi pi-home mr-2" />Rooms</Tab>
+        <Tab value="1"><i class="pi pi-home mr-2" />{{ t("Rooms") }}</Tab>
       </TabList>
-
       <TabPanels>
         <TabPanel value="0">
           <HotelBasicInfoTab
@@ -52,7 +53,6 @@
             @add-gallery-files="addGalleryFiles"
           />
         </TabPanel>
-
         <TabPanel value="1">
           <HotelRoomsTab
             :rooms="rooms"
@@ -93,17 +93,14 @@ import ConfirmDialog from "primevue/confirmdialog";
 import Toast from "primevue/toast";
 import { useConfirm } from "primevue/useconfirm";
 import { useToast } from "primevue/usetoast";
-
 import { useAdminHotelStore } from "~/stores/admin/hotels";
 import { useRoomStore } from "~/stores/admin/rooms";
 import { useRoomTypeStore } from "~/stores/admin/room-type";
 import { useCitiesStore } from "~/stores/admin/cities";
 import { useUploadStore } from "~/stores/admin/uploadImage";
-
 import HotelBasicInfoTab from "~/components/admin/hotel/HotelBasicInfoTab.vue";
 import HotelRoomsTab from "~/components/admin/hotel/HotelRoomsTab.vue";
 import CombinedRoomDialog from "~/components/admin/room/CombinedRoomDialog.vue";
-
 import type { Hotel, HotelPayload } from "~/stores/admin/interfaces/hotels";
 import type {
   RoomDto,
@@ -114,10 +111,10 @@ import type { CombinedSavePayload } from "~/components/admin/room/CombinedRoomDi
 
 definePageMeta({ layout: "admin", middleware: ["admin"] });
 
+const { t } = useI18n();
 const route = useRoute();
 const confirm = useConfirm();
 const toast = useToast();
-
 const hotelStore = useAdminHotelStore();
 const roomStore = useRoomStore();
 const roomTypeStore = useRoomTypeStore();
@@ -128,7 +125,6 @@ const MAX_GALLERY = 4;
 const hotelId = computed(() => Number(route.params.id));
 const activeTab = ref("0");
 
-// Loading states
 const loading = ref(false);
 const saving = ref(false);
 const deleting = ref(false);
@@ -138,7 +134,6 @@ const savingRoom = ref(false);
 const savingRoomType = ref(false);
 const submitted = ref(false);
 
-// Form
 const form = ref<HotelPayload>({
   cityId: 0,
   name: "",
@@ -148,22 +143,20 @@ const form = ref<HotelPayload>({
   latitude: 0,
   longitude: 0,
 });
-
 const primaryPreview = ref<string | null>(null);
 const primaryFile = ref<File | null>(null);
 const galleryPreviews = ref<string[]>([]);
 const galleryFiles = ref<File[]>([]);
-
 const cities = ref<{ cityId: number; name: string }[]>([]);
 const rooms = ref<RoomDto[]>([]);
 const roomTypes = ref<RoomTypeDto[]>([]);
-
 const combinedDialogVisible = ref(false);
 const editingRoom = ref<RoomDto | null>(null);
 const editingRoomType = ref<RoomTypeDto | null>(null);
-
-// Track ảnh cần xóa khi Save (imageId để xóa DB, publicId để xóa Cloudinary)
 const pendingDeleteImages = ref<{ imageId: number; publicId: string }[]>([]);
+const pendingDeletePrimary = ref<{ imageId: number; publicId: string } | null>(
+  null,
+);
 
 async function fetchHotel() {
   loading.value = true;
@@ -189,8 +182,8 @@ async function fetchHotel() {
   } catch {
     toast.add({
       severity: "error",
-      summary: "Error",
-      detail: "Failed to load hotel",
+      summary: t("Error"),
+      detail: t("Failed to load hotel"),
       life: 3000,
     });
   } finally {
@@ -201,12 +194,11 @@ async function fetchHotel() {
 async function fetchCities() {
   try {
     const res = await citiesStore.getCities({ pageSize: 200 });
-    if (res?.success) {
+    if (res?.success)
       cities.value = res.data.items.map((c: any) => ({
         cityId: c.cityId,
         name: c.name,
       }));
-    }
   } catch {}
 }
 
@@ -218,8 +210,8 @@ async function fetchRooms() {
   } catch {
     toast.add({
       severity: "error",
-      summary: "Error",
-      detail: "Failed to load rooms",
+      summary: t("Error"),
+      detail: t("Failed to load rooms"),
       life: 3000,
     });
   } finally {
@@ -235,8 +227,8 @@ async function fetchRoomTypes() {
   } catch {
     toast.add({
       severity: "error",
-      summary: "Error",
-      detail: "Failed to load room types",
+      summary: t("Error"),
+      detail: t("Failed to load room types"),
       life: 3000,
     });
   } finally {
@@ -257,10 +249,6 @@ async function setPrimaryFile(file: File) {
   primaryPreview.value = await toPreview(file);
 }
 
-const pendingDeletePrimary = ref<{ imageId: number; publicId: string } | null>(
-  null,
-);
-
 function removePrimary() {
   if (primaryPreview.value?.startsWith("https://res.cloudinary.com")) {
     const imgRecord = hotelStore.selectedHotel?.images?.find(
@@ -268,12 +256,8 @@ function removePrimary() {
     );
     if (imgRecord) {
       const publicId = extractCloudinaryPublicId(primaryPreview.value);
-      if (publicId) {
-        pendingDeletePrimary.value = {
-          imageId: imgRecord.imageId,
-          publicId,
-        };
-      }
+      if (publicId)
+        pendingDeletePrimary.value = { imageId: imgRecord.imageId, publicId };
     }
   }
   primaryPreview.value = null;
@@ -293,8 +277,6 @@ async function addGalleryFiles(files: File[]) {
 
 function extractCloudinaryPublicId(url: string): string | null {
   try {
-    // https://res.cloudinary.com/cloud/image/upload/v1234/folder/name.jpg
-    // → "folder/name"
     const match = url.match(/\/upload\/(?:v\d+\/)?(.+)\.[a-z]+$/i);
     return match?.[1] ?? null;
   } catch {
@@ -304,24 +286,19 @@ function extractCloudinaryPublicId(url: string): string | null {
 
 function removeGalleryItem(i: number) {
   const urlToDelete = galleryPreviews.value[i];
-
   if (urlToDelete?.startsWith("https://res.cloudinary.com")) {
-    // Tìm imageId từ selectedHotel
     const imgRecord = hotelStore.selectedHotel?.images?.find(
       (img: any) => img.imageUrl === urlToDelete,
     );
     if (imgRecord) {
       const publicId = extractCloudinaryPublicId(urlToDelete);
-      if (publicId) {
-        // Chỉ mark lại, chưa gọi API
+      if (publicId)
         pendingDeleteImages.value.push({
           imageId: imgRecord.imageId,
           publicId,
         });
-      }
     }
   }
-
   galleryFiles.value.splice(i, 1);
   galleryPreviews.value.splice(i, 1);
 }
@@ -337,36 +314,32 @@ async function handleSave() {
   if (!form.value.name || !form.value.cityId || !form.value.location) {
     toast.add({
       severity: "warn",
-      summary: "Validation",
-      detail: "Please fill in all required fields",
+      summary: t("Validation"),
+      detail: t("Please fill in all required fields"),
       life: 3000,
     });
     return;
   }
   saving.value = true;
   try {
-    // 1. Update thông tin cơ bản
     const res = await hotelStore.updateHotel(hotelId.value, form.value);
     if (!res?.success) {
       toast.add({
         severity: "error",
-        summary: "Error",
-        detail: res?.message ?? "Failed to update hotel",
+        summary: t("Error"),
+        detail: res?.message ?? t("Failed to update hotel"),
         life: 3000,
       });
       return;
     }
 
-    // 2. Xóa gallery items đã mark (Cloudinary + DB)
     for (const item of pendingDeleteImages.value) {
       await uploadStore.deleteImage(item.publicId);
       await hotelStore.deleteHotelImage(hotelId.value, item.imageId);
     }
     pendingDeleteImages.value = [];
 
-    // 3. Xử lý primary image
     if (pendingDeletePrimary.value) {
-      // User đã xóa primary cũ (không upload mới)
       await uploadStore.deleteImage(pendingDeletePrimary.value.publicId);
       await hotelStore.deleteHotelImage(
         hotelId.value,
@@ -376,7 +349,6 @@ async function handleSave() {
     }
 
     if (primaryFile.value) {
-      // User upload primary mới → xóa cũ nếu chưa xóa
       const oldPrimary = hotelStore.selectedHotel?.images?.find(
         (img: any) => img.isPrimary,
       );
@@ -385,7 +357,6 @@ async function handleSave() {
         if (publicId) await uploadStore.deleteImage(publicId);
         await hotelStore.deleteHotelImage(hotelId.value, oldPrimary.imageId);
       }
-
       const up = await uploadStore.uploadImage(primaryFile.value, "hotels");
       if (up?.success && up.data) {
         await hotelStore.addHotelImage(hotelId.value, {
@@ -398,7 +369,6 @@ async function handleSave() {
       }
     }
 
-    // 4. Upload gallery mới
     if (galleryFiles.value.length) {
       const up = await uploadStore.uploadImages(galleryFiles.value, "hotels");
       if (up?.success && up.data?.uploaded?.length) {
@@ -412,17 +382,17 @@ async function handleSave() {
 
     toast.add({
       severity: "success",
-      summary: "Success",
-      detail: "Hotel updated successfully",
+      summary: t("Success"),
+      detail: t("Hotel updated successfully"),
       life: 3000,
     });
     submitted.value = false;
-    await fetchHotel(); // sync lại với server
+    await fetchHotel();
   } catch (e: any) {
     toast.add({
       severity: "error",
-      summary: "Error",
-      detail: e?.message ?? "Unexpected error",
+      summary: t("Error"),
+      detail: e?.message ?? t("Unexpected error"),
       life: 3000,
     });
   } finally {
@@ -432,12 +402,13 @@ async function handleSave() {
 
 function confirmDelete() {
   confirm.require({
-    message:
+    message: t(
       "Are you sure you want to delete this hotel? This action cannot be undone.",
-    header: "Delete Hotel",
+    ),
+    header: t("Delete Hotel"),
     icon: "pi pi-exclamation-triangle",
-    acceptProps: { severity: "danger", label: "Delete" },
-    rejectProps: { severity: "secondary", label: "Cancel", outlined: true },
+    acceptProps: { severity: "danger", label: t("Delete") },
+    rejectProps: { severity: "secondary", label: t("Cancel"), outlined: true },
     accept: async () => {
       deleting.value = true;
       try {
@@ -445,16 +416,16 @@ function confirmDelete() {
         if (res?.success) {
           toast.add({
             severity: "success",
-            summary: "Deleted",
-            detail: "Hotel deleted",
+            summary: t("Deleted"),
+            detail: t("Hotel deleted"),
             life: 2000,
           });
           setTimeout(() => navigateTo("/admin/hotels"), 1500);
         } else {
           toast.add({
             severity: "error",
-            summary: "Error",
-            detail: res?.message ?? "Failed to delete hotel",
+            summary: t("Error"),
+            detail: res?.message ?? t("Failed to delete hotel"),
             life: 3000,
           });
         }
@@ -468,7 +439,6 @@ function confirmDelete() {
 async function openCombinedDialog(room?: RoomDto) {
   editingRoom.value = null;
   editingRoomType.value = null;
-
   if (room) {
     loadingRooms.value = true;
     try {
@@ -476,14 +446,13 @@ async function openCombinedDialog(room?: RoomDto) {
         roomStore.getRoomById(room.roomId),
         roomTypeStore.getRoomTypeById(room.roomTypeId),
       ]);
-
       if (roomRes?.success) editingRoom.value = roomRes.data;
       if (roomTypeRes?.success) editingRoomType.value = roomTypeRes.data;
     } catch {
       toast.add({
         severity: "error",
-        summary: "Error",
-        detail: "Failed to load room details",
+        summary: t("Error"),
+        detail: t("Failed to load room details"),
         life: 3000,
       });
       return;
@@ -491,7 +460,6 @@ async function openCombinedDialog(room?: RoomDto) {
       loadingRooms.value = false;
     }
   }
-
   combinedDialogVisible.value = true;
 }
 
@@ -505,12 +473,11 @@ async function handleCombinedSave(payload: CombinedSavePayload) {
           payload.roomTypePayload,
         )
       : await roomTypeStore.createRoomType(payload.roomTypePayload);
-
     if (!rtRes?.success) {
       toast.add({
         severity: "error",
-        summary: "Error",
-        detail: rtRes?.message ?? "Failed to save room type",
+        summary: t("Error"),
+        detail: rtRes?.message ?? t("Failed to save room type"),
         life: 3000,
       });
       return;
@@ -518,20 +485,20 @@ async function handleCombinedSave(payload: CombinedSavePayload) {
 
     const savedRoomTypeId: number =
       payload.roomTypeId ?? rtRes.data?.roomTypeId ?? rtRes.data?.id;
-    const roomPayloadFull = {
-      ...payload.roomPayload,
-      roomTypeId: savedRoomTypeId,
-    };
-
     const rRes = payload.roomId
-      ? await roomStore.updateRoom(payload.roomId, roomPayloadFull)
-      : await roomStore.createRoom(roomPayloadFull);
-
+      ? await roomStore.updateRoom(payload.roomId, {
+          ...payload.roomPayload,
+          roomTypeId: savedRoomTypeId,
+        })
+      : await roomStore.createRoom({
+          ...payload.roomPayload,
+          roomTypeId: savedRoomTypeId,
+        });
     if (!rRes?.success) {
       toast.add({
         severity: "error",
-        summary: "Error",
-        detail: rRes?.message ?? "Failed to save room",
+        summary: t("Error"),
+        detail: rRes?.message ?? t("Failed to save room"),
         life: 3000,
       });
       return;
@@ -539,10 +506,10 @@ async function handleCombinedSave(payload: CombinedSavePayload) {
 
     toast.add({
       severity: "success",
-      summary: "Success",
+      summary: t("Success"),
       detail: payload.roomId
-        ? "Room updated"
-        : "Room & Room Type saved successfully",
+        ? t("Room updated")
+        : t("Room & Room Type saved successfully"),
       life: 3000,
     });
     combinedDialogVisible.value = false;
@@ -550,8 +517,8 @@ async function handleCombinedSave(payload: CombinedSavePayload) {
   } catch (e: any) {
     toast.add({
       severity: "error",
-      summary: "Error",
-      detail: e?.message ?? "Unexpected error",
+      summary: t("Error"),
+      detail: e?.message ?? t("Unexpected error"),
       life: 3000,
     });
   } finally {
@@ -562,35 +529,35 @@ async function handleCombinedSave(payload: CombinedSavePayload) {
 
 function confirmDeleteRoom(room: RoomDto) {
   confirm.require({
-    message: `Delete room "${room.roomNumber}"?`,
-    header: "Delete Room",
+    message: t("Delete room {name}?", { name: room.roomNumber }),
+    header: t("Delete Room"),
     icon: "pi pi-exclamation-triangle",
-    acceptProps: { severity: "danger", label: "Delete" },
-    rejectProps: { severity: "secondary", label: "Cancel", outlined: true },
+    acceptProps: { severity: "danger", label: t("Delete") },
+    rejectProps: { severity: "secondary", label: t("Cancel"), outlined: true },
     accept: async () => {
       try {
         const res = await roomStore.deleteRoom(room.roomId);
         if (res?.success) {
           toast.add({
             severity: "success",
-            summary: "Deleted",
-            detail: "Room deleted",
+            summary: t("Deleted"),
+            detail: t("Room deleted"),
             life: 2000,
           });
           await fetchRooms();
         } else {
           toast.add({
             severity: "error",
-            summary: "Error",
-            detail: res?.message ?? "Failed to delete room",
+            summary: t("Error"),
+            detail: res?.message ?? t("Failed to delete room"),
             life: 3000,
           });
         }
       } catch {
         toast.add({
           severity: "error",
-          summary: "Error",
-          detail: "Unexpected error",
+          summary: t("Error"),
+          detail: t("Unexpected error"),
           life: 3000,
         });
       }

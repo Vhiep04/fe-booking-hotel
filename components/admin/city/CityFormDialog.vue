@@ -2,7 +2,7 @@
   <Dialog
     v-model:visible="visible"
     :style="{ width: '640px', maxWidth: '95vw' }"
-    :header="isEditing ? 'Edit City' : 'Add New City'"
+    :header="isEditing ? t('Edit City') : t('Add New City')"
     :modal="true"
     class="p-fluid"
     @hide="emit('hide')"
@@ -13,44 +13,44 @@
         <span
           class="text-xs font-bold uppercase tracking-widest text-(--admin-text-muted) flex items-center gap-1.5"
         >
-          <i class="pi pi-info-circle" /> Basic Information
+          <i class="pi pi-info-circle" /> {{ t("Basic Information") }}
         </span>
 
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div class="md:col-span-2 flex flex-col gap-1">
             <label class="text-sm font-medium">
-              City Name <span class="text-red-500">*</span>
+              {{ t("City Name") }} <span class="text-red-500">*</span>
             </label>
             <InputText
               v-model="form.name"
-              placeholder="e.g. Ho Chi Minh City"
+              :placeholder="t('e.g. Ho Chi Minh City')"
               :class="{ 'p-invalid': submitted && !form.name }"
             />
             <small v-if="submitted && !form.name" class="p-error">
-              City name is required
+              {{ t("City name is required") }}
             </small>
           </div>
 
           <div class="flex flex-col gap-1">
             <label class="text-sm font-medium">
-              Country <span class="text-red-500">*</span>
+              {{ t("Country") }} <span class="text-red-500">*</span>
             </label>
             <InputText
               v-model="form.country"
-              placeholder="e.g. Vietnam"
+              :placeholder="t('e.g. Vietnam')"
               :class="{ 'p-invalid': submitted && !form.country }"
             />
             <small v-if="submitted && !form.country" class="p-error">
-              Country is required
+              {{ t("Country is required") }}
             </small>
           </div>
 
           <div class="flex flex-col gap-1">
-            <label class="text-sm font-medium">Description</label>
+            <label class="text-sm font-medium">{{ t("Description") }}</label>
             <Textarea
               v-model="form.description"
               rows="3"
-              placeholder="Enter a short description..."
+              :placeholder="t('Enter a short description...')"
               class="w-full resize-none"
             />
           </div>
@@ -62,15 +62,15 @@
         <span
           class="text-xs font-bold uppercase tracking-widest text-(--admin-text-muted) flex items-center gap-1.5"
         >
-          <i class="pi pi-map-marker" /> Coordinates
+          <i class="pi pi-map-marker" /> {{ t("Coordinates") }}
         </span>
 
         <div class="grid grid-cols-2 gap-4">
           <div class="flex flex-col gap-1">
-            <label class="text-sm font-medium">Latitude</label>
+            <label class="text-sm font-medium">{{ t("Latitude") }}</label>
             <InputNumber
               v-model="form.latitude"
-              placeholder="e.g. 10.8231"
+              :placeholder="t('e.g. 10.8231')"
               :minFractionDigits="0"
               :maxFractionDigits="6"
               class="w-full"
@@ -78,10 +78,10 @@
           </div>
 
           <div class="flex flex-col gap-1">
-            <label class="text-sm font-medium">Longitude</label>
+            <label class="text-sm font-medium">{{ t("Longitude") }}</label>
             <InputNumber
               v-model="form.longitude"
-              placeholder="e.g. 106.6297"
+              :placeholder="t('e.g. 106.6297')"
               :minFractionDigits="0"
               :maxFractionDigits="6"
               class="w-full"
@@ -95,7 +95,7 @@
         <span
           class="text-xs font-bold uppercase tracking-widest text-(--admin-text-muted) flex items-center gap-1.5"
         >
-          <i class="pi pi-image" /> Primary Image
+          <i class="pi pi-image" /> {{ t("Primary Image") }}
         </span>
 
         <div
@@ -122,13 +122,13 @@
                   primaryFile = null;
                 "
               >
-                <i class="pi pi-trash mr-1" /> Remove
+                <i class="pi pi-trash mr-1" /> {{ t("Remove") }}
               </button>
               <button
                 class="text-white text-sm font-semibold bg-white/20 hover:bg-white/30 backdrop-blur px-3 py-1.5 rounded-lg border border-white/40 transition-colors"
                 @click.stop="primaryInput?.click()"
               >
-                <i class="pi pi-refresh mr-1" /> Change
+                <i class="pi pi-refresh mr-1" /> {{ t("Change") }}
               </button>
             </div>
           </template>
@@ -138,10 +138,12 @@
             >
               <i class="pi pi-cloud-upload text-2xl" />
               <p class="text-sm font-medium">
-                Drop cover image or
-                <span class="text-(--admin-primary) font-semibold">browse</span>
+                {{ t("Drop cover image or") }}
+                <span class="text-(--admin-primary) font-semibold">{{
+                  t("browse")
+                }}</span>
               </p>
-              <p class="text-xs">PNG, JPG, WEBP up to 10MB</p>
+              <p class="text-xs">{{ t("PNG, JPG, WEBP up to 10MB") }}</p>
             </div>
           </template>
         </div>
@@ -165,7 +167,7 @@
     <template #footer>
       <div class="pt-4 gap-4 w-full flex justify-end items-center">
         <Button
-          label="Cancel"
+          :label="t('Cancel')"
           icon="pi pi-times"
           severity="secondary"
           outlined
@@ -173,7 +175,7 @@
           @click="emit('hide')"
         />
         <Button
-          :label="isEditing ? 'Update City' : 'Add City'"
+          :label="isEditing ? t('Update City') : t('Add City')"
           :icon="isEditing ? 'pi pi-check' : 'pi pi-plus'"
           :loading="saving || uploading"
           @click="handleSave"
@@ -196,6 +198,8 @@ import type {
   UpdateCityPayload,
 } from "~/stores/admin/interfaces/cities";
 import { useUploadStore } from "~/stores/admin/uploadImage";
+
+const { t } = useI18n();
 
 const props = defineProps<{
   modelValue: boolean;
@@ -254,18 +258,12 @@ watch(
       : { ...defaultForm };
 
     const existingPrimary = city?.images?.find((img) => img.isPrimary);
-
-    // Fix URL cho Unsplash
     let previewUrl = existingPrimary?.imageUrl ?? null;
     if (previewUrl?.includes("unsplash.com") && !previewUrl.includes("?")) {
       previewUrl = `${previewUrl}?w=800&h=400&fit=crop`;
     }
     primaryPreview.value = previewUrl;
-
-    // Lưu publicId để delete nếu user upload ảnh mới
-    // Giả sử API trả về publicId trong image object — nếu không có thì bỏ qua phần delete
     existingImagePublicId.value = (existingPrimary as any)?.publicId ?? null;
-
     primaryFile.value = null;
     submitted.value = false;
   },
@@ -280,13 +278,10 @@ async function handleSave() {
 
   if (primaryFile.value) {
     uploading.value = true;
-
     const res = await uploadStore.uploadImage(primaryFile.value, "cities");
     uploading.value = false;
-
     if (!res?.success || !res.data) return;
     imageUrl = res.data.url;
-
     if (props.isEditing && existingImagePublicId.value) {
       await uploadStore.deleteImage(existingImagePublicId.value);
     }
@@ -324,39 +319,4 @@ async function setFile(file: File) {
   primaryFile.value = file;
   primaryPreview.value = await toPreview(file);
 }
-
-// async function handleSave() {
-//   submitted.value = true;
-//   if (!form.value.name || !form.value.country) return;
-
-//   let imageUrl = "";
-
-//   if (primaryFile.value) {
-//     uploading.value = true;
-//     const res = await uploadStore.uploadImage(primaryFile.value, "cities");
-//     uploading.value = false;
-
-//     if (!res?.success || !res.data) return;
-//     imageUrl = res.data.url;
-//   }
-
-//   const payload = {
-//     name: form.value.name,
-//     country: form.value.country,
-//     description: form.value.description,
-//     latitude: form.value.latitude ?? 0,
-//     longitude: form.value.longitude ?? 0,
-//   };
-
-//   if (props.isEditing && props.editingCity) {
-//     emit(
-//       "save-update",
-//       props.editingCity.cityId,
-//       payload as UpdateCityPayload,
-//       imageUrl,
-//     );
-//   } else {
-//     emit("save-create", payload as CreateCityPayload, imageUrl);
-//   }
-// }
 </script>

@@ -2,13 +2,12 @@
   <Dialog
     v-model:visible="visible"
     :style="{ width: '500px' }"
-    header="Edit Feedback"
+    :header="t('Edit Feedback')"
     :modal="true"
     class="p-fluid"
     @hide="emit('hide')"
   >
     <div class="flex flex-col gap-5 pt-3">
-      <!-- Read-only info -->
       <div
         class="p-3 rounded-lg bg-(--admin-surface-hover) flex items-center gap-3"
       >
@@ -19,7 +18,7 @@
         />
         <div>
           <p class="font-medium text-(--admin-text-color)">
-            {{ feedback?.userName ?? "Anonymous" }}
+            {{ feedback?.userName ?? t("Anonymous") }}
           </p>
           <p class="text-xs text-(--admin-text-muted)">
             {{ feedback?.hotelName }}
@@ -27,10 +26,9 @@
         </div>
       </div>
 
-      <!-- Rating -->
       <div class="field">
         <label class="font-medium mb-2 block">
-          Rating <span class="text-red-500">*</span>
+          {{ t("Rating") }} <span class="text-red-500">*</span>
         </label>
         <div class="flex items-center gap-2">
           <span
@@ -48,18 +46,17 @@
             >{{ form.rating }} / 5</span
           >
         </div>
-        <small v-if="submitted && !form.rating" class="p-error"
-          >Rating is required</small
-        >
+        <small v-if="submitted && !form.rating" class="p-error">
+          {{ t("Rating is required") }}
+        </small>
       </div>
 
-      <!-- Comment -->
       <div class="field">
-        <label class="font-medium mb-2 block">Comment</label>
+        <label class="font-medium mb-2 block">{{ t("Comment") }}</label>
         <Textarea
           v-model="form.comment"
           rows="4"
-          placeholder="Enter feedback comment..."
+          :placeholder="t('Enter feedback comment...')"
           class="w-full resize-none"
         />
       </div>
@@ -67,7 +64,7 @@
 
     <template #footer>
       <Button
-        label="Cancel"
+        :label="t('Cancel')"
         icon="pi pi-times"
         severity="secondary"
         outlined
@@ -75,7 +72,7 @@
         @click="emit('hide')"
       />
       <Button
-        label="Save Changes"
+        :label="t('Save Changes')"
         icon="pi pi-check"
         :loading="saving"
         @click="handleSave"
@@ -91,6 +88,8 @@ import Button from "primevue/button";
 import Avatar from "primevue/avatar";
 import type { AdminFeedbackDto } from "~/stores/admin/interfaces/feedbacks";
 import type { UpdateFeedbackPayload } from "~/stores/interface/request/feedback";
+
+const { t } = useI18n();
 
 const props = defineProps<{
   modelValue: boolean;
@@ -129,8 +128,7 @@ function getInitial() {
 
 function handleSave() {
   submitted.value = true;
-  if (!form.value.rating) return;
-  if (!props.feedback) return;
+  if (!form.value.rating || !props.feedback) return;
   emit("save", props.feedback.feedbackId, {
     rating: form.value.rating,
     comment: form.value.comment,

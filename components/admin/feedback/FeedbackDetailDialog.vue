@@ -2,14 +2,15 @@
   <Dialog
     v-model:visible="visible"
     :style="{ width: '560px' }"
-    header="Feedback Details"
+    :header="t('Feedback Details')"
     :modal="true"
   >
     <div v-if="feedback" class="space-y-5">
-      <!-- User + Hotel -->
       <div class="grid grid-cols-2 gap-4">
         <div>
-          <label class="text-sm text-(--admin-text-muted)">User</label>
+          <label class="text-sm text-(--admin-text-muted)">{{
+            t("User")
+          }}</label>
           <div class="flex items-center gap-2 mt-1">
             <Avatar
               :label="getInitial(feedback)"
@@ -18,7 +19,7 @@
             />
             <div>
               <p class="font-medium text-(--admin-text-color)">
-                {{ feedback.userName ?? "Anonymous" }}
+                {{ feedback.userName ?? t("Anonymous") }}
               </p>
               <p class="text-xs text-(--admin-text-muted)">
                 {{ feedback.userEmail }}
@@ -28,22 +29,25 @@
         </div>
 
         <div>
-          <label class="text-sm text-(--admin-text-muted)">Hotel</label>
+          <label class="text-sm text-(--admin-text-muted)">{{
+            t("Hotel")
+          }}</label>
           <p class="font-medium text-(--admin-text-color) mt-1">
             {{ feedback.hotelName }}
           </p>
           <p class="text-xs text-(--admin-text-muted)">
-            Hotel ID: {{ feedback.hotelId }}
+            {{ t("Hotel ID: {id}", { id: feedback.hotelId }) }}
           </p>
         </div>
       </div>
 
       <Divider />
 
-      <!-- Rating + Date -->
       <div class="grid grid-cols-2 gap-4">
         <div>
-          <label class="text-sm text-(--admin-text-muted)">Rating</label>
+          <label class="text-sm text-(--admin-text-muted)">{{
+            t("Rating")
+          }}</label>
           <div class="flex items-center gap-1 mt-1">
             <span
               v-for="i in 5"
@@ -62,16 +66,19 @@
         </div>
 
         <div>
-          <label class="text-sm text-(--admin-text-muted)">Submitted</label>
+          <label class="text-sm text-(--admin-text-muted)">{{
+            t("Submitted")
+          }}</label>
           <p class="font-medium text-(--admin-text-color) mt-1">
             {{ formatDate(feedback.createdAt) }}
           </p>
         </div>
       </div>
 
-      <!-- Reservation link -->
       <div v-if="feedback.reservationId">
-        <label class="text-sm text-(--admin-text-muted)">Reservation</label>
+        <label class="text-sm text-(--admin-text-muted)">{{
+          t("Reservation")
+        }}</label>
         <p class="font-medium text-(--admin-primary) mt-1">
           #{{ feedback.reservationId }}
         </p>
@@ -79,26 +86,27 @@
 
       <Divider />
 
-      <!-- Comment -->
       <div>
-        <label class="text-sm text-(--admin-text-muted)">Comment</label>
+        <label class="text-sm text-(--admin-text-muted)">{{
+          t("Comment")
+        }}</label>
         <p
           class="mt-2 text-(--admin-text-color) leading-relaxed bg-(--admin-surface-hover) rounded-lg p-3 text-sm"
         >
-          {{ feedback.comment || "No comment provided." }}
+          {{ feedback.comment || t("No comment provided.") }}
         </p>
       </div>
     </div>
 
     <template #footer>
       <Button
-        label="Edit"
+        :label="t('Edit')"
         icon="pi pi-pencil"
         severity="secondary"
         outlined
         @click="emit('edit', feedback!)"
       />
-      <Button label="Close" @click="emit('update:modelValue', false)" />
+      <Button :label="t('Close')" @click="emit('update:modelValue', false)" />
     </template>
   </Dialog>
 </template>
@@ -109,6 +117,8 @@ import Divider from "primevue/divider";
 import Button from "primevue/button";
 import Avatar from "primevue/avatar";
 import type { AdminFeedbackDto } from "~/stores/admin/interfaces/feedbacks";
+
+const { t } = useI18n();
 
 const props = defineProps<{
   modelValue: boolean;

@@ -7,7 +7,7 @@
           <InputText
             :modelValue="modelValue.search"
             @update:modelValue="update('search', $event)"
-            placeholder="Search hotels..."
+            :placeholder="t('Search hotels...')"
             class="w-full"
           />
         </IconField>
@@ -18,7 +18,7 @@
           :options="cities"
           optionLabel="name"
           optionValue="cityId"
-          placeholder="All Cities"
+          :placeholder="t('All Cities')"
           showClear
           class="w-full"
         />
@@ -29,7 +29,7 @@
           :options="statusOptions"
           optionLabel="label"
           optionValue="value"
-          placeholder="All Status"
+          :placeholder="t('All Status')"
           showClear
           class="w-full"
         />
@@ -40,7 +40,7 @@
           :options="ratingOptions"
           optionLabel="label"
           optionValue="value"
-          placeholder="All Ratings"
+          :placeholder="t('All Ratings')"
           showClear
           class="w-full"
         />
@@ -67,6 +67,8 @@ interface CityOption {
   name: string;
 }
 
+const { t } = useI18n();
+
 const props = defineProps<{
   modelValue: HotelFiltersModel;
   cities: CityOption[];
@@ -76,18 +78,18 @@ const emit = defineEmits<{
   (e: "update:modelValue", value: HotelFiltersModel): void;
 }>();
 
-const statusOptions = [
-  { label: "Active", value: "Active" },
-  { label: "Inactive", value: "Inactive" },
-];
+const statusOptions = computed(() => [
+  { label: t("Active"), value: "Active" },
+  { label: t("Inactive"), value: "Inactive" },
+]);
 
-const ratingOptions = [
-  { label: "5 Stars", value: 5 },
-  { label: "4 Stars", value: 4 },
-  { label: "3 Stars", value: 3 },
-  { label: "2 Stars", value: 2 },
-  { label: "1 Star", value: 1 },
-];
+const ratingOptions = computed(() => [
+  { label: "5 " + t("Stars"), value: 5 },
+  { label: "4 " + t("Stars"), value: 4 },
+  { label: "3 " + t("Stars"), value: 3 },
+  { label: "2 " + t("Stars"), value: 2 },
+  { label: "1 " + t("Star"), value: 1 },
+]);
 
 function update<K extends keyof HotelFiltersModel>(
   key: K,

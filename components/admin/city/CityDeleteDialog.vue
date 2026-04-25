@@ -2,19 +2,23 @@
   <Dialog
     v-model:visible="visible"
     :style="{ width: '450px' }"
-    header="Confirm Delete"
+    :header="t('Confirm Delete')"
     :modal="true"
   >
     <div class="flex items-center gap-4">
       <i class="pi pi-exclamation-triangle text-4xl text-yellow-500"></i>
-      <span>
-        Are you sure you want to delete <strong>{{ city?.name }}</strong
-        >? This will not delete the hotels in this city.
-      </span>
+      <span
+        v-html="
+          t(
+            'Are you sure you want to delete {name}? This will not delete the hotels in this city.',
+            { name: `<strong>${city?.name}</strong>` },
+          )
+        "
+      />
     </div>
     <template #footer>
       <Button
-        label="No"
+        :label="t('No')"
         icon="pi pi-times"
         severity="secondary"
         outlined
@@ -22,7 +26,7 @@
         @click="emit('update:modelValue', false)"
       />
       <Button
-        label="Yes, Delete"
+        :label="t('Yes, Delete')"
         icon="pi pi-trash"
         severity="danger"
         :loading="deleting"
@@ -36,6 +40,8 @@
 import Dialog from "primevue/dialog";
 import Button from "primevue/button";
 import type { CityDto } from "~/stores/admin/interfaces/cities";
+
+const { t } = useI18n();
 
 const props = defineProps<{
   modelValue: boolean;

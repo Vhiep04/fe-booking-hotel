@@ -26,6 +26,8 @@
 <script setup lang="ts">
 import type { Reservation } from "~/stores/admin/interfaces/reservations";
 
+const { t } = useI18n();
+
 const props = defineProps<{
   reservations: Reservation[];
   totalCount: number;
@@ -33,14 +35,14 @@ const props = defineProps<{
 
 const cards = computed(() => [
   {
-    label: "Total",
+    label: t("Reservationst"),
     value: props.totalCount,
     icon: "pi pi-calendar",
     bg: "bg-blue-100 dark:bg-blue-900/30",
     iconColor: "text-blue-600",
   },
   {
-    label: "Pending",
+    label: t("Pending"),
     value: props.reservations.filter((r) => r.paymentStatus === "Pending")
       .length,
     icon: "pi pi-clock",
@@ -48,7 +50,7 @@ const cards = computed(() => [
     iconColor: "text-yellow-600",
   },
   {
-    label: "Confirmed",
+    label: t("Confirmed"),
     value: props.reservations.filter((r) => r.paymentStatus === "Confirmed")
       .length,
     icon: "pi pi-check-circle",
@@ -56,7 +58,7 @@ const cards = computed(() => [
     iconColor: "text-green-600",
   },
   {
-    label: "Cancelled",
+    label: t("Cancelled"),
     value: props.reservations.filter((r) => r.paymentStatus === "Cancelled")
       .length,
     icon: "pi pi-times-circle",

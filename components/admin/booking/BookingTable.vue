@@ -10,19 +10,21 @@
       dataKey="reservationId"
       :rowsPerPageOptions="[5, 10, 20, 50]"
       paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
-      currentPageReportTemplate="Showing {first} to {last} of {totalRecords} bookings"
+      :currentPageReportTemplate="
+        t('Showing {first} to {last} of {totalRecords} bookings')
+      "
       responsiveLayout="scroll"
       @page="onPage"
     >
       <template #header>
         <span class="text-(--admin-text-secondary)">
-          {{ totalCount }} bookings found
+          {{ t("{n} bookings found", { n: totalCount }) }}
         </span>
       </template>
 
       <Column
         field="reservationId"
-        header="Booking ID"
+        :header="t('Booking ID')"
         sortable
         style="min-width: 130px"
       >
@@ -35,7 +37,7 @@
 
       <Column
         field="hotelName"
-        header="Hotel"
+        :header="t('Hotel')"
         sortable
         style="min-width: 220px"
       >
@@ -51,18 +53,23 @@
 
       <Column
         field="roomNumber"
-        header="RoomNumber"
+        :header="t('Room Number')"
         sortable
         style="min-width: 100px"
       >
         <template #body="{ data }">
-          <span class="font-medium text-(--admin-text-color)">
-            #{{ data.roomId }}
-          </span>
+          <span class="font-medium text-(--admin-text-color)"
+            >#{{ data.roomId }}</span
+          >
         </template>
       </Column>
 
-      <Column field="userName" header="Guest" sortable style="min-width: 180px">
+      <Column
+        field="userName"
+        :header="t('Guest')"
+        sortable
+        style="min-width: 180px"
+      >
         <template #body="{ data }">
           <div class="flex items-center gap-2">
             <Avatar
@@ -87,7 +94,7 @@
 
       <Column
         field="checkInDate"
-        header="Check-in"
+        :header="t('Check-in')"
         sortable
         style="min-width: 120px"
       >
@@ -98,7 +105,7 @@
 
       <Column
         field="checkOutDate"
-        header="Check-out"
+        :header="t('Check-out')"
         sortable
         style="min-width: 120px"
       >
@@ -107,15 +114,20 @@
         </template>
       </Column>
 
-      <Column field="nights" header="Nights" sortable style="min-width: 80px">
+      <Column
+        field="nights"
+        :header="t('Nights')"
+        sortable
+        style="min-width: 80px"
+      >
         <template #body="{ data }">
-          <span>{{ data.nights }}n</span>
+          <span>{{ data.nights }}{{ t("n") }}</span>
         </template>
       </Column>
 
       <Column
         field="totalPrice"
-        header="Amount"
+        :header="t('Amount')"
         sortable
         style="min-width: 130px"
       >
@@ -124,7 +136,7 @@
             ${{ data.totalPrice.toLocaleString() }}
           </p>
           <Tag
-            :value="data.paymentStatus"
+            :value="t(data.paymentStatus)"
             :severity="getPaymentSeverity(data.paymentStatus)"
             class="text-xs mt-1"
           />
@@ -133,7 +145,7 @@
 
       <Column
         field="paymentStatus"
-        header="Status"
+        :header="t('Status')"
         sortable
         style="min-width: 150px"
       >
@@ -149,7 +161,7 @@
           >
             <template #value="slotProps">
               <Tag
-                :value="slotProps.value"
+                :value="t(slotProps.value)"
                 :severity="getPaymentSeverity(slotProps.value)"
               />
             </template>
@@ -157,7 +169,7 @@
         </template>
       </Column>
 
-      <Column header="Actions" style="min-width: 100px">
+      <Column :header="t('Actions')" style="min-width: 100px">
         <template #body="{ data }">
           <div class="flex items-center gap-1">
             <Button
@@ -166,7 +178,7 @@
               text
               rounded
               size="small"
-              v-tooltip.top="'View Details'"
+              v-tooltip.top="t('View Details')"
               @click="emit('view', data)"
             />
             <Button
@@ -175,7 +187,7 @@
               text
               rounded
               size="small"
-              v-tooltip.top="'Print Invoice'"
+              v-tooltip.top="t('Print Invoice')"
               @click="emit('print', data)"
             />
           </div>
@@ -194,6 +206,8 @@ import Avatar from "primevue/avatar";
 import Dropdown from "primevue/dropdown";
 import type { Reservation } from "~/stores/admin/interfaces/reservations";
 
+const { t } = useI18n();
+
 const props = defineProps<{
   reservations: Reservation[];
   totalCount: number;
@@ -209,13 +223,13 @@ const emit = defineEmits<{
   (e: "page", event: { page: number; rows: number }): void;
 }>();
 
-const statusOptions = [
-  { label: "Pending", value: "Pending" },
-  { label: "Confirmed", value: "Confirmed" },
-  { label: "Completed", value: "Completed" },
-  { label: "Cancelled", value: "Cancelled" },
-  { label: "Refunded", value: "Refunded" },
-];
+const statusOptions = computed(() => [
+  { label: t("Pending"), value: "Pending" },
+  { label: t("Confirmed"), value: "Confirmed" },
+  { label: t("Completed"), value: "Completed" },
+  { label: t("Cancelled"), value: "Cancelled" },
+  { label: t("Refunded"), value: "Refunded" },
+]);
 
 function onPage(event: any) {
   emit("page", { page: event.page + 1, rows: event.rows });

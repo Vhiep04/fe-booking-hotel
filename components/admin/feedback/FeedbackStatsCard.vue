@@ -13,9 +13,7 @@
             <p class="text-2xl font-bold text-(--admin-text-color)">
               {{ card.value }}
             </p>
-            <p class="text-sm text-(--admin-text-muted)">
-              {{ card.label }}
-            </p>
+            <p class="text-sm text-(--admin-text-muted)">{{ card.label }}</p>
           </div>
         </div>
       </div>
@@ -25,6 +23,8 @@
 
 <script setup lang="ts">
 import type { AdminFeedbackDto } from "~/stores/admin/interfaces/feedbacks";
+
+const { t } = useI18n();
 
 const props = defineProps<{
   feedbacks: AdminFeedbackDto[];
@@ -40,28 +40,28 @@ const avgRating = computed(() => {
 
 const cards = computed(() => [
   {
-    label: "Total Reviews",
+    label: t("Total Reviews"),
     value: props.totalCount,
     icon: "pi pi-comments",
     bg: "bg-blue-100 dark:bg-blue-900/30",
     iconColor: "text-blue-600",
   },
   {
-    label: "Avg Rating",
+    label: t("Avg Rating"),
     value: avgRating.value,
     icon: "pi pi-star-fill",
     bg: "bg-yellow-100 dark:bg-yellow-900/30",
     iconColor: "text-yellow-500",
   },
   {
-    label: "5 Stars",
+    label: t("5 Stars"),
     value: props.feedbacks.filter((f) => f.rating === 5).length,
     icon: "pi pi-thumbs-up",
     bg: "bg-green-100 dark:bg-green-900/30",
     iconColor: "text-green-600",
   },
   {
-    label: "Low Ratings (≤2)",
+    label: t("Low Ratings (≤2)"),
     value: props.feedbacks.filter((f) => f.rating <= 2).length,
     icon: "pi pi-thumbs-down",
     bg: "bg-red-100 dark:bg-red-900/30",

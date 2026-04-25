@@ -2,10 +2,16 @@
   <div>
     <div class="flex items-center justify-between mb-6">
       <div>
-        <h2 class="admin-page-title">Facilities</h2>
-        <p class="admin-page-subtitle">Manage hotel facilities and amenities</p>
+        <h2 class="admin-page-title">{{ t("Facilities") }}</h2>
+        <p class="admin-page-subtitle">
+          {{ t("Manage hotel facilities and amenities") }}
+        </p>
       </div>
-      <Button label="Add Facility" icon="pi pi-plus" @click="openCreateModal" />
+      <Button
+        :label="t('Add Facility')"
+        icon="pi pi-plus"
+        @click="openCreateModal"
+      />
     </div>
 
     <div class="admin-card mb-6">
@@ -15,7 +21,7 @@
             <InputIcon class="pi pi-search" />
             <InputText
               v-model="search"
-              placeholder="Search facilities..."
+              :placeholder="t('Search facilities...')"
               class="w-full"
             />
           </IconField>
@@ -23,7 +29,7 @@
             icon="pi pi-refresh"
             severity="secondary"
             outlined
-            v-tooltip.top="'Clear search'"
+            v-tooltip.top="t('Clear search')"
             @click="search = ''"
           />
         </div>
@@ -38,29 +44,36 @@
         :paginator="filteredFacilities.length > 10"
         :rows-per-page-options="[10, 20, 50]"
         paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
-        currentPageReportTemplate="Showing {first} to {last} of {totalRecords} facilities"
+        :currentPageReportTemplate="
+          t('Showing {first} to {last} of {totalRecords} facilities')
+        "
         class="p-datatable-sm"
       >
         <template #header>
           <span class="text-(--admin-text-secondary)">
-            {{ filteredFacilities.length }} facilities found
+            {{ t("{n} facilities found", { n: filteredFacilities.length }) }}
           </span>
         </template>
 
         <template #empty>
           <div class="text-center py-8 text-(--admin-text-muted)">
             <i class="pi pi-inbox text-4xl mb-2 block" />
-            <p>No facilities found</p>
+            <p>{{ t("No facilities found") }}</p>
           </div>
         </template>
 
-        <Column field="facilityId" header="ID" style="width: 100px" sortable>
+        <Column
+          field="facilityId"
+          :header="t('ID')"
+          style="width: 100px"
+          sortable
+        >
           <template #body="{ data }">
             <span class="font-medium">#{{ data.facilityId }}</span>
           </template>
         </Column>
 
-        <Column field="name" header="Name" sortable>
+        <Column field="name" :header="t('Name')" sortable>
           <template #body="{ data }">
             <div class="flex items-center gap-2">
               <i class="pi pi-cog text-(--admin-primary)" />
@@ -71,7 +84,7 @@
           </template>
         </Column>
 
-        <Column header="Actions" style="width: 120px">
+        <Column :header="t('Actions')" style="width: 120px">
           <template #body="{ data }">
             <div class="flex items-center gap-1">
               <Button
@@ -80,7 +93,7 @@
                 text
                 rounded
                 size="small"
-                v-tooltip.top="'Edit'"
+                v-tooltip.top="t('Edit')"
                 @click="openEditModal(data)"
               />
               <Button
@@ -89,7 +102,7 @@
                 text
                 rounded
                 size="small"
-                v-tooltip.top="'Delete'"
+                v-tooltip.top="t('Delete')"
                 @click="openDeleteModal(data)"
               />
             </div>
@@ -98,35 +111,38 @@
       </DataTable>
     </div>
 
+    <!-- Add/Edit Dialog -->
     <Dialog
       v-model:visible="isModalOpen"
-      :header="isEditing ? 'Edit Facility' : 'Add Facility'"
+      :header="isEditing ? t('Edit Facility') : t('Add Facility')"
       modal
       :style="{ width: '450px' }"
     >
-      <div class="pt-4">
-        <label class="font-medium mb-2 block">Name *</label>
+      <div class="pt-0">
+        <label class="font-medium mb-2 block"
+          >{{ t("FName") }} <span class="text-red-500">*</span></label
+        >
         <InputText
           v-model="formName"
-          placeholder="Enter facility name"
+          :placeholder="t('Enter facility name')"
           class="w-full"
           :class="{ 'p-invalid': submitted && !formName.trim() }"
           @keyup.enter="onSubmit"
         />
         <small v-if="submitted && !formName.trim()" class="p-error">
-          Facility name is required
+          {{ t("Facility name is required") }}
         </small>
       </div>
       <template #footer>
         <Button
-          label="Cancel"
+          :label="t('Cancel')"
           severity="secondary"
           outlined
           :disabled="isSaving"
           @click="isModalOpen = false"
         />
         <Button
-          :label="isEditing ? 'Update' : 'Create'"
+          :label="isEditing ? t('Update') : t('Create')"
           :loading="isSaving"
           @click="onSubmit"
         />
@@ -136,28 +152,31 @@
     <!-- Delete Confirmation Dialog -->
     <Dialog
       v-model:visible="isDeleteModalOpen"
-      header="Delete Facility"
+      :header="t('Delete Facility')"
       modal
       :style="{ width: '450px' }"
     >
       <div class="flex items-center gap-4">
         <i class="pi pi-exclamation-triangle text-4xl text-yellow-500" />
-        <p>
-          Are you sure you want to delete
-          <strong>{{ deletingFacility?.name }}</strong
-          >? This action cannot be undone.
-        </p>
+        <p
+          v-html="
+            t(
+              'Are you sure you want to delete {name}? This action cannot be undone.',
+              { name: `<strong>${deletingFacility?.name}</strong>` },
+            )
+          "
+        />
       </div>
       <template #footer>
         <Button
-          label="Cancel"
+          :label="t('Cancel')"
           severity="secondary"
           outlined
           :disabled="isDeleting"
           @click="isDeleteModalOpen = false"
         />
         <Button
-          label="Delete"
+          :label="t('Delete')"
           severity="danger"
           icon="pi pi-trash"
           :loading="isDeleting"
@@ -166,6 +185,8 @@
       </template>
     </Dialog>
   </div>
+
+  <Toast />
 </template>
 
 <script setup lang="ts">
@@ -179,16 +200,16 @@ import Dialog from "primevue/dialog";
 import { useToast } from "primevue/usetoast";
 import type { FacilityDto } from "~/stores/admin/interfaces/facility";
 import { useFacilitiesStore } from "~/stores/admin/facilties";
+import { Toast } from "primevue";
 
 definePageMeta({
   layout: "admin",
   middleware: ["admin"],
 });
 
-useHead({
-  title: "Facility Management",
-});
+useHead({ title: "Facility Management" });
 
+const { t } = useI18n();
 const toast = useToast();
 const facilitiesStore = useFacilitiesStore();
 
@@ -199,13 +220,11 @@ const isDeleting = ref(false);
 const search = ref("");
 const submitted = ref(false);
 
-// Modal state
 const isModalOpen = ref(false);
 const isEditing = ref(false);
 const editingId = ref<number | null>(null);
 const formName = ref("");
 
-// Delete modal state
 const isDeleteModalOpen = ref(false);
 const deletingFacility = ref<FacilityDto | null>(null);
 
@@ -225,24 +244,22 @@ async function fetchFacilities() {
     } else {
       toast.add({
         severity: "error",
-        summary: "Error",
-        detail: res.message ?? "Failed to load facilities",
+        summary: t("Error"),
+        detail: res.message ?? t("Failed to load facilities"),
         life: 3000,
       });
     }
   } catch {
     toast.add({
       severity: "error",
-      summary: "Error",
-      detail: "Unexpected error loading facilities",
+      summary: t("Error"),
+      detail: t("Unexpected error loading facilities"),
       life: 3000,
     });
   } finally {
     isLoading.value = false;
   }
 }
-
-onMounted(fetchFacilities);
 
 function openCreateModal() {
   isEditing.value = false;
@@ -276,23 +293,22 @@ async function onSubmit() {
         name: formName.value.trim(),
       });
       if (res.success) {
-        // Update in-place — no need to re-fetch the full list
         const index = facilities.value.findIndex(
           (f) => f.facilityId === editingId.value,
         );
         if (index !== -1) facilities.value[index] = res.data;
         toast.add({
           severity: "success",
-          summary: "Success",
-          detail: "Facility updated successfully",
+          summary: t("Success"),
+          detail: t("Facility updated successfully"),
           life: 3000,
         });
         isModalOpen.value = false;
       } else {
         toast.add({
           severity: "error",
-          summary: "Error",
-          detail: res.message ?? "Failed to update facility",
+          summary: t("Error"),
+          detail: res.message ?? t("Failed to update facility"),
           life: 3000,
         });
       }
@@ -304,16 +320,16 @@ async function onSubmit() {
         facilities.value.push(res.data);
         toast.add({
           severity: "success",
-          summary: "Success",
-          detail: "Facility created successfully",
+          summary: t("Success"),
+          detail: t("Facility created successfully"),
           life: 3000,
         });
         isModalOpen.value = false;
       } else {
         toast.add({
           severity: "error",
-          summary: "Error",
-          detail: res.message ?? "Failed to create facility",
+          summary: t("Error"),
+          detail: res.message ?? t("Failed to create facility"),
           life: 3000,
         });
       }
@@ -321,8 +337,8 @@ async function onSubmit() {
   } catch {
     toast.add({
       severity: "error",
-      summary: "Error",
-      detail: "Unexpected error",
+      summary: t("Error"),
+      detail: t("Unexpected error"),
       life: 3000,
     });
   } finally {
@@ -343,31 +359,39 @@ async function confirmDelete() {
       );
       toast.add({
         severity: "success",
-        summary: "Success",
-        detail: "Facility deleted successfully",
+        summary: t("Success"),
+        detail: t("Facility deleted successfully"),
         life: 3000,
       });
       isDeleteModalOpen.value = false;
       deletingFacility.value = null;
     } else {
-      toast.add({
-        severity: "error",
-        summary: "Error",
-        detail: res.message ?? "Failed to delete facility",
-        life: 3000,
-      });
+      // Map server message sang i18n key
+      const errorMessageMap: Record<string, string> = {
+        "Facility is in use by rooms.": t(
+          "Facility is in use by rooms and cannot be deleted.",
+        ),
+      };
+
+      const detail =
+        errorMessageMap[res.message ?? ""] ??
+        res.message ??
+        t("Failed to delete facility");
+      toast.add({ severity: "error", summary: t("Error"), detail, life: 3000 });
     }
   } catch {
     toast.add({
       severity: "error",
-      summary: "Error",
-      detail: "Unexpected error",
+      summary: t("Error"),
+      detail: t("Unexpected error"),
       life: 3000,
     });
   } finally {
     isDeleting.value = false;
   }
 }
+
+onMounted(fetchFacilities);
 </script>
 
 <style scoped>

@@ -9,7 +9,6 @@ export const useApiStore = defineStore("api", () => {
   async function apiRequest<ResponseDataType>(payload: Payload) {
     let { headers } = payload;
 
-    // ✅ Nếu data là FormData thì xóa Content-Type, để browser tự set kèm boundary
     if (payload.data instanceof FormData) {
       const { "Content-Type": _, ...rest } = (headers ?? {}) as Record<
         string,
@@ -41,8 +40,13 @@ export const useApiStore = defineStore("api", () => {
         });
       }
       return response;
-    } catch (e) {
+    } catch (e: any) {
       console.log(e);
+
+      if (e?.data) {
+        return e.data as ResponseDataType;
+      }
+
       throw e;
     }
   }

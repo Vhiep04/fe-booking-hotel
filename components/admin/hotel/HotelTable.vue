@@ -10,7 +10,9 @@
       dataKey="hotelId"
       :rowsPerPageOptions="[5, 10, 20, 50]"
       paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
-      currentPageReportTemplate="Showing {first} to {last} of {totalRecords} hotels"
+      :currentPageReportTemplate="
+        t('Showing {first} to {last} of {totalRecords} hotels')
+      "
       responsiveLayout="scroll"
       v-model:selection="selectedHotels"
       @page="onPage"
@@ -18,11 +20,11 @@
       <template #header>
         <div class="flex items-center justify-between">
           <span class="text-(--admin-text-secondary)">
-            {{ totalCount }} hotels found
+            {{ t("{n} hotels found", { n: totalCount }) }}
           </span>
           <Button
             v-if="selectedHotels.length > 0"
-            label="Delete Selected"
+            :label="t('Delete Selected')"
             icon="pi pi-trash"
             severity="danger"
             outlined
@@ -34,13 +36,23 @@
 
       <Column selectionMode="multiple" headerStyle="width: 3rem" />
 
-      <Column field="hotelId" header="ID" sortable style="min-width: 80px">
-        <template #body="{ data }">
-          <span class="font-medium">#{{ data.hotelId }}</span>
-        </template>
+      <Column
+        field="hotelId"
+        :header="t('ID')"
+        sortable
+        style="min-width: 80px"
+      >
+        <template #body="{ data }"
+          ><span class="font-medium">#{{ data.hotelId }}</span></template
+        >
       </Column>
 
-      <Column field="name" header="Hotel" sortable style="min-width: 280px">
+      <Column
+        field="name"
+        :header="t('Hotel')"
+        sortable
+        style="min-width: 280px"
+      >
         <template #body="{ data }">
           <div class="flex items-center gap-3">
             <Image
@@ -61,15 +73,20 @@
         </template>
       </Column>
 
-      <Column field="cityName" header="City" sortable style="min-width: 120px">
-        <template #body="{ data }">
-          <span>{{ data.cityName }}</span>
-        </template>
+      <Column
+        field="cityName"
+        :header="t('Cities')"
+        sortable
+        style="min-width: 120px"
+      >
+        <template #body="{ data }"
+          ><span>{{ data.cityName }}</span></template
+        >
       </Column>
 
       <Column
         field="averageRating"
-        header="Rating"
+        :header="t('Rating')"
         sortable
         style="min-width: 130px"
       >
@@ -88,18 +105,18 @@
 
       <Column
         field="roomCount"
-        header="Rooms"
+        :header="t('Rooms')"
         sortable
         style="min-width: 100px"
       >
         <template #body="{ data }">
-          <span>{{ data.roomCount }} rooms</span>
+          <span>{{ t("{n} rooms", { n: data.roomCount }) }}</span>
         </template>
       </Column>
 
       <Column
         field="createdAt"
-        header="Created"
+        :header="t('Created')"
         sortable
         style="min-width: 120px"
       >
@@ -110,25 +127,16 @@
         </template>
       </Column>
 
-      <Column header="Actions" style="min-width: 120px">
+      <Column :header="t('Actions')" style="min-width: 120px">
         <template #body="{ data }">
           <div class="flex items-center gap-1">
-            <!-- <Button
-              icon="pi pi-eye"
-              severity="info"
-              text
-              rounded
-              size="small"
-              v-tooltip.top="'View'"
-              @click="emit('view', data)"
-            /> -->
             <Button
               icon="pi pi-pencil"
               severity="secondary"
               text
               rounded
               size="small"
-              v-tooltip.top="'Edit'"
+              v-tooltip.top="t('Edit')"
               @click="emit('view', data)"
             />
             <Button
@@ -137,7 +145,7 @@
               text
               rounded
               size="small"
-              v-tooltip.top="'Delete'"
+              v-tooltip.top="t('Delete')"
               @click="emit('delete', data)"
             />
           </div>
@@ -151,9 +159,10 @@
 import DataTable from "primevue/datatable";
 import Column from "primevue/column";
 import Button from "primevue/button";
-import type { Hotel } from "~/stores/admin/interfaces/hotels";
 import { Image } from "primevue";
+import type { Hotel } from "~/stores/admin/interfaces/hotels";
 
+const { t } = useI18n();
 const FALLBACK_IMAGE =
   "https://images.unsplash.com/photo-1566073771259-6a8506099945?w=200&h=200&fit=crop";
 
@@ -163,7 +172,6 @@ const props = defineProps<{
   pageSize: number;
   loading: boolean;
 }>();
-
 const emit = defineEmits<{
   (e: "view", hotel: Hotel): void;
   (e: "edit", hotel: Hotel): void;

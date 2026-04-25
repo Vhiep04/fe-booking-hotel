@@ -1,12 +1,17 @@
 <template>
   <div>
-    <!-- Page Header -->
     <div class="flex items-center justify-between mb-6">
       <div>
-        <h2 class="admin-page-title">Rooms</h2>
-        <p class="admin-page-subtitle">Manage hotel rooms and availability</p>
+        <h2 class="admin-page-title">{{ t("Rooms") }}</h2>
+        <p class="admin-page-subtitle">
+          {{ t("Manage hotel rooms and availability") }}
+        </p>
       </div>
-      <Button label="Add Room" icon="pi pi-plus" @click="openCreateModal" />
+      <Button
+        :label="t('Add Room')"
+        icon="pi pi-plus"
+        @click="openCreateModal"
+      />
     </div>
 
     <!-- Filters -->
@@ -17,7 +22,7 @@
             <InputIcon class="pi pi-search" />
             <InputText
               v-model="filters.search"
-              placeholder="Search rooms..."
+              :placeholder="t('Search rooms...')"
               class="w-full"
             />
           </IconField>
@@ -27,7 +32,7 @@
             :options="roomTypeFilterOptions"
             optionLabel="label"
             optionValue="value"
-            placeholder="Filter by type"
+            :placeholder="t('Filter by type')"
             class="w-48"
           />
 
@@ -36,7 +41,7 @@
             :options="hotelOptions"
             optionLabel="name"
             optionValue="hotelId"
-            placeholder="Filter by hotel"
+            :placeholder="t('Filter by hotel')"
             showClear
             class="w-48"
           />
@@ -45,14 +50,13 @@
             icon="pi pi-refresh"
             severity="secondary"
             outlined
-            v-tooltip.top="'Reset filters'"
+            v-tooltip.top="t('Reset filters')"
             @click="resetFilters"
           />
         </div>
       </div>
     </div>
 
-    <!-- Table -->
     <RoomTable
       :rooms="rooms"
       :totalCount="pagination.totalCount"
@@ -64,7 +68,6 @@
       @page="onPageChange"
     />
 
-    <!-- Combined Create/Edit Dialog -->
     <CombinedRoomDialog
       v-model="roomDialog"
       :hotelId="selectedHotelId"
@@ -75,14 +78,12 @@
       @save="handleSave"
     />
 
-    <!-- Detail Dialog -->
     <RoomDetailDialog
       v-model="detailDialog"
       :room="detailRoom"
       @edit="openEditModal"
     />
 
-    <!-- Delete Dialog -->
     <RoomDeleteDialog
       v-model="deleteDialog"
       :room="roomToDelete"
@@ -112,14 +113,14 @@ import RoomDetailDialog from "~/components/admin/room/RoomDetailDialog.vue";
 import RoomDeleteDialog from "~/components/admin/room/RoomDeleteDialog.vue";
 
 definePageMeta({ layout: "admin", middleware: ["admin"] });
-useHead({ title: "Room Management" });
+
+const { t } = useI18n();
+useHead({ title: t("Room Management") });
 
 const toast = useToast();
 const roomStore = useRoomStore();
 const roomTypeStore = useRoomTypeStore();
 const hotelStore = useAdminHotelStore();
-
-// ─── State ────────────────────────────────────────────────────────────────────
 
 const rooms = ref<RoomDto[]>([]);
 const loading = ref(false);
@@ -134,30 +135,23 @@ const editingRoom = ref<RoomDto | null>(null);
 const editingRoomType = ref<RoomTypeDto | null>(null);
 const detailRoom = ref<RoomDto | null>(null);
 const roomToDelete = ref<RoomDto | null>(null);
-
-// hotelId used when opening the dialog (needed by CombinedRoomDialog)
 const selectedHotelId = ref<number>(0);
 
 const pagination = ref({ page: 1, pageSize: 10, totalCount: 0 });
-
 const filters = ref({
   search: "",
   roomType: null as string | null,
   hotelId: null as number | null,
 });
-
-// Hotel list for filter dropdown
 const hotelOptions = ref<{ hotelId: number; name: string }[]>([]);
 
-const roomTypeFilterOptions = [
-  { label: "All Types", value: null },
+const roomTypeFilterOptions = computed(() => [
+  { label: t("All Types"), value: null },
   { label: "Standard", value: "Standard" },
   { label: "Deluxe", value: "Deluxe" },
   { label: "Suite", value: "Suite" },
   { label: "Presidential", value: "Presidential" },
-];
-
-// ─── Init ─────────────────────────────────────────────────────────────────────
+]);
 
 onMounted(async () => {
   await Promise.all([fetchRooms(), fetchHotelOptions()]);
@@ -172,12 +166,8 @@ async function fetchHotelOptions() {
         name: h.name,
       }));
     }
-  } catch {
-    // non-critical
-  }
+  } catch {}
 }
-
-// ─── Fetch Rooms ──────────────────────────────────────────────────────────────
 
 async function fetchRooms() {
   loading.value = true;
@@ -189,23 +179,22 @@ async function fetchRooms() {
       roomType: filters.value.roomType || undefined,
       hotelId: filters.value.hotelId ?? undefined,
     });
-
     if (res?.success) {
       rooms.value = res.data.items;
       pagination.value.totalCount = res.data.totalCount;
     } else {
       toast.add({
         severity: "error",
-        summary: "Error",
-        detail: res?.message ?? "Failed to load rooms",
+        summary: t("Error"),
+        detail: res?.message ?? t("Failed to load rooms"),
         life: 3000,
       });
     }
   } catch {
     toast.add({
       severity: "error",
-      summary: "Error",
-      detail: "Unexpected error loading rooms",
+      summary: t("Error"),
+      detail: t("Unexpected error loading rooms"),
       life: 3000,
     });
   } finally {
@@ -224,26 +213,19 @@ watch(
   { deep: true },
 );
 
-// ─── Pagination ───────────────────────────────────────────────────────────────
-
 function onPageChange({ page, rows }: { page: number; rows: number }) {
   pagination.value.page = page;
   pagination.value.pageSize = rows;
   fetchRooms();
 }
 
-// ─── Filters ──────────────────────────────────────────────────────────────────
-
 function resetFilters() {
   filters.value = { search: "", roomType: null, hotelId: null };
 }
 
-// ─── Dialogs ──────────────────────────────────────────────────────────────────
-
 function openCreateModal() {
   editingRoom.value = null;
   editingRoomType.value = null;
-  // default to first hotel or 0 — user picks in the form
   selectedHotelId.value = hotelOptions.value[0]?.hotelId ?? 0;
   roomDialog.value = true;
 }
@@ -251,17 +233,14 @@ function openCreateModal() {
 async function openEditModal(room: RoomDto) {
   editingRoom.value = room;
   selectedHotelId.value = room.hotelId;
-
-  // Fetch the full RoomType to pre-fill the form
   try {
     const res = await roomTypeStore.getRoomTypeById(room.roomTypeId);
     editingRoomType.value = res?.success ? res.data : null;
   } catch {
     editingRoomType.value = null;
   }
-
   roomDialog.value = true;
-  detailDialog.value = false; // close detail if open
+  detailDialog.value = false;
 }
 
 function openDetailModal(room: RoomDto) {
@@ -284,7 +263,6 @@ async function handleSave(payload: CombinedSavePayload) {
   saving.value = true;
   try {
     if (payload.roomTypeId && payload.roomId) {
-      // ── UPDATE path ──
       const [rtRes, rRes] = await Promise.all([
         roomTypeStore.updateRoomType(
           payload.roomTypeId,
@@ -295,50 +273,43 @@ async function handleSave(payload: CombinedSavePayload) {
           roomTypeId: payload.roomTypeId,
         }),
       ]);
-
       if (rtRes?.success && rRes?.success) {
         toast.add({
           severity: "success",
-          summary: "Success",
-          detail: "Room updated successfully",
+          summary: t("Success"),
+          detail: t("Room updated successfully"),
           life: 3000,
         });
         closeRoomDialog();
         await fetchRooms();
       } else {
-        const msg = rtRes?.message ?? rRes?.message ?? "Failed to update room";
         toast.add({
           severity: "error",
-          summary: "Error",
-          detail: msg,
+          summary: t("Error"),
+          detail: rtRes?.message ?? rRes?.message ?? t("Failed to update room"),
           life: 3000,
         });
       }
     } else {
-      // ── CREATE path ──
-      // 1. Create RoomType first to get roomTypeId
       const rtRes = await roomTypeStore.createRoomType(payload.roomTypePayload);
       if (!rtRes?.success) {
         toast.add({
           severity: "error",
-          summary: "Error",
-          detail: rtRes?.message ?? "Failed to create room type",
+          summary: t("Error"),
+          detail: rtRes?.message ?? t("Failed to create room type"),
           life: 3000,
         });
         return;
       }
-
-      // 2. Create Room with the new roomTypeId
       const rRes = await roomStore.createRoom({
         ...payload.roomPayload,
         roomTypeId: rtRes.data.roomTypeId,
       });
-
       if (rRes?.success) {
         toast.add({
           severity: "success",
-          summary: "Success",
-          detail: "Room created successfully",
+          summary: t("Success"),
+          detail: t("Room created successfully"),
           life: 3000,
         });
         closeRoomDialog();
@@ -346,8 +317,8 @@ async function handleSave(payload: CombinedSavePayload) {
       } else {
         toast.add({
           severity: "error",
-          summary: "Error",
-          detail: rRes?.message ?? "Failed to create room",
+          summary: t("Error"),
+          detail: rRes?.message ?? t("Failed to create room"),
           life: 3000,
         });
       }
@@ -355,16 +326,14 @@ async function handleSave(payload: CombinedSavePayload) {
   } catch {
     toast.add({
       severity: "error",
-      summary: "Error",
-      detail: "Unexpected error",
+      summary: t("Error"),
+      detail: t("Unexpected error"),
       life: 3000,
     });
   } finally {
     saving.value = false;
   }
 }
-
-// ─── Delete ───────────────────────────────────────────────────────────────────
 
 async function handleDelete() {
   if (!roomToDelete.value) return;
@@ -374,8 +343,8 @@ async function handleDelete() {
     if (res?.success) {
       toast.add({
         severity: "success",
-        summary: "Success",
-        detail: "Room deleted successfully",
+        summary: t("Success"),
+        detail: t("Room deleted successfully"),
         life: 3000,
       });
       deleteDialog.value = false;
@@ -384,16 +353,16 @@ async function handleDelete() {
     } else {
       toast.add({
         severity: "error",
-        summary: "Error",
-        detail: res?.message ?? "Failed to delete room",
+        summary: t("Error"),
+        detail: res?.message ?? t("Failed to delete room"),
         life: 3000,
       });
     }
   } catch {
     toast.add({
       severity: "error",
-      summary: "Error",
-      detail: "Unexpected error",
+      summary: t("Error"),
+      detail: t("Unexpected error"),
       life: 3000,
     });
   } finally {

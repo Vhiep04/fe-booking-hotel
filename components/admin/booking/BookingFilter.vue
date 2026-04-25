@@ -6,7 +6,7 @@
           <InputIcon class="pi pi-search" />
           <InputText
             v-model="filters.search"
-            placeholder="Search bookings..."
+            :placeholder="t('Search bookings...')"
             class="w-full"
           />
         </IconField>
@@ -16,14 +16,14 @@
           :options="statusOptions"
           optionLabel="label"
           optionValue="value"
-          placeholder="All Status"
+          :placeholder="t('All Status')"
           showClear
           class="w-full"
         />
 
         <Calendar
           v-model="filters.dateFrom"
-          placeholder="From Date"
+          :placeholder="t('From Date')"
           dateFormat="yy-mm-dd"
           showIcon
           class="w-full"
@@ -31,7 +31,7 @@
 
         <Calendar
           v-model="filters.dateTo"
-          placeholder="To Date"
+          :placeholder="t('To Date')"
           dateFormat="yy-mm-dd"
           showIcon
           class="w-full"
@@ -55,13 +55,15 @@ export interface BookingFiltersModel {
   dateTo: Date | null;
 }
 
+const { t } = useI18n();
+
 const filters = defineModel<BookingFiltersModel>({ required: true });
 
-const statusOptions = [
-  { label: "Pending", value: "Pending" },
-  { label: "Confirmed", value: "Confirmed" },
-  { label: "Completed", value: "Completed" },
-  { label: "Cancelled", value: "Cancelled" },
-  { label: "Refunded", value: "Refunded" },
-];
+const statusOptions = computed(() => [
+  { label: t("Pending"), value: "Pending" },
+  { label: t("Confirmed"), value: "Confirmed" },
+  { label: t("Completed"), value: "Completed" },
+  { label: t("Cancelled"), value: "Cancelled" },
+  { label: t("Refunded"), value: "Refunded" },
+]);
 </script>

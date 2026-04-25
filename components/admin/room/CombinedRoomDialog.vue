@@ -2,62 +2,59 @@
   <Dialog
     v-model:visible="visible"
     :style="{ width: '560px', maxWidth: '95vw' }"
-    :header="isEditing ? 'Edit Room' : 'Add Room'"
+    :header="isEditing ? t('Edit Room') : t('Add Room')"
     :modal="true"
     class="p-fluid"
     @hide="emit('hide')"
   >
     <div class="flex flex-col gap-6 pt-2">
-      <!-- ── Section: Room Type ── -->
+      <!-- Room Type Section -->
       <div class="flex flex-col gap-4">
         <span
           class="text-xs font-bold uppercase tracking-widest text-(--admin-text-muted) flex items-center gap-1.5"
         >
-          <i class="pi pi-tag" /> Room Type Information
+          <i class="pi pi-tag" /> {{ t("Room Type Information") }}
         </span>
 
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <!-- Type Name -->
           <div class="flex flex-col gap-1">
             <label class="text-sm font-medium">
-              Type Name <span class="text-red-500">*</span>
+              {{ t("Type Name") }} <span class="text-red-500">*</span>
             </label>
             <InputText
               v-model="form.typeName"
-              placeholder="e.g. Deluxe, Suite"
+              :placeholder="t('e.g. Deluxe, Suite')"
               :class="{ 'p-invalid': submitted && !form.typeName }"
             />
             <small v-if="submitted && !form.typeName" class="p-error">
-              Type name is required
+              {{ t("Type name is required") }}
             </small>
           </div>
 
-          <!-- Capacity -->
           <div class="flex flex-col gap-1">
             <label class="text-sm font-medium">
-              Capacity <span class="text-red-500">*</span>
+              {{ t("Capacity") }} <span class="text-red-500">*</span>
             </label>
             <InputNumber
               v-model="form.capacity"
-              placeholder="e.g. 2"
+              :placeholder="t('e.g. 2')"
               :min="1"
               :max="20"
               class="w-full"
               :class="{ 'p-invalid': submitted && !form.capacity }"
             />
             <small v-if="submitted && !form.capacity" class="p-error">
-              Capacity is required
+              {{ t("Capacity is required") }}
             </small>
           </div>
 
-          <!-- Price Per Night -->
           <div class="flex flex-col gap-1">
             <label class="text-sm font-medium">
-              Price / Night <span class="text-red-500">*</span>
+              {{ t("Price / Night") }} <span class="text-red-500">*</span>
             </label>
             <InputNumber
               v-model="form.pricePerNight"
-              placeholder="e.g. 500000"
+              :placeholder="t('e.g. 500000')"
               :min="0"
               mode="currency"
               currency="VND"
@@ -66,41 +63,38 @@
               :class="{ 'p-invalid': submitted && !form.pricePerNight }"
             />
             <small v-if="submitted && !form.pricePerNight" class="p-error">
-              Price is required
+              {{ t("Price is required") }}
             </small>
           </div>
 
-          <!-- Room Count -->
           <div class="flex flex-col gap-1">
-            <label class="text-sm font-medium">Room Count</label>
+            <label class="text-sm font-medium">{{ t("Room Count") }}</label>
             <InputNumber
               v-model="form.roomCount"
-              placeholder="e.g. 10"
+              :placeholder="t('e.g. 10')"
               :min="0"
               class="w-full"
             />
           </div>
 
-          <!-- Description -->
           <div class="md:col-span-2 flex flex-col gap-1">
-            <label class="text-sm font-medium">Description</label>
+            <label class="text-sm font-medium">{{ t("Description") }}</label>
             <Textarea
               v-model="form.description"
               rows="2"
-              placeholder="Enter room type description"
+              :placeholder="t('Enter room type description')"
               class="resize-none"
             />
           </div>
 
-          <!-- Facilities -->
           <div class="md:col-span-2 flex flex-col gap-1">
-            <label class="text-sm font-medium">Facilities</label>
+            <label class="text-sm font-medium">{{ t("Facilities") }}</label>
             <MultiSelect
               v-model="form.facilityIds"
               :options="facilities"
               optionLabel="name"
               optionValue="facilityId"
-              placeholder="Select facilities"
+              :placeholder="t('Select facilities')"
               class="w-full"
               display="chip"
             />
@@ -110,33 +104,31 @@
 
       <Divider />
 
-      <!-- ── Section: Individual Room ── -->
+      <!-- Room Details Section -->
       <div class="flex flex-col gap-4">
         <span
           class="text-xs font-bold uppercase tracking-widest text-(--admin-text-muted) flex items-center gap-1.5"
         >
-          <i class="pi pi-home" /> Room Details
+          <i class="pi pi-home" /> {{ t("Room Details") }}
         </span>
 
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <!-- Room Number -->
           <div class="flex flex-col gap-1">
             <label class="text-sm font-medium">
-              Room Number <span class="text-red-500">*</span>
+              {{ t("Room Number") }} <span class="text-red-500">*</span>
             </label>
             <InputText
               v-model="form.roomNumber"
-              placeholder="e.g. 101, A-202"
+              :placeholder="t('e.g. 101, A-202')"
               :class="{ 'p-invalid': submitted && !form.roomNumber }"
             />
             <small v-if="submitted && !form.roomNumber" class="p-error">
-              Room number is required
+              {{ t("Room number is required") }}
             </small>
           </div>
 
-          <!-- Status -->
           <div class="flex flex-col gap-1">
-            <label class="text-sm font-medium">Status</label>
+            <label class="text-sm font-medium">{{ t("Status") }}</label>
             <div class="flex flex-wrap gap-2 pt-1">
               <div
                 v-for="s in statusOptions"
@@ -155,8 +147,9 @@
             </div>
           </div>
         </div>
+
         <div class="md:col-span-2 flex flex-col gap-1">
-          <label class="text-sm font-medium">Room Type Image</label>
+          <label class="text-sm font-medium">{{ t("Room Type Image") }}</label>
           <div
             v-if="roomTypePreview"
             class="relative w-full h-40 rounded-lg overflow-hidden border"
@@ -175,7 +168,9 @@
             @click="triggerRoomTypeFileInput"
           >
             <i class="pi pi-image text-2xl text-gray-400 mb-2" />
-            <span class="text-sm text-gray-400">Click to upload image</span>
+            <span class="text-sm text-gray-400">{{
+              t("Click to upload image")
+            }}</span>
           </div>
           <input
             ref="roomTypeFileInput"
@@ -190,7 +185,7 @@
 
     <template #footer>
       <Button
-        label="Cancel"
+        :label="t('Cancel')"
         icon="pi pi-times"
         severity="secondary"
         outlined
@@ -198,7 +193,7 @@
         @click="emit('hide')"
       />
       <Button
-        :label="isEditing ? 'Update' : 'Create'"
+        :label="isEditing ? t('Update') : t('Create')"
         :icon="isEditing ? 'pi pi-check' : 'pi pi-plus'"
         :loading="saving"
         @click="handleSave"
@@ -257,6 +252,7 @@ const emit = defineEmits<{
   (e: "save", payload: CombinedSavePayload): void;
 }>();
 
+const { t } = useI18n();
 const uploadStore = useUploadStore();
 const submitted = ref(false);
 const uploadingImage = ref(false);
@@ -269,12 +265,12 @@ const roomTypePreview = ref<string | null>(null);
 const roomTypeFile = ref<File | null>(null);
 const oldImgUrl = ref<string | null>(null);
 
-const statusOptions = [
-  { value: "Available", label: "Available", dotClass: "bg-green-500" },
-  { value: "Occupied", label: "Occupied", dotClass: "bg-red-500" },
-  { value: "Maintenance", label: "Maintenance", dotClass: "bg-yellow-500" },
-  { value: "Reserved", label: "Reserved", dotClass: "bg-blue-500" },
-];
+const statusOptions = computed(() => [
+  { value: "Available", label: t("Available"), dotClass: "bg-green-500" },
+  { value: "Occupied", label: t("Occupied"), dotClass: "bg-red-500" },
+  { value: "Maintenance", label: t("Maintenance"), dotClass: "bg-yellow-500" },
+  { value: "Reserved", label: t("Reserved"), dotClass: "bg-blue-500" },
+]);
 
 const defaultForm = (): CombinedFormData => ({
   typeName: "",
@@ -363,29 +359,19 @@ async function handleSave() {
   )
     return;
 
-  // Upload ảnh mới nếu có, đồng thời xóa ảnh cũ trên Cloudinary
   let finalImgUrl = form.value.imgUrl;
-
   if (roomTypeFile.value) {
     uploadingImage.value = true;
     try {
-      // Xóa ảnh cũ nếu đang edit và có ảnh cũ
       if (isEditing.value && oldImgUrl.value) {
-        // Extract publicId từ Cloudinary URL
-        // URL dạng: https://res.cloudinary.com/.../upload/v123/folder/publicId.ext
         const publicId = extractCloudinaryPublicId(oldImgUrl.value);
-        if (publicId) {
-          await uploadStore.deleteImage(publicId);
-        }
+        if (publicId) await uploadStore.deleteImage(publicId);
       }
-
       const up = await uploadStore.uploadImage(
         roomTypeFile.value,
         "room-types",
       );
-      if (up?.success && up.data) {
-        finalImgUrl = up.data.url;
-      }
+      if (up?.success && up.data) finalImgUrl = up.data.url;
     } finally {
       uploadingImage.value = false;
     }
@@ -403,7 +389,7 @@ async function handleSave() {
 
   const roomPayload: RoomPayload = {
     hotelId: props.hotelId,
-    roomTypeId: props.editingRoomType?.roomTypeId ?? 0, // parent sẽ replace sau khi tạo roomType
+    roomTypeId: props.editingRoomType?.roomTypeId ?? 0,
     roomNumber: form.value.roomNumber,
     status: form.value.status,
   };
@@ -416,11 +402,8 @@ async function handleSave() {
   });
 }
 
-// Helper: lấy publicId từ Cloudinary URL
 function extractCloudinaryPublicId(url: string): string | null {
   try {
-    // https://res.cloudinary.com/cloud/image/upload/v1234/folder/name.jpg
-    // → "folder/name"
     const match = url.match(/\/upload\/(?:v\d+\/)?(.+)\.[a-z]+$/i);
     return match?.[1] ?? null;
   } catch {

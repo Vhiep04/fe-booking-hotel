@@ -1,86 +1,86 @@
 <template>
   <div class="flex flex-col gap-6 pt-4">
-    <!-- Basic Information Section -->
+    <!-- Basic Information -->
     <div class="flex flex-col gap-4">
       <span
         class="text-xs font-bold uppercase tracking-widest text-(--admin-text-muted) flex items-center gap-1.5"
       >
-        <i class="pi pi-building" /> Basic Information
+        <i class="pi pi-building" /> {{ t("Basic Information") }}
       </span>
 
       <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div class="md:col-span-2 flex flex-col gap-1">
-          <label class="text-sm font-medium"
-            >Hotel Name <span class="text-red-500">*</span></label
-          >
+          <label class="text-sm font-medium">
+            {{ t("Hotel Name") }} <span class="text-red-500">*</span>
+          </label>
           <InputText
             v-model="form.name"
-            placeholder="e.g. Hanoi Hilton"
+            :placeholder="t('e.g. Hanoi Hilton')"
             :class="{ 'p-invalid': submitted && !form.name }"
           />
-          <small v-if="submitted && !form.name" class="p-error"
-            >Hotel name is required</small
-          >
+          <small v-if="submitted && !form.name" class="p-error">
+            {{ t("Hotel name is required") }}
+          </small>
         </div>
 
         <div class="md:col-span-2 flex flex-col gap-1">
-          <label class="text-sm font-medium">Description</label>
+          <label class="text-sm font-medium">{{ t("Description") }}</label>
           <Textarea
             v-model="form.description"
             rows="3"
-            placeholder="Enter hotel description"
+            :placeholder="t('Enter hotel description')"
             class="resize-none"
           />
         </div>
       </div>
     </div>
 
-    <!-- Location Section -->
+    <!-- Location -->
     <div class="flex flex-col gap-4">
       <span
         class="text-xs font-bold uppercase tracking-widest text-(--admin-text-muted) flex items-center gap-1.5"
       >
-        <i class="pi pi-map-marker" /> Location
+        <i class="pi pi-map-marker" /> {{ t("Location") }}
       </span>
 
       <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div class="flex flex-col gap-1">
-          <label class="text-sm font-medium"
-            >City <span class="text-red-500">*</span></label
-          >
+          <label class="text-sm font-medium">
+            {{ t("City") }} <span class="text-red-500">*</span>
+          </label>
           <Dropdown
             v-model="form.cityId"
             :options="cities"
             optionLabel="name"
             optionValue="cityId"
-            placeholder="Select a city"
+            :placeholder="t('Select a city')"
             class="w-full"
             :class="{ 'p-invalid': submitted && !form.cityId }"
           />
-          <small v-if="submitted && !form.cityId" class="p-error"
-            >City is required</small
-          >
+          <small v-if="submitted && !form.cityId" class="p-error">
+            {{ t("City is required") }}
+          </small>
         </div>
 
         <div class="flex flex-col gap-1">
-          <label class="text-sm font-medium"
-            >Address <span class="text-red-500">*</span></label
-          >
+          <label class="text-sm font-medium">
+            {{ t("Address") }} <span class="text-red-500">*</span>
+          </label>
           <InputText
             v-model="form.location"
-            placeholder="e.g. 123 Ba Dinh St"
+            :placeholder="t('e.g. 123 Ba Dinh St')"
             :class="{ 'p-invalid': submitted && !form.location }"
           />
-          <small v-if="submitted && !form.location" class="p-error"
-            >Address is required</small
-          >
+          <small v-if="submitted && !form.location" class="p-error">
+            {{ t("Address is required") }}
+          </small>
         </div>
 
         <div class="flex flex-col gap-1">
-          <label class="text-sm font-medium">Latitude</label>
+          <label class="text-sm font-medium">{{ t("Latitude") }}</label>
           <InputNumber
             v-model="form.latitude"
-            placeholder="e.g. 21.0285"
+            :placeholder="t('e.g. 21.0285')"
             :minFractionDigits="0"
             :maxFractionDigits="6"
             mode="decimal"
@@ -90,10 +90,10 @@
         </div>
 
         <div class="flex flex-col gap-1">
-          <label class="text-sm font-medium">Longitude</label>
+          <label class="text-sm font-medium">{{ t("Longitude") }}</label>
           <InputNumber
             v-model="form.longitude"
-            placeholder="e.g. 105.8542"
+            :placeholder="t('e.g. 105.8542')"
             :minFractionDigits="0"
             :maxFractionDigits="6"
             mode="decimal"
@@ -104,12 +104,12 @@
       </div>
     </div>
 
-    <!-- Primary Image Section -->
+    <!-- Primary Image -->
     <div class="flex flex-col gap-3">
       <span
         class="text-xs font-bold uppercase tracking-widest text-(--admin-text-muted) flex items-center gap-1.5"
       >
-        <i class="pi pi-image" /> Primary Image
+        <i class="pi pi-image" /> {{ t("Primary Image") }}
       </span>
 
       <div
@@ -128,13 +128,13 @@
               class="text-white text-sm font-semibold bg-white/20 hover:bg-white/30 backdrop-blur px-3 py-1.5 rounded-lg border border-white/40 transition-colors"
               @click.stop="$emit('removePrimary')"
             >
-              <i class="pi pi-trash mr-1" /> Remove
+              <i class="pi pi-trash mr-1" /> {{ t("Remove") }}
             </button>
             <button
               class="text-white text-sm font-semibold bg-white/20 hover:bg-white/30 backdrop-blur px-3 py-1.5 rounded-lg border border-white/40 transition-colors"
               @click.stop="primaryInput?.click()"
             >
-              <i class="pi pi-refresh mr-1" /> Change
+              <i class="pi pi-refresh mr-1" /> {{ t("Change") }}
             </button>
           </div>
         </template>
@@ -144,10 +144,12 @@
           >
             <i class="pi pi-cloud-upload text-2xl" />
             <p class="text-sm font-medium">
-              Drop cover image or
-              <span class="text-(--admin-primary) font-semibold">browse</span>
+              {{ t("Drop cover image or") }}
+              <span class="text-(--admin-primary) font-semibold">{{
+                t("browse")
+              }}</span>
             </p>
-            <p class="text-xs">PNG, JPG, WEBP up to 10MB</p>
+            <p class="text-xs">{{ t("PNG, JPG, WEBP up to 10MB") }}</p>
           </div>
         </template>
       </div>
@@ -160,12 +162,12 @@
       />
     </div>
 
-    <!-- Gallery Section -->
+    <!-- Gallery -->
     <div class="flex flex-col gap-3">
       <span
         class="text-xs font-bold uppercase tracking-widest text-(--admin-text-muted) flex items-center gap-1.5"
       >
-        <i class="pi pi-images" /> Gallery
+        <i class="pi pi-images" /> {{ t("Gallery") }}
         <span
           class="ml-auto text-[0.65rem] font-semibold bg-(--admin-primary-light) text-(--admin-primary) px-2 py-0.5 rounded-full"
         >
@@ -215,10 +217,12 @@
         >
           <i class="pi pi-images text-2xl" />
           <p class="text-sm font-medium">
-            Drop images or
-            <span class="text-(--admin-primary) font-semibold">browse</span>
+            {{ t("Drop images or") }}
+            <span class="text-(--admin-primary) font-semibold">{{
+              t("browse")
+            }}</span>
           </p>
-          <p class="text-xs">Up to {{ maxGallery }} images</p>
+          <p class="text-xs">{{ t("Up to {n} images", { n: maxGallery }) }}</p>
         </div>
       </div>
       <input
@@ -234,13 +238,13 @@
     <!-- Actions -->
     <div class="flex gap-3 pt-2">
       <Button
-        label="Save Changes"
+        :label="t('Save Changes')"
         icon="pi pi-check"
         :loading="saving"
         @click="$emit('save')"
       />
       <Button
-        label="Reset"
+        :label="t('Reset')"
         icon="pi pi-refresh"
         severity="secondary"
         outlined
@@ -257,8 +261,10 @@ import InputNumber from "primevue/inputnumber";
 import Textarea from "primevue/textarea";
 import Button from "primevue/button";
 import Dropdown from "primevue/dropdown";
-import type { HotelPayload } from "~/stores/admin/interfaces/hotels";
 import { Image } from "primevue";
+import type { HotelPayload } from "~/stores/admin/interfaces/hotels";
+
+const { t } = useI18n();
 
 const props = defineProps<{
   form: HotelPayload;

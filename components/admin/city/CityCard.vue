@@ -1,6 +1,5 @@
 <template>
   <div class="admin-card overflow-hidden group">
-    <!-- City Image -->
     <div class="relative h-48 overflow-hidden">
       <img
         :src="primaryImage"
@@ -16,7 +15,6 @@
       </div>
     </div>
 
-    <!-- City Info -->
     <div class="p-4">
       <div class="grid grid-cols-1 gap-4 mb-4">
         <div class="text-center p-3 rounded-lg bg-(--admin-surface-hover)">
@@ -24,7 +22,7 @@
           <p class="text-lg font-bold text-(--admin-text-color)">
             {{ city.hotelCount }}
           </p>
-          <p class="text-xs text-(--admin-text-muted)">Hotels</p>
+          <p class="text-xs text-(--admin-text-muted)">{{ t("Hotels") }}</p>
         </div>
       </div>
 
@@ -42,7 +40,7 @@
           text
           rounded
           size="small"
-          v-tooltip.top="'Edit'"
+          v-tooltip.top="t('Edit')"
           @click="emit('edit', city)"
         />
         <Button
@@ -51,7 +49,7 @@
           text
           rounded
           size="small"
-          v-tooltip.top="'Delete'"
+          v-tooltip.top="t('Delete')"
           @click="emit('delete', city)"
         />
       </div>
@@ -62,6 +60,8 @@
 <script setup lang="ts">
 import Button from "primevue/button";
 import type { CityDto } from "~/stores/admin/interfaces/cities";
+
+const { t } = useI18n();
 
 const props = defineProps<{ city: CityDto }>();
 
@@ -77,7 +77,6 @@ const primaryImage = computed(() => {
   const primary = props.city.images?.find((img) => img.isPrimary);
   const url =
     primary?.imageUrl ?? props.city.images?.[0]?.imageUrl ?? FALLBACK_IMAGE;
-  // Append Unsplash sizing params nếu là Unsplash URL
   if (url.includes("unsplash.com") && !url.includes("?")) {
     return `${url}?w=500&h=300&fit=crop`;
   }

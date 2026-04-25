@@ -2,19 +2,23 @@
   <Dialog
     v-model:visible="visible"
     :style="{ width: '700px' }"
-    header="Booking Details"
+    :header="t('Booking Details')"
     :modal="true"
   >
     <div v-if="booking" class="space-y-6">
       <div class="grid grid-cols-2 gap-4">
         <div>
-          <label class="text-sm text-(--admin-text-muted)"> Booking ID </label>
+          <label class="text-sm text-(--admin-text-muted)">{{
+            t("Booking ID")
+          }}</label>
           <p class="font-semibold text-(--admin-primary)">
             #{{ booking.reservationId }}
           </p>
         </div>
         <div>
-          <label class="text-sm text-(--admin-text-muted)"> Created At </label>
+          <label class="text-sm text-(--admin-text-muted)">{{
+            t("Created At")
+          }}</label>
           <p class="font-medium">{{ formatDate(booking.createdAt) }}</p>
         </div>
       </div>
@@ -22,10 +26,10 @@
       <Divider />
 
       <div>
-        <h4 class="font-semibold mb-3">Hotel Information</h4>
+        <h4 class="font-semibold mb-3">{{ t("Hotel Information") }}</h4>
         <p class="font-semibold text-lg">{{ booking.hotelName }}</p>
         <p class="text-(--admin-text-muted)">
-          {{ booking.roomType }} Room Number: {{ booking.roomId }}
+          {{ booking.roomType }} {{ t("Room Number:") }} {{ booking.roomId }}
         </p>
         <p class="text-sm text-(--admin-text-muted) mt-1">
           <i class="pi pi-map-marker mr-1"></i>{{ booking.cityName }}
@@ -35,14 +39,18 @@
       <Divider />
 
       <div>
-        <h4 class="font-semibold mb-3">Guest Information</h4>
+        <h4 class="font-semibold mb-3">{{ t("Guest Information") }}</h4>
         <div class="grid grid-cols-2 gap-4">
           <div>
-            <label class="text-sm text-(--admin-text-muted)">Name</label>
+            <label class="text-sm text-(--admin-text-muted)">{{
+              t("Name")
+            }}</label>
             <p class="font-medium">{{ booking.userName }}</p>
           </div>
           <div>
-            <label class="text-sm text-(--admin-text-muted)">Email</label>
+            <label class="text-sm text-(--admin-text-muted)">{{
+              t("Email")
+            }}</label>
             <p class="font-medium">{{ booking.userEmail }}</p>
           </div>
         </div>
@@ -51,19 +59,27 @@
       <Divider />
 
       <div>
-        <h4 class="font-semibold mb-3">Stay Information</h4>
+        <h4 class="font-semibold mb-3">{{ t("Stay Information") }}</h4>
         <div class="grid grid-cols-3 gap-4">
           <div>
-            <label class="text-sm text-(--admin-text-muted)">Check-in</label>
+            <label class="text-sm text-(--admin-text-muted)">{{
+              t("Check-in")
+            }}</label>
             <p class="font-medium">{{ formatDate(booking.checkInDate) }}</p>
           </div>
           <div>
-            <label class="text-sm text-(--admin-text-muted)">Check-out</label>
+            <label class="text-sm text-(--admin-text-muted)">{{
+              t("Check-out")
+            }}</label>
             <p class="font-medium">{{ formatDate(booking.checkOutDate) }}</p>
           </div>
           <div>
-            <label class="text-sm text-(--admin-text-muted)">Duration</label>
-            <p class="font-medium">{{ booking.nights }} nights</p>
+            <label class="text-sm text-(--admin-text-muted)">{{
+              t("Duration")
+            }}</label>
+            <p class="font-medium">
+              {{ t("{n} nights", { n: booking.nights }) }}
+            </p>
           </div>
         </div>
       </div>
@@ -71,23 +87,23 @@
       <Divider />
 
       <div>
-        <h4 class="font-semibold mb-3">Payment Information</h4>
+        <h4 class="font-semibold mb-3">{{ t("Payment Information") }}</h4>
         <div class="grid grid-cols-2 gap-4 mb-4">
           <div>
-            <label class="text-sm text-(--admin-text-muted)">
-              Total Amount
-            </label>
+            <label class="text-sm text-(--admin-text-muted)">{{
+              t("Total Amount")
+            }}</label>
             <p class="font-bold text-xl">
               ${{ booking.totalPrice.toLocaleString() }}
             </p>
           </div>
           <div>
-            <label class="text-sm text-(--admin-text-muted)">
-              Payment Status
-            </label>
+            <label class="text-sm text-(--admin-text-muted)">{{
+              t("Payment Status")
+            }}</label>
             <div class="mt-1">
               <Tag
-                :value="booking.paymentStatus"
+                :value="t(booking.paymentStatus)"
                 :severity="getPaymentSeverity(booking.paymentStatus)"
               />
             </div>
@@ -96,7 +112,7 @@
 
         <div v-if="booking.payments?.length > 0">
           <label class="text-sm text-(--admin-text-muted) mb-2 block">
-            Payment History
+            {{ t("Payment History") }}
           </label>
           <div class="space-y-2">
             <div
@@ -115,7 +131,7 @@
                   ${{ payment.amount.toLocaleString() }}
                 </p>
                 <Tag
-                  :value="payment.status"
+                  :value="t(payment.status)"
                   :severity="getPaymentSeverity(payment.status)"
                   class="text-xs"
                 />
@@ -128,13 +144,13 @@
 
     <template #footer>
       <Button
-        label="Close"
+        :label="t('Close')"
         severity="secondary"
         outlined
         @click="emit('update:modelValue', false)"
       />
       <Button
-        label="Print Invoice"
+        :label="t('Print Invoice')"
         icon="pi pi-print"
         @click="emit('print', booking!)"
       />
@@ -148,6 +164,8 @@ import Divider from "primevue/divider";
 import Button from "primevue/button";
 import Tag from "primevue/tag";
 import type { Reservation } from "~/stores/admin/interfaces/reservations";
+
+const { t } = useI18n();
 
 const props = defineProps<{
   modelValue: boolean;

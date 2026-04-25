@@ -10,24 +10,31 @@
       dataKey="feedbackId"
       :rowsPerPageOptions="[5, 10, 20, 50]"
       paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
-      currentPageReportTemplate="Showing {first} to {last} of {totalRecords} feedbacks"
+      :currentPageReportTemplate="
+        t('Showing {first} to {last} of {totalRecords} feedbacks')
+      "
       responsiveLayout="scroll"
       @page="onPage"
     >
       <template #header>
         <span class="text-(--admin-text-secondary)">
-          {{ totalCount }} feedbacks found
+          {{ t("{n} feedbacks found", { n: totalCount }) }}
         </span>
       </template>
 
       <template #empty>
         <div class="text-center py-8 text-(--admin-text-muted)">
           <i class="pi pi-comments text-4xl mb-2 block" />
-          <p>No feedbacks found</p>
+          <p>{{ t("No feedbacks found") }}</p>
         </div>
       </template>
 
-      <Column field="feedbackId" header="ID" sortable style="min-width: 80px">
+      <Column
+        field="feedbackId"
+        :header="t('ID')"
+        sortable
+        style="min-width: 80px"
+      >
         <template #body="{ data }">
           <span class="font-medium text-(--admin-text-muted)"
             >#{{ data.feedbackId }}</span
@@ -35,20 +42,25 @@
         </template>
       </Column>
 
-      <Column field="userName" header="User" sortable style="min-width: 180px">
+      <Column
+        field="userName"
+        :header="t('User')"
+        sortable
+        style="min-width: 180px"
+      >
         <template #body="{ data }">
           <div class="flex items-center gap-2">
             <Avatar
               :label="getInitial(data)"
               shape="circle"
               size="normal"
-              class="bg-(--admin-primary)] text-white"
+              class="bg-(--admin-primary) text-white"
             />
             <div>
               <p class="font-medium text-(--admin-text-color)">
-                {{ data.userName ?? "Anonymous" }}
+                {{ data.userName ?? t("Anonymous") }}
               </p>
-              <p class="text-xs text-(--admin-text-muted)]">
+              <p class="text-xs text-(--admin-text-muted)">
                 {{ data.userEmail }}
               </p>
             </div>
@@ -58,7 +70,7 @@
 
       <Column
         field="hotelName"
-        header="Hotel"
+        :header="t('Hotel')"
         sortable
         style="min-width: 180px"
       >
@@ -72,7 +84,12 @@
         </template>
       </Column>
 
-      <Column field="rating" header="Rating" sortable style="min-width: 130px">
+      <Column
+        field="rating"
+        :header="t('Rating')"
+        sortable
+        style="min-width: 130px"
+      >
         <template #body="{ data }">
           <div class="flex items-center gap-1">
             <span
@@ -92,7 +109,7 @@
         </template>
       </Column>
 
-      <Column field="comment" header="Comment" style="min-width: 250px">
+      <Column field="comment" :header="t('Comment')" style="min-width: 250px">
         <template #body="{ data }">
           <p class="text-sm text-(--admin-text-color) line-clamp-2">
             {{ data.comment || "—" }}
@@ -100,7 +117,12 @@
         </template>
       </Column>
 
-      <Column field="createdAt" header="Date" sortable style="min-width: 120px">
+      <Column
+        field="createdAt"
+        :header="t('Date')"
+        sortable
+        style="min-width: 120px"
+      >
         <template #body="{ data }">
           <span class="text-sm text-(--admin-text-muted)">{{
             formatDate(data.createdAt)
@@ -108,7 +130,7 @@
         </template>
       </Column>
 
-      <Column header="Actions" style="min-width: 110px">
+      <Column :header="t('Actions')" style="min-width: 110px">
         <template #body="{ data }">
           <div class="flex items-center gap-1">
             <Button
@@ -117,7 +139,7 @@
               text
               rounded
               size="small"
-              v-tooltip.top="'View'"
+              v-tooltip.top="t('View')"
               @click="emit('view', data)"
             />
             <Button
@@ -126,7 +148,7 @@
               text
               rounded
               size="small"
-              v-tooltip.top="'Edit'"
+              v-tooltip.top="t('Edit')"
               @click="emit('edit', data)"
             />
             <Button
@@ -135,7 +157,7 @@
               text
               rounded
               size="small"
-              v-tooltip.top="'Delete'"
+              v-tooltip.top="t('Delete')"
               @click="emit('delete', data)"
             />
           </div>
@@ -151,6 +173,8 @@ import Column from "primevue/column";
 import Button from "primevue/button";
 import Avatar from "primevue/avatar";
 import type { AdminFeedbackDto } from "~/stores/admin/interfaces/feedbacks";
+
+const { t } = useI18n();
 
 const props = defineProps<{
   feedbacks: AdminFeedbackDto[];

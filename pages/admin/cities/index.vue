@@ -4,10 +4,16 @@
       class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6"
     >
       <div>
-        <h1 class="admin-page-title">Cities Management</h1>
-        <p class="admin-page-subtitle">Manage cities and destinations</p>
+        <h1 class="admin-page-title">{{ t("Cities Management") }}</h1>
+        <p class="admin-page-subtitle">
+          {{ t("Manage cities and destinations") }}
+        </p>
       </div>
-      <Button label="Add City" icon="pi pi-plus" @click="openCreateDialog" />
+      <Button
+        :label="t('Add City')"
+        icon="pi pi-plus"
+        @click="openCreateDialog"
+      />
     </div>
 
     <div class="admin-card mb-6">
@@ -17,13 +23,13 @@
             <InputIcon class="pi pi-search" />
             <InputText
               v-model="filters.search"
-              placeholder="Search cities..."
+              :placeholder="t('Search cities...')"
               class="w-full"
             />
           </IconField>
           <InputText
             v-model="filters.country"
-            placeholder="Filter by country..."
+            :placeholder="t('Filter by country...')"
             class="w-full"
           />
         </div>
@@ -59,7 +65,6 @@
         @delete="openDeleteDialog"
       />
 
-      <!-- Add City Card -->
       <div
         class="admin-card overflow-hidden border-2 border-dashed border-(--admin-surface-border) hover:border-(--admin-primary) cursor-pointer transition-colors flex items-center justify-center min-h-[280px]"
         @click="openCreateDialog"
@@ -70,26 +75,26 @@
           >
             <i class="pi pi-plus text-2xl text-(--admin-primary)"></i>
           </div>
-          <p class="font-semibold text-(--admin-text-color)">Add New City</p>
+          <p class="font-semibold text-(--admin-text-color)">
+            {{ t("Add New City") }}
+          </p>
           <p class="text-sm text-(--admin-text-muted)">
-            Click to add a new destination
+            {{ t("Click to add a new destination") }}
           </p>
         </div>
       </div>
     </div>
 
-    <!-- Empty State -->
     <div v-else class="admin-card p-12 text-center">
       <i class="pi pi-map text-5xl text-(--admin-text-muted) mb-4"></i>
       <h3 class="text-xl font-semibold text-(--admin-text-color) mb-2">
-        No cities found
+        {{ t("No cities found") }}
       </h3>
-      <p class="text-(--admin-text-muted)]">
-        Try adjusting your search or add a new city
+      <p class="text-(--admin-text-muted)">
+        {{ t("Try adjusting your search or add a new city") }}
       </p>
     </div>
 
-    <!-- Pagination -->
     <div
       v-if="pagination.totalCount > pagination.pageSize"
       class="flex justify-center mt-6"
@@ -143,15 +148,10 @@ import type {
   UpdateCityPayload,
 } from "~/stores/admin/interfaces/cities";
 
-definePageMeta({
-  layout: "admin",
-  middleware: ["admin"],
-});
+definePageMeta({ layout: "admin", middleware: ["admin"] });
+useHead({ title: "City Management" });
 
-useHead({
-  title: "City Management",
-});
-
+const { t } = useI18n();
 const toast = useToast();
 const citiesStore = useCitiesStore();
 
@@ -166,16 +166,8 @@ const isEditing = ref(false);
 const editingCity = ref<CityDto | null>(null);
 const cityToDelete = ref<CityDto | null>(null);
 
-const pagination = ref({
-  page: 1,
-  pageSize: 8,
-  totalCount: 0,
-});
-
-const filters = ref({
-  search: "",
-  country: "",
-});
+const pagination = ref({ page: 1, pageSize: 8, totalCount: 0 });
+const filters = ref({ search: "", country: "" });
 
 async function fetchCities() {
   loading.value = true;
@@ -193,16 +185,16 @@ async function fetchCities() {
     } else {
       toast.add({
         severity: "error",
-        summary: "Error",
-        detail: res.message ?? "Failed to load cities",
+        summary: t("Error"),
+        detail: res.message ?? t("Failed to load cities"),
         life: 3000,
       });
     }
   } catch {
     toast.add({
       severity: "error",
-      summary: "Error",
-      detail: "Unexpected error loading cities",
+      summary: t("Error"),
+      detail: t("Unexpected error loading cities"),
       life: 3000,
     });
   } finally {
@@ -210,7 +202,6 @@ async function fetchCities() {
   }
 }
 
-// Debounce filter changes
 let debounceTimer: ReturnType<typeof setTimeout> | null = null;
 watch(
   filters,
@@ -235,18 +226,15 @@ function openCreateDialog() {
   isEditing.value = false;
   cityDialog.value = true;
 }
-
 function openEditDialog(city: CityDto) {
   editingCity.value = city;
   isEditing.value = true;
   cityDialog.value = true;
 }
-
 function openDeleteDialog(city: CityDto) {
   cityToDelete.value = city;
   deleteDialog.value = true;
 }
-
 function closeCityDialog() {
   cityDialog.value = false;
   editingCity.value = null;
@@ -257,7 +245,6 @@ async function handleCreate(payload: CreateCityPayload, imageUrl: string) {
   try {
     const res = await citiesStore.createCity(payload);
     if (res.success) {
-      // ✅ Lưu ảnh vào DB nếu có upload
       if (imageUrl && res.data?.cityId) {
         const imagePayload: AddCityImagePayload = {
           imageUrl,
@@ -267,11 +254,10 @@ async function handleCreate(payload: CreateCityPayload, imageUrl: string) {
         };
         await citiesStore.addCityImage(res.data.cityId, imagePayload);
       }
-
       toast.add({
         severity: "success",
-        summary: "Success",
-        detail: "City created successfully",
+        summary: t("Success"),
+        detail: t("City created successfully"),
         life: 3000,
       });
       closeCityDialog();
@@ -279,16 +265,16 @@ async function handleCreate(payload: CreateCityPayload, imageUrl: string) {
     } else {
       toast.add({
         severity: "error",
-        summary: "Error",
-        detail: res.message ?? "Failed to create city",
+        summary: t("Error"),
+        detail: res.message ?? t("Failed to create city"),
         life: 3000,
       });
     }
   } catch {
     toast.add({
       severity: "error",
-      summary: "Error",
-      detail: "Unexpected error",
+      summary: t("Error"),
+      detail: t("Unexpected error"),
       life: 3000,
     });
   } finally {
@@ -310,11 +296,8 @@ async function handleUpdate(
         const existingPrimary = existingCity?.images?.find(
           (img) => img.isPrimary,
         );
-
-        if (existingPrimary) {
+        if (existingPrimary)
           await citiesStore.deleteCityImage(id, existingPrimary.imageId);
-        }
-
         const imagePayload: AddCityImagePayload = {
           imageUrl,
           isPrimary: true,
@@ -323,11 +306,10 @@ async function handleUpdate(
         };
         await citiesStore.addCityImage(id, imagePayload);
       }
-
       toast.add({
         severity: "success",
-        summary: "Success",
-        detail: "City updated successfully",
+        summary: t("Success"),
+        detail: t("City updated successfully"),
         life: 3000,
       });
       closeCityDialog();
@@ -335,16 +317,16 @@ async function handleUpdate(
     } else {
       toast.add({
         severity: "error",
-        summary: "Error",
-        detail: res.message ?? "Failed to update city",
+        summary: t("Error"),
+        detail: res.message ?? t("Failed to update city"),
         life: 3000,
       });
     }
   } catch {
     toast.add({
       severity: "error",
-      summary: "Error",
-      detail: "Unexpected error",
+      summary: t("Error"),
+      detail: t("Unexpected error"),
       life: 3000,
     });
   } finally {
@@ -360,8 +342,8 @@ async function handleDelete() {
     if (res.success) {
       toast.add({
         severity: "success",
-        summary: "Success",
-        detail: "City deleted successfully",
+        summary: t("Success"),
+        detail: t("City deleted successfully"),
         life: 3000,
       });
       deleteDialog.value = false;
@@ -370,16 +352,16 @@ async function handleDelete() {
     } else {
       toast.add({
         severity: "error",
-        summary: "Error",
-        detail: res.message ?? "Failed to delete city",
+        summary: t("Error"),
+        detail: res.message ?? t("Failed to delete city"),
         life: 3000,
       });
     }
   } catch {
     toast.add({
       severity: "error",
-      summary: "Error",
-      detail: "Unexpected error",
+      summary: t("Error"),
+      detail: t("Unexpected error"),
       life: 3000,
     });
   } finally {
