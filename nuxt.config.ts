@@ -10,6 +10,7 @@ export default defineNuxtConfig({
     public: {
       apiHost: process.env.NUXT_PUBLIC_API_HOST || "http://localhost:5000",
       apiBase: process.env.NUXT_PUBLIC_API_BASE || "https://localhost:44329",
+      googleClientId: process.env.GOOGLE_CLIENT_ID,
     },
   },
 

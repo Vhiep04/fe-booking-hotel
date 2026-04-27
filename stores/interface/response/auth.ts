@@ -58,3 +58,9 @@ export interface ResetPasswordResponseData {
   success: boolean;
   message: string;
 }
+
+export interface GoogleLoginResponseData {
+  success: boolean;
+  message: string;
+  data: LoginData;
+}

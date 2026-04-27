@@ -11,6 +11,7 @@ import type {
   RequestResendOtpVerify,
 } from "./interface/request/auth";
 import type {
+  GoogleLoginResponseData,
   LoginData,
   LoginResponseData,
   RegisterResponseData,
@@ -34,6 +35,9 @@ export const useAuthStore = defineStore("auth", () => {
   const userRegisterRequesting = ref(false);
   const userSendOtpCode = ref(false);
   const reSendOtpCode = ref(false);
+  // ── Thêm loading state cho Google login ──────────────────────────────────
+  const googleLoginRequesting = ref(false);
+  // ─────────────────────────────────────────────────────────────────────────
 
   const isAdmin = computed(() => {
     const role = jwtPayload.value?.[ROLE_CLAIM];
@@ -134,6 +138,68 @@ export const useAuthStore = defineStore("auth", () => {
     }
   }
 
+  // ── Google Login ──────────────────────────────────────────────────────────
+  /**
+   * Đăng nhập bằng Google OAuth2.
+   * Frontend dùng Google Identity Services để lấy idToken,
+   * sau đó truyền vào đây để gửi lên backend verify.
+   *
+   * @param idToken - id_token từ Google Identity Services (response.credential)
+   */
+  async function loginWithGoogle(idToken: string) {
+    try {
+      googleLoginRequesting.value = true;
+
+      const response = await apiStore.apiRequest<GoogleLoginResponseData>({
+        method: "POST",
+        endpoint: `${namespace}/login-google`,
+        data: { idToken },
+        proxy: false,
+        auth: false,
+      });
+
+      if (response.success && response.data) {
+        userLoginSuccess(response.data);
+        await fetchUserInfo();
+        return response;
+      } else {
+        throw new Error(response.message || "Google login failed");
+      }
+    } catch (e: any) {
+      console.error("Google login error:", e);
+      throw e;
+    } finally {
+      googleLoginRequesting.value = false;
+    }
+  }
+
+  async function loginWithGoogleCode(code: string) {
+    try {
+      googleLoginRequesting.value = true;
+
+      const response = await apiStore.apiRequest<GoogleLoginResponseData>({
+        method: "POST",
+        endpoint: `${namespace}/login-google-code`,
+        data: { code },
+        proxy: false,
+        auth: false,
+      });
+
+      if (response.success && response.data) {
+        userLoginSuccess(response.data);
+        await fetchUserInfo();
+        return response;
+      } else {
+        throw new Error(response.message || "Google login failed");
+      }
+    } catch (e: any) {
+      console.error("Google login error:", e);
+      throw e;
+    } finally {
+      googleLoginRequesting.value = false;
+    }
+  }
+
   async function userRegister(payload: RequestRegisterPayload) {
     try {
       userRegisterRequesting.value = true;
@@ -203,9 +269,12 @@ export const useAuthStore = defineStore("auth", () => {
     isAdminOrManager,
     userLoginRequesting,
     userRegisterRequesting,
+    googleLoginRequesting,
     initAuthFromCookie,
     fetchUserInfo,
     userLogin,
+    loginWithGoogle,
+    loginWithGoogleCode,
     userRegister,
     userLogout,
     sendOtpVerify,
