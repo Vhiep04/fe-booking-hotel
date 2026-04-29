@@ -1,36 +1,29 @@
 <template>
   <div
     v-if="cityInfo && cityInfo.data"
-    class="flex bg-gray-100 gap-6 p-6 max-w-7xl mx-auto"
+    class="flex flex-col md:flex-row bg-gray-100 gap-6 p-6 max-w-7xl mx-auto"
   >
-    <!-- Map Section -->
-    <div class="w-[383px] h-[393px] flex-shrink-0">
+    <!-- Map -->
+    <div
+      class="w-full md:w-80 lg:w-96 h-56 md:h-72 lg:h-80 shrink-0 rounded-xl overflow-hidden shadow-md"
+    >
       <MapView
         v-if="cityCoords"
         :latitude="cityCoords[0]"
         :longitude="cityCoords[1]"
         :location-name="cityData.name"
+        class="w-full h-full"
       />
     </div>
 
-    <!-- Content Section -->
+    <!-- Info -->
     <div class="flex-1">
-      <!-- <div class="mb-6">
-        <Dropdown
-          v-model="selectedSort"
-          :options="sortOptions"
-          optionLabel="label"
-          placeholder="Sort By : Our Top Picks For Families"
-          class="w-full md:w-80 border-2 border-gray-300 rounded-lg"
-        />
-      </div> -->
-
       <h2 class="text-3xl font-bold text-gray-900 mb-2">
         {{ cityData?.name }}
       </h2>
 
       <p class="text-sm text-gray-600 mb-4">
-        {{ hotelTotal }} Properties Found
+        {{ hotelTotal }} {{ t("Hotel Found") }}
       </p>
 
       <p class="text-gray-700 leading-relaxed">
@@ -42,10 +35,11 @@
 
 <script setup lang="ts">
 import { ref, computed } from "vue";
-import Dropdown from "primevue/dropdown";
 import MapView from "./shared/MapView.vue";
 import type { CityResponse } from "~/stores/interface/response/cityList";
 import { toRefs } from "vue";
+
+const { t } = useI18n();
 
 const props = defineProps<{
   cityInfo: CityResponse;

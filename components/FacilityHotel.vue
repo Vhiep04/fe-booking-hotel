@@ -1,10 +1,10 @@
 <template>
   <div class="w-60 bg-gray-100 p-4 rounded-lg">
-    <h2 class="text-xl font-bold text-gray-900 mb-6">Filter By</h2>
+    <h2 class="text-xl font-bold text-gray-900 mb-6">{{ t("Filter By") }}</h2>
 
     <div class="mb-6">
       <h3 class="text-sm font-semibold text-gray-900 mb-3">
-        Your Budget For Per Night
+        {{ t("Your Budget For Per Night") }}
       </h3>
 
       <Slider
@@ -22,7 +22,7 @@
           <InputNumber
             v-model="localBudgetRange[0]"
             inputId="minprice"
-            suffix="Đ"
+            suffix=" đ"
             class="w-20"
             :min="0"
             :max="localBudgetRange[1]"
@@ -33,7 +33,7 @@
           <InputNumber
             v-model="localBudgetRange[1]"
             inputId="maxprice"
-            suffix="Đ"
+            suffix=" đ"
             class="w-20"
             :min="localBudgetRange[0]"
             :max="25000000"
@@ -45,7 +45,9 @@
 
     <!-- Room Facilities -->
     <div class="mb-6">
-      <h3 class="text-sm font-semibold text-gray-900 mb-3">Room Facilities</h3>
+      <h3 class="text-sm font-semibold text-gray-900 mb-3">
+        {{ t("Room Facilities") }}
+      </h3>
 
       <div class="flex flex-col gap-2">
         <div
@@ -59,12 +61,11 @@
             :value="item.facilityId"
             @change="emitFiltersChange"
           />
-
           <label
             :for="'facility-' + item.facilityId"
             class="ml-2 text-sm text-gray-700 cursor-pointer"
           >
-            {{ item.name }}
+            {{ translateFacility(item.name) }}
           </label>
         </div>
       </div>
@@ -74,7 +75,7 @@
         class="text-sm text-blue-600 mt-2 flex items-center gap-1 hover:text-blue-700"
         @click="showMore = !showMore"
       >
-        {{ showMore ? "Show Less" : "Show More" }}
+        {{ showMore ? t("Show Less") : t("Show More") }}
         <i :class="showMore ? 'pi pi-chevron-up' : 'pi pi-chevron-down'"></i>
       </button>
     </div>
@@ -84,7 +85,7 @@
       class="w-full px-4 py-2 text-sm font-medium text-blue-600 border border-blue-600 rounded hover:bg-blue-50 transition-colors"
       @click="resetFilters"
     >
-      Reset Filters
+      {{ t("Reset Filters") }}
     </button>
   </div>
 </template>
@@ -96,10 +97,12 @@ import Checkbox from "primevue/checkbox";
 import InputNumber from "primevue/inputnumber";
 import InputGroup from "primevue/inputgroup";
 import { useFacilityStore } from "~/stores/facilityList";
+import { useFacilityTranslation } from "#imports";
 
+const { t } = useI18n();
 const facilityStore = useFacilityStore();
+const { translateFacility } = useFacilityTranslation();
 
-// Props
 interface Props {
   minPrice?: number;
   maxPrice?: number;
@@ -112,31 +115,22 @@ const props = withDefaults(defineProps<Props>(), {
   facilities: () => [],
 });
 
-// Emits
 const emit = defineEmits<{
   filterChange: [
-    filters: {
-      minPrice?: number;
-      maxPrice?: number;
-      facilities: number[];
-    },
+    filters: { minPrice?: number; maxPrice?: number; facilities: number[] },
   ];
 }>();
 
-// Local state
 const localBudgetRange = ref([props.minPrice, props.maxPrice]);
 const localRoomFacilities = ref<number[]>([]);
 const showMore = ref(false);
 
-// Computed
 const facilities = computed(() => facilityStore.facilities);
-
 const displayedFacilities = computed(() => {
   const list = facilities.value ?? [];
   return showMore.value ? list : list.slice(0, 5);
 });
 
-// Watch props để sync với store
 watch(
   () => props.facilities,
   (newFacilities) => {
@@ -152,7 +146,6 @@ watch(
   },
 );
 
-// Emit changes
 const emitPriceChange = () => {
   emit("filterChange", {
     minPrice: localBudgetRange.value[0],
@@ -175,9 +168,8 @@ const resetFilters = () => {
   emitFiltersChange();
 };
 
-// Lifecycle
 onMounted(() => {
-  facilityStore.getFacility();
+  facilityStore.getFacilities();
 });
 </script>
 
@@ -185,11 +177,9 @@ onMounted(() => {
 :deep(.p-slider .p-slider-range) {
   background: #07689f;
 }
-
 :deep(.p-slider .p-slider-handle) {
   border-color: #07689f;
 }
-
 :deep(.p-slider .p-slider-handle:hover) {
   border-color: #0a7fbf;
 }

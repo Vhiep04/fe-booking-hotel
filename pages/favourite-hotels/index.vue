@@ -12,7 +12,7 @@
             <span class="font-semibold text-blue-600 dark:text-blue-400">
               {{ store.totalCount }}
             </span>
-            {{ store.totalCount }}
+            <!-- {{ store.totalCount }} -->
             {{
               t(store.totalCount !== 1 ? "saved properties" : "saved property")
             }}
@@ -29,8 +29,8 @@
             <InputIcon class="pi pi-search" />
             <InputText
               v-model="filters.search"
-              placeholder="Search hotels…"
-              class="w-full !text-sm"
+              :placeholder="t('Search hotels…')"
+              class="w-full text-sm!"
             />
           </IconField>
         </div>
@@ -42,7 +42,7 @@
           option-value="value"
           :placeholder="t('All Locations')"
           show-clear
-          class="w-full !text-sm"
+          class="w-full text-sm!"
         />
 
         <Select
@@ -52,7 +52,7 @@
           option-value="value"
           :placeholder="t('All Prices')"
           show-clear
-          class="w-full !text-sm"
+          class="w-full text-sm!"
         />
 
         <Select
@@ -62,7 +62,7 @@
           option-value="value"
           :placeholder="t('All Ratings')"
           show-clear
-          class="w-full !text-sm"
+          class="w-full text-sm!"
         />
 
         <Select
@@ -72,7 +72,7 @@
           option-value="value"
           :placeholder="t('Sort by')"
           show-clear
-          class="w-full !text-sm"
+          class="w-full text-sm!"
         />
       </div>
 
@@ -81,14 +81,14 @@
           v-if="filters.search"
           :label="`${t('Search')}: ${filters.search}`"
           removable
-          class="!text-xs"
+          class="text-xs!"
           @remove="filters.search = ''"
         />
         <Chip
           v-if="filters.location"
           :label="t(filters.location)"
           removable
-          class="!text-xs"
+          class="text-xs!"
           @remove="filters.location = null"
         />
         <Chip
@@ -97,14 +97,14 @@
             priceRanges.find((p) => p.value === filters.priceRange)?.label ?? ''
           "
           removable
-          class="!text-xs"
+          class="text-xs!"
           @remove="filters.priceRange = null"
         />
         <Chip
           v-if="filters.rating"
           :label="`${filters.rating}+ ${t('Stars')}`"
           removable
-          class="!text-xs"
+          class="text-xs!"
           @remove="filters.rating = null"
         />
         <Button
@@ -112,7 +112,7 @@
           text
           severity="secondary"
           size="small"
-          class="!text-xs !py-0"
+          class="text-xs! py-0!"
           @click="resetFilters"
         />
       </div>
@@ -126,7 +126,7 @@
           <Skeleton
             width="190px"
             height="100%"
-            class="shrink-0 !rounded-none"
+            class="shrink-0 rounded-none!"
           />
           <div class="flex flex-col gap-3 flex-1 p-4">
             <Skeleton width="65%" height="16px" />
@@ -196,7 +196,7 @@
           :total-records="filtered.length"
           :rows-per-page-options="[5, 10, 20]"
           template="PrevPageLink PageLinks NextPageLink RowsPerPageDropdown"
-          class="!bg-transparent !border-none"
+          class="bg-transparent! border-none!"
         />
       </div>
     </div>

@@ -3,14 +3,14 @@
     <div v-if="open" class="fixed inset-0 z-50 flex">
       <!-- Sidebar trái -->
       <div
-        class="w-[370px] bg-white flex flex-col shadow-xl overflow-y-auto flex-shrink-0"
+        class="w-[370px] bg-white flex flex-col shadow-xl overflow-y-auto shrink-0"
       >
         <!-- Hotel Info -->
         <div class="p-4 border-b">
           <div class="flex gap-3">
             <img
               :src="hotelImage"
-              class="w-20 h-20 object-cover rounded-lg flex-shrink-0"
+              class="w-20 h-20 object-cover rounded-lg shrink-0"
               :alt="name"
             />
             <div class="flex-1 min-w-0">
@@ -22,7 +22,7 @@
                 </h3>
                 <button
                   @click="$emit('close')"
-                  class="text-gray-400 hover:text-black flex-shrink-0 text-lg leading-none"
+                  class="text-gray-400 hover:text-black shrink-0 text-lg leading-none"
                 >
                   ✕
                 </button>
@@ -103,12 +103,10 @@
               @click="focusPlace(place)"
             >
               <div class="flex items-center gap-2 min-w-0">
-                <span class="text-base flex-shrink-0">{{ place.icon }}</span>
+                <span class="text-base shrink-0">{{ place.icon }}</span>
                 <span class="text-gray-700 truncate">{{ place.name }}</span>
               </div>
-              <span
-                class="text-gray-500 flex-shrink-0 ml-3 text-xs font-medium"
-              >
+              <span class="text-gray-500 shrink-0 ml-3 text-xs font-medium">
                 {{ place.distance }}
               </span>
             </div>

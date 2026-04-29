@@ -24,11 +24,8 @@ export default defineNuxtConfig({
 
   i18n: {
     defaultLocale: "vi",
-
     strategy: "no_prefix",
-
     langDir: "locales/",
-
     locales: [
       {
         code: "en",
@@ -43,7 +40,6 @@ export default defineNuxtConfig({
         name: "Tiếng Việt",
       },
     ],
-
     detectBrowserLanguage: {
       useCookie: true,
       cookieKey: "i18n_language",

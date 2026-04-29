@@ -24,7 +24,11 @@
         </h2>
         <div class="text-red-500 flex items-center gap-2">
           <i class="pi pi-exclamation-circle"></i>
-          <p>Select dates to see this property's availability and prices</p>
+          <p>
+            {{
+              t("Select dates to see this property's availability and prices")
+            }}
+          </p>
         </div>
         <SearchForm
           :loading="isSearching"
@@ -48,7 +52,9 @@
       >
         <p class="text-sm text-gray-700 leading-relaxed">
           {{
-            "To see available rooms and prices please enter your check-in and check-out dates."
+            t(
+              "To see available rooms and prices please enter your check-in and check-out dates.",
+            )
           }}
         </p>
 

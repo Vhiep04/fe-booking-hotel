@@ -1,5 +1,5 @@
 <template>
-  <div class="relative h-full w-full">
+  <div class="relative h-full w-full" style="isolation: isolate">
     <div
       ref="mapContainer"
       class="h-full w-full rounded-lg overflow-hidden shadow-lg"

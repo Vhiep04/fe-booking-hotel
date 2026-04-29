@@ -6,7 +6,7 @@
         <div class="hidden lg:block lg:w-80">
           <img
             src="../assets/images/travel_photo.png"
-            alt="Travel Photo"
+            :alt="t('Travel Photo')"
             class="w-full h-full object-cover rounded"
           />
         </div>
@@ -14,87 +14,74 @@
         <!-- Right side - Login Form -->
         <div class="p-8 lg:p-12 flex flex-col justify-center">
           <div class="max-w-md mx-auto w-full">
-            <!-- Header -->
-            <h1 class="text-2xl font-bold text-gray-900 mb-2">Login</h1>
+            <h1 class="text-2xl font-bold text-gray-900 mb-2">
+              {{ t("Login") }}
+            </h1>
             <p class="text-gray-600 mb-4">
-              Login to access your EasySet24 account
+              {{ t("Login to access your EasySet24 account") }}
             </p>
 
-            <!-- Login Form -->
             <form @submit.prevent="handleLogin">
-              <!-- Email Field -->
               <div class="space-y-2">
                 <label
                   for="email"
                   class="block text-sm font-medium text-gray-700"
+                  >Email</label
                 >
-                  Email
-                </label>
                 <CustomInputText
                   id="email"
                   v-model="form.email"
                   type="email"
-                  placeholder="Enter your email"
+                  :placeholder="t('Enter your email')"
                   :invalid="!!emailError"
                   :show-clear="true"
                   @clear="clearEmail"
                 />
-                <small class="block min-h-5 text-red-500">
-                  {{ emailError || "" }}
-                </small>
+                <small class="block min-h-5 text-red-500">{{
+                  emailError || ""
+                }}</small>
               </div>
 
-              <!-- Password Field -->
               <div class="space-y-2">
                 <label
                   for="password"
                   class="block text-sm font-medium text-gray-700"
+                  >{{ t("Password") }}</label
                 >
-                  Password
-                </label>
                 <CustomPassword
                   id="password"
                   v-model="form.password"
-                  placeholder="Enter your password"
+                  :placeholder="t('Enter your password')"
                   :invalid="!!passwordError"
                   :show-clear="true"
                   :toggle-mask="true"
                   @clear="clearPassword"
                 />
-                <small class="block min-h-5 text-red-500">
-                  {{ passwordError || "" }}
-                </small>
+                <small class="block min-h-5 text-red-500">{{
+                  passwordError || ""
+                }}</small>
               </div>
 
-              <!-- Remember Me & Forgot Password -->
-              <div class="flex items-center justify-between">
-                <div class="flex items-center">
-                  <Checkbox v-model="rememberMe" inputId="remember" binary />
-                  <label for="remember" class="ml-2 text-sm text-gray-600">
-                    Remember Me
-                  </label>
-                </div>
+              <div class="flex items-center justify-end">
                 <a
                   href="/forgot-password"
                   class="text-sm text-blue-600 hover:text-blue-500"
                 >
-                  Forgot Password?
+                  {{ t("Forgot Password?") }}
                 </a>
               </div>
 
-              <!-- Login Button -->
               <Button
                 type="submit"
-                label="Login"
+                :label="t('Login')"
                 class="w-full text-white mb-4 mt-4"
                 :loading="isLoading"
                 severity="info"
               />
             </form>
 
-            <!-- Divider -->
             <Divider align="center" type="solid">
-              <span class="text-sm text-gray-400 px-2">Or</span>
+              <span class="text-sm text-gray-400 px-2">{{ t("Or") }}</span>
             </Divider>
 
             <!-- Google Login Button -->
@@ -135,23 +122,22 @@
               <span class="text-sm font-medium text-gray-700">
                 {{
                   authStore.googleLoginRequesting
-                    ? "Đang đăng nhập..."
-                    : "Đăng nhập bằng Google"
+                    ? t("Signing in...")
+                    : t("Sign in with Google")
                 }}
               </span>
             </button>
 
-            <!-- Register Link -->
             <div class="text-center">
-              <span class="text-sm text-gray-600 mb-2 mt-4"
-                >Don't have an account in EasySet24 yet?
-              </span>
+              <span class="text-sm text-gray-600 mb-2 mt-4">{{
+                t("Don't have an EasySet24 account yet?")
+              }}</span>
               <br />
               <NuxtLink
                 to="/register"
                 class="text-sm cursor-pointer text-blue-600 hover:text-blue-500 font-medium"
               >
-                Register!
+                {{ t("Register!") }}
               </NuxtLink>
             </div>
           </div>
@@ -178,32 +164,21 @@ const { t } = useI18n();
 
 useHead({
   title: t("Login"),
-  // Load Google Identity Services script
   script: [
-    {
-      src: "https://accounts.google.com/gsi/client",
-      async: true,
-      defer: true,
-    },
+    { src: "https://accounts.google.com/gsi/client", async: true, defer: true },
   ],
 });
 
 let toast: ReturnType<typeof useToast> | null = null;
 
-definePageMeta({
-  layout: "auth",
-});
+definePageMeta({ layout: "auth" });
 
 const router = useRouter();
 const authStore = useAuthStore();
 
-const form = ref({
-  email: "",
-  password: "",
-});
+const form = ref({ email: "", password: "" });
 const rememberMe = ref(false);
 const isLoading = ref(false);
-
 const emailError = ref("");
 const passwordError = ref("");
 
@@ -212,25 +187,21 @@ const validateForm = () => {
   passwordError.value = "";
 
   if (!form.value.email) {
-    emailError.value = "Email is required";
+    emailError.value = t("Email is required");
     return false;
   }
-
   if (!form.value.email.includes("@")) {
-    emailError.value = "Please enter a valid email";
+    emailError.value = t("Please enter a valid email");
     return false;
   }
-
   if (!form.value.password) {
-    passwordError.value = "Password is required";
+    passwordError.value = t("Password is required");
     return false;
   }
-
   if (form.value.password.length < 6) {
-    passwordError.value = "Password must be at least 6 characters";
+    passwordError.value = t("Password must be at least 6 characters");
     return false;
   }
-
   return true;
 };
 
@@ -244,9 +215,7 @@ const redirectAfterLogin = () => {
 
 const handleLogin = async () => {
   if (!validateForm()) return;
-
   isLoading.value = true;
-
   try {
     const res = await authStore.userLogin({
       email: form.value.email.trim().toLowerCase(),
@@ -257,24 +226,21 @@ const handleLogin = async () => {
     if (res.success) {
       toast?.add({
         severity: "success",
-        summary: "Success",
+        summary: t("Success"),
         detail: res.message,
         life: 3000,
       });
-
-      if (authStore.isAuthenticated) {
-        redirectAfterLogin();
-      }
+      if (authStore.isAuthenticated) redirectAfterLogin();
     }
   } catch (error: any) {
     console.error("Login error:", error);
-    let errorMessage = "An unexpected error occurred";
+    let errorMessage = t("An unexpected error occurred");
     if (error?.data) {
       errorMessage = error.data.message || errorMessage;
       if (error.data.requiresVerification) {
         toast?.add({
           severity: "error",
-          summary: "Email Verification Required",
+          summary: t("Email Verification Required"),
           detail: error.data.message,
           life: 5000,
         });
@@ -283,7 +249,7 @@ const handleLogin = async () => {
     }
     toast?.add({
       severity: "error",
-      summary: "Error",
+      summary: t("Error"),
       detail: errorMessage,
       life: 3000,
     });
@@ -297,78 +263,47 @@ const handleGoogleLogin = () => {
   if (typeof google === "undefined") {
     toast?.add({
       severity: "error",
-      summary: "Error",
-      detail: "Google login is not available. Please try again.",
+      summary: t("Error"),
+      detail: t("Google login is not available. Please try again."),
       life: 3000,
     });
     return;
   }
-
   // @ts-ignore
   const client = google.accounts.oauth2.initCodeClient({
     client_id: useRuntimeConfig().public.googleClientId,
     scope: "openid email profile",
-    ux_mode: "popup", // ← mở popup thay vì One Tap
+    ux_mode: "popup",
     callback: async (response: any) => {
-      // response ở đây trả về authorization_code, không phải idToken
-      // nên cần đổi cách gọi backend
       try {
         const res = await authStore.loginWithGoogleCode(response.code);
         if (res?.success) {
           toast?.add({
             severity: "success",
-            summary: "Success",
-            detail: "Đăng nhập Google thành công!",
+            summary: t("Success"),
+            detail: t("Google login successful!"),
             life: 3000,
           });
           redirectAfterLogin();
         }
       } catch (error: any) {
-        const errorMessage = error?.data?.message || "Google login failed.";
+        const errorMessage = error?.data?.message || t("Google login failed.");
         toast?.add({
           severity: "error",
-          summary: "Error",
+          summary: t("Error"),
           detail: errorMessage,
           life: 3000,
         });
       }
     },
   });
-
   client.requestCode();
-};
-
-const onGoogleCallback = async (response: { credential: string }) => {
-  try {
-    const res = await authStore.loginWithGoogle(response.credential);
-
-    if (res?.success) {
-      toast?.add({
-        severity: "success",
-        summary: "Success",
-        detail: "Đăng nhập Google thành công!",
-        life: 3000,
-      });
-      redirectAfterLogin();
-    }
-  } catch (error: any) {
-    console.error("Google login error:", error);
-    const errorMessage =
-      error?.data?.message || "Google login failed. Please try again.";
-    toast?.add({
-      severity: "error",
-      summary: "Error",
-      detail: errorMessage,
-      life: 3000,
-    });
-  }
 };
 
 const clearEmail = () => {
   form.value.email = "";
   emailError.value = "";
 };
-
 const clearPassword = () => {
   form.value.password = "";
   passwordError.value = "";
@@ -384,52 +319,42 @@ onMounted(() => {
   border-radius: 12px;
   border: none;
 }
-
 :deep(.p-card-content) {
   padding: 0;
 }
-
 :deep(.p-inputtext) {
   border-radius: 8px;
   padding: 12px 16px;
   border: 1px solid #d1d5db;
 }
-
 :deep(.p-inputtext:focus) {
   border-color: #3b82f6;
   box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
 }
-
 :deep(.p-password input) {
   border-radius: 8px;
   padding: 12px 16px;
   border: 1px solid #d1d5db;
   width: 100%;
 }
-
 :deep(.p-password:not(.p-disabled).p-focus) {
   border-color: #3b82f6;
   box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
 }
-
 :deep(.p-button:hover) {
   background: #2563eb;
 }
-
 :deep(.p-checkbox .p-checkbox-box) {
   border-radius: 4px;
   border: 1px solid #d1d5db;
 }
-
 :deep(.p-invalid) {
   border-color: #ef4444 !important;
 }
-
 :deep(.p-error) {
   color: #ef4444;
   font-size: 0.875rem;
 }
-
 .google-btn {
   padding: 10px 16px;
   border: 1px solid #d1d5db;
@@ -440,17 +365,14 @@ onMounted(() => {
     background 0.2s,
     box-shadow 0.2s;
 }
-
 .google-btn:hover:not(:disabled) {
   background: #f9fafb;
   box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
 }
-
 .google-btn:disabled {
   opacity: 0.6;
   cursor: not-allowed;
 }
-
 .google-spinner {
   display: inline-block;
   width: 20px;
@@ -460,7 +382,6 @@ onMounted(() => {
   border-radius: 50%;
   animation: spin 0.7s linear infinite;
 }
-
 @keyframes spin {
   to {
     transform: rotate(360deg);

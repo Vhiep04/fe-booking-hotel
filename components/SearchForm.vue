@@ -41,6 +41,7 @@
           :placeholder="t('Check In Date - Check Out Date')"
           showIcon
           inputClass="w-full h-[50px]"
+          :minDate="today"
           :class="{ 'p-invalid': !!errors.dates }"
           @focus="errors.dates = ''"
         >
@@ -116,6 +117,7 @@ import { useSearchStore } from "~/stores/searchStore";
 import { useI18n } from "#imports";
 
 const { t } = useI18n();
+const { translateRoomType } = useRoomTypeTranslation();
 
 interface Props {
   loading: boolean;
@@ -134,14 +136,17 @@ const emit = defineEmits<{
 
 const searchStore = useSearchStore();
 const cityStore = useCityStore();
-
+const today = new Date();
 const localDates = computed({
   get: () => searchStore.dateRange,
   set: (val) => searchStore.setDateRange(val),
 });
 
-const localRoomType = ref();
-
+const localRoomType = computed({
+  get: () =>
+    rooms.value.find((r) => r.code === searchStore.roomTypeName) ?? null,
+  set: (val) => searchStore.setRoomTypeName(val?.code ?? ""),
+});
 const errors = reactive({
   search: "",
   dates: "",
@@ -149,7 +154,7 @@ const errors = reactive({
 
 const rooms = computed(() =>
   cityStore.roomTypes.map((rt) => ({
-    name: t(rt.typeName),
+    name: translateRoomType(rt.typeName),
     code: rt.typeName,
   })),
 );
@@ -211,8 +216,17 @@ const clearSearch = () => {
   errors.search = "";
 };
 
-onMounted(() => {
-  cityStore.fetchRoomTypes();
+onMounted(async () => {
+  await cityStore.fetchRoomTypes();
+
+  if (searchStore.roomTypeName) {
+    const matched = rooms.value.find(
+      (r) => r.code === searchStore.roomTypeName,
+    );
+    if (matched) {
+      localRoomType.value = matched;
+    }
+  }
 });
 </script>
 
