@@ -15,7 +15,7 @@
       </div>
     </div>
 
-    <div class="p-4">
+    <div class="p-4 flex flex-col flex-1">
       <div class="grid grid-cols-1 gap-4 mb-4">
         <div class="text-center p-3 rounded-lg bg-(--admin-surface-hover)">
           <i class="pi pi-building text-(--admin-primary) mb-1"></i>
@@ -26,14 +26,11 @@
         </div>
       </div>
 
-      <p
-        v-if="city.description"
-        class="text-sm text-(--admin-text-muted) mb-4 line-clamp-2"
-      >
-        {{ city.description }}
+      <p class="text-sm text-(--admin-text-muted) mb-4 line-clamp-2 min-h-10">
+        {{ city.description || "" }}
       </p>
 
-      <div class="flex items-center justify-end gap-1">
+      <div class="flex items-center justify-end gap-1 mt-auto">
         <Button
           icon="pi pi-pencil"
           severity="secondary"

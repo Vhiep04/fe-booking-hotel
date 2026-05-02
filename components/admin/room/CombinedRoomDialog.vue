@@ -91,7 +91,7 @@
             <label class="text-sm font-medium">{{ t("Facilities") }}</label>
             <MultiSelect
               v-model="form.facilityIds"
-              :options="facilities"
+              :options="translatedFacilities"
               optionLabel="name"
               optionValue="facilityId"
               :placeholder="t('Select facilities')"
@@ -149,7 +149,7 @@
         </div>
 
         <div class="md:col-span-2 flex flex-col gap-1">
-          <label class="text-sm font-medium">{{ t("Room Type Image") }}</label>
+          <label class="text-sm font-medium">{{ t("Room Image") }}</label>
           <div
             v-if="roomTypePreview"
             class="relative w-full h-40 rounded-lg overflow-hidden border"
@@ -253,6 +253,8 @@ const emit = defineEmits<{
 }>();
 
 const { t } = useI18n();
+const { translateFacility } = useFacilityTranslation();
+
 const uploadStore = useUploadStore();
 const submitted = ref(false);
 const uploadingImage = ref(false);
@@ -271,6 +273,13 @@ const statusOptions = computed(() => [
   { value: "Maintenance", label: t("Maintenance"), dotClass: "bg-yellow-500" },
   { value: "Reserved", label: t("Reserved"), dotClass: "bg-blue-500" },
 ]);
+
+const translatedFacilities = computed(() =>
+  (facilities.value ?? []).map((f) => ({
+    ...f,
+    name: translateFacility(f.name),
+  })),
+);
 
 const defaultForm = (): CombinedFormData => ({
   typeName: "",

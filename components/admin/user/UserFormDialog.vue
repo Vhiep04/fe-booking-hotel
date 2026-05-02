@@ -2,76 +2,77 @@
   <Dialog
     v-model:visible="visible"
     :style="{ width: '640px', maxWidth: '95vw' }"
-    :header="isEditing ? 'Edit User' : 'Add New User'"
+    :header="isEditing ? t('Edit User') : t('Add New User')"
     :modal="true"
     class="p-fluid"
     @hide="emit('hide')"
   >
     <div class="flex flex-col gap-6 pt-2">
+      <!-- Basic Information -->
       <div class="flex flex-col gap-4">
         <span
           class="text-xs font-bold uppercase tracking-widest text-(--admin-text-muted) flex items-center gap-1.5"
         >
-          <i class="pi pi-user" /> Basic Information
+          <i class="pi pi-user" /> {{ t("Basic Information") }}
         </span>
 
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div class="flex flex-col gap-1">
             <label class="text-sm font-medium">
-              First Name <span class="text-red-500">*</span>
+              {{ t("First Name") }} <span class="text-red-500">*</span>
             </label>
             <InputText
               v-model="form.firstName"
-              placeholder="e.g. Nguyen"
+              :placeholder="t('e.g. Nguyen')"
               :class="{ 'p-invalid': submitted && !form.firstName }"
             />
             <small v-if="submitted && !form.firstName" class="p-error">
-              First name is required
+              {{ t("First name is required") }}
             </small>
           </div>
 
           <div class="flex flex-col gap-1">
             <label class="text-sm font-medium">
-              Last Name <span class="text-red-500">*</span>
+              {{ t("Last Name") }} <span class="text-red-500">*</span>
             </label>
             <InputText
               v-model="form.lastName"
-              placeholder="e.g. Van A"
+              :placeholder="t('e.g. Van A')"
               :class="{ 'p-invalid': submitted && !form.lastName }"
             />
             <small v-if="submitted && !form.lastName" class="p-error">
-              Last name is required
+              {{ t("Last name is required") }}
             </small>
           </div>
 
           <div class="md:col-span-2 flex flex-col gap-1">
             <label class="text-sm font-medium">
-              Username <span class="text-red-500">*</span>
+              {{ t("Username") }} <span class="text-red-500">*</span>
             </label>
             <InputText
               v-model="form.userName"
-              placeholder="e.g. nguyenvana"
+              :placeholder="t('e.g. nguyenvana')"
               :disabled="isEditing"
               :class="{ 'p-invalid': submitted && !form.userName }"
             />
             <small v-if="submitted && !form.userName" class="p-error">
-              Username is required
+              {{ t("Username is required") }}
             </small>
           </div>
 
           <div class="md:col-span-2 flex flex-col gap-1">
             <label class="text-sm font-medium">
-              Email <span class="text-red-500">*</span>
+              {{ t("Email") }} <span class="text-red-500">*</span>
             </label>
             <InputText
               v-model="form.email"
               type="email"
-              placeholder="e.g. user@example.com"
+              :placeholder="t('e.g. user@example.com')"
               :disabled="isEditing"
               :class="{ 'p-invalid': submitted && !form.email }"
             />
             <small v-if="submitted && !form.email" class="p-error">
-              Email is required
+              {{ t("Email is required") }}
             </small>
           </div>
         </div>
@@ -82,17 +83,17 @@
         <span
           class="text-xs font-bold uppercase tracking-widest text-(--admin-text-muted) flex items-center gap-1.5"
         >
-          <i class="pi pi-lock" /> Account
+          <i class="pi pi-lock" /> {{ t("Account") }}
         </span>
 
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div v-if="!isEditing" class="md:col-span-2 flex flex-col gap-1">
             <label class="text-sm font-medium">
-              Password <span class="text-red-500">*</span>
+              {{ t("Password") }} <span class="text-red-500">*</span>
             </label>
             <Password
               v-model="form.password"
-              placeholder="Enter password"
+              :placeholder="t('Enter password')"
               toggleMask
               :feedback="true"
               :class="{ 'p-invalid': submitted && !form.password }"
@@ -100,28 +101,28 @@
               fluid
             />
             <small v-if="submitted && !form.password" class="p-error">
-              Password is required
+              {{ t("Password is required") }}
             </small>
           </div>
 
           <div class="flex flex-col gap-1">
-            <label class="text-sm font-medium">Phone</label>
+            <label class="text-sm font-medium">{{ t("Phone") }}</label>
             <InputText
               v-model="form.phoneNumber"
-              placeholder="e.g. 0901234567"
+              :placeholder="t('e.g. 0901234567')"
             />
           </div>
 
           <div class="flex flex-col gap-1">
             <label class="text-sm font-medium">
-              Role <span class="text-red-500">*</span>
+              {{ t("Role") }} <span class="text-red-500">*</span>
             </label>
             <Dropdown
               v-model="selectedRole"
               :options="roleOptions"
               optionLabel="label"
               optionValue="value"
-              placeholder="Select a role"
+              :placeholder="t('Select a role')"
               class="w-full"
             />
           </div>
@@ -131,7 +132,7 @@
 
     <template #footer>
       <Button
-        label="Cancel"
+        :label="t('Cancel')"
         icon="pi pi-times"
         severity="secondary"
         outlined
@@ -139,7 +140,7 @@
         @click="emit('hide')"
       />
       <Button
-        :label="isEditing ? 'Update User' : 'Add User'"
+        :label="isEditing ? t('Update User') : t('Add User')"
         :icon="isEditing ? 'pi pi-check' : 'pi pi-plus'"
         :loading="saving"
         @click="handleSave"
@@ -159,6 +160,8 @@ import type {
   UpdateUserPayload,
   UserDto,
 } from "~/stores/admin/interfaces/users";
+
+const { t } = useI18n();
 
 const props = defineProps<{
   modelValue: boolean;
@@ -189,15 +192,14 @@ const defaultForm = {
   lastName: "",
   phoneNumber: "",
 };
-
 const form = ref({ ...defaultForm });
 const selectedRole = ref<string>("Customer");
 
-const roleOptions = [
+const roleOptions = computed(() => [
   { label: "Admin", value: "Admin" },
   { label: "Customer", value: "Customer" },
   { label: "Manager", value: "Manager" },
-];
+]);
 
 watch(
   () => props.editingUser,
@@ -213,7 +215,7 @@ watch(
         }
       : { ...defaultForm };
     selectedRole.value = user?.roles?.[0]
-      ? (roleOptions.find(
+      ? (roleOptions.value.find(
           (r) => r.value.toLowerCase() === user.roles[0]!.toLowerCase(),
         )?.value ?? "Customer")
       : "Customer";
@@ -224,7 +226,6 @@ watch(
 
 function handleSave() {
   submitted.value = true;
-
   if (!form.value.firstName || !form.value.lastName || !form.value.email)
     return;
   if (!props.isEditing && (!form.value.userName || !form.value.password))

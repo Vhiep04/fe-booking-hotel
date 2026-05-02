@@ -29,23 +29,12 @@
         </div>
       </template>
 
-      <Column field="roomId" :header="t('ID')" style="width: 80px">
+      <Column field="roomId" :header="t('Room No.')" style="min-width: 100px">
         <template #body="{ data }">
-          <span class="font-medium text-(--admin-text-muted)"
-            >#{{ data.roomId }}</span
+          <span
+            class="font-semibold text-(--admin-primary) flex justify-center"
+            >{{ data.roomNumber }}</span
           >
-        </template>
-      </Column>
-
-      <Column
-        field="roomNumber"
-        :header="t('Room No.')"
-        style="min-width: 100px"
-      >
-        <template #body="{ data }">
-          <span class="font-semibold text-(--admin-primary)">{{
-            data.roomNumber
-          }}</span>
         </template>
       </Column>
 
@@ -63,7 +52,7 @@
       <Column field="roomType" :header="t('Type')" style="min-width: 120px">
         <template #body="{ data }">
           <Tag
-            :value="data.roomType"
+            :value="translateRoomType(data.roomType)"
             :severity="getRoomTypeSeverity(data.roomType)"
           />
         </template>
@@ -112,7 +101,7 @@
               severity="info"
               class="text-xs"
             >
-              {{ facility.name }}
+              {{ translateFacility(facility.name) }}
             </Tag>
             <Tag
               v-if="data.facilities.length > 2"
@@ -170,6 +159,8 @@ import Tag from "primevue/tag";
 import type { RoomDto } from "~/stores/admin/interfaces/rooms";
 
 const { t } = useI18n();
+const { translateFacility } = useFacilityTranslation();
+const { translateRoomType } = useRoomTypeTranslation();
 
 const props = defineProps<{
   rooms: RoomDto[];
@@ -190,9 +181,9 @@ function onPage(event: any) {
 }
 
 function formatPrice(price: number) {
-  return new Intl.NumberFormat("en-US", {
+  return new Intl.NumberFormat("vi-VN", {
     style: "currency",
-    currency: "USD",
+    currency: "VND",
   }).format(price);
 }
 

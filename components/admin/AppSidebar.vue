@@ -95,6 +95,11 @@ const menuItems = computed<MenuEntry[]>(() => [
     ...badge(data.value?.totalHotels, "bg-blue-500"),
     items: [
       {
+        label: t("Hotel List"),
+        icon: "pi pi-building",
+        to: "/admin/hotels",
+      },
+      {
         label: t("Add Hotel"),
         icon: "pi pi-plus",
         to: "/admin/hotels/create",

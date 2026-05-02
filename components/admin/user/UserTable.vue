@@ -10,7 +10,9 @@
       dataKey="id"
       paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
       :rowsPerPageOptions="[5, 10, 20, 50]"
-      currentPageReportTemplate="Showing {first} to {last} of {totalRecords} users"
+      :currentPageReportTemplate="
+        t('Showing {first} to {last} of {totalRecords} users')
+      "
       responsiveLayout="scroll"
       v-model:selection="selectedUsers"
       @page="onPage"
@@ -18,11 +20,11 @@
       <template #header>
         <div class="flex items-center justify-between">
           <span class="text-(--admin-text-secondary)">
-            {{ totalCount }} users found
+            {{ t("{n} users found", { n: totalCount }) }}
           </span>
           <div class="flex items-center gap-2" v-if="selectedUsers.length > 0">
             <Button
-              label="Delete Selected"
+              :label="t('Delete Selected')"
               icon="pi pi-trash"
               severity="danger"
               outlined
@@ -35,13 +37,18 @@
 
       <Column selectionMode="multiple" headerStyle="width: 3rem" />
 
-      <Column field="id" header="ID" sortable style="min-width: 80px">
+      <Column field="id" :header="t('ID')" sortable style="min-width: 80px">
         <template #body="{ data }">
           <span class="font-medium">#{{ data.id }}</span>
         </template>
       </Column>
 
-      <Column field="fullName" header="User" sortable style="min-width: 250px">
+      <Column
+        field="fullName"
+        :header="t('User')"
+        sortable
+        style="min-width: 250px"
+      >
         <template #body="{ data }">
           <div class="flex items-center gap-3">
             <Avatar
@@ -54,15 +61,18 @@
               <p class="font-semibold text-(--admin-text-color)">
                 {{ data.fullName }}
               </p>
-              <p class="text-sm text-(--admin-text-muted)">
-                {{ data.email }}
-              </p>
+              <p class="text-sm text-(--admin-text-muted)">{{ data.email }}</p>
             </div>
           </div>
         </template>
       </Column>
 
-      <Column field="roles" header="Role" sortable style="min-width: 130px">
+      <Column
+        field="roles"
+        :header="t('Role')"
+        sortable
+        style="min-width: 130px"
+      >
         <template #body="{ data }">
           <Tag
             v-for="role in data.roles"
@@ -76,29 +86,29 @@
 
       <Column
         field="emailConfirmed"
-        header="Email Verified"
+        :header="t('Email Verified')"
         sortable
         style="min-width: 130px"
       >
         <template #body="{ data }">
           <Tag
-            :value="data.emailConfirmed ? 'Verified' : 'Unverified'"
+            :value="data.emailConfirmed ? t('Verified') : t('Unverified')"
             :severity="data.emailConfirmed ? 'success' : 'warn'"
           />
         </template>
       </Column>
 
-      <Column field="phoneNumber" header="Phone" style="min-width: 140px">
+      <Column field="phoneNumber" :header="t('Phone')" style="min-width: 140px">
         <template #body="{ data }">
-          <span class="text-(--admin-text-muted)">
-            {{ data.phoneNumber || "—" }}
-          </span>
+          <span class="text-(--admin-text-muted)">{{
+            data.phoneNumber || "—"
+          }}</span>
         </template>
       </Column>
 
       <Column
         field="createdAt"
-        header="Joined"
+        :header="t('Joined')"
         sortable
         style="min-width: 130px"
       >
@@ -107,7 +117,7 @@
         </template>
       </Column>
 
-      <Column header="Actions" style="min-width: 120px">
+      <Column :header="t('Actions')" style="min-width: 120px">
         <template #body="{ data }">
           <div class="flex items-center gap-1">
             <Button
@@ -116,7 +126,7 @@
               text
               rounded
               size="small"
-              v-tooltip.top="'Edit'"
+              v-tooltip.top="t('Edit')"
               @click="emit('edit', data)"
             />
             <Button
@@ -125,7 +135,7 @@
               text
               rounded
               size="small"
-              v-tooltip.top="'Delete'"
+              v-tooltip.top="t('Delete')"
               @click="emit('delete', data)"
             />
           </div>
@@ -142,6 +152,8 @@ import Button from "primevue/button";
 import Tag from "primevue/tag";
 import Avatar from "primevue/avatar";
 import type { UserDto } from "~/stores/admin/interfaces/users";
+
+const { t } = useI18n();
 
 const props = defineProps<{
   users: UserDto[];

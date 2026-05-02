@@ -11,13 +11,6 @@
       </div>
       <div class="flex items-center gap-3">
         <Button
-          :label="t('Export')"
-          icon="pi pi-download"
-          severity="secondary"
-          outlined
-          @click="exportData"
-        />
-        <Button
           :label="t('Add Hotel')"
           icon="pi pi-plus"
           @click="openCreateDialog"

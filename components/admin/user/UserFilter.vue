@@ -9,7 +9,7 @@
             @update:modelValue="
               emit('update:modelValue', { ...modelValue, search: $event })
             "
-            placeholder="Search users..."
+            :placeholder="t('Search users...')"
             class="w-full"
           />
         </IconField>
@@ -22,7 +22,7 @@
           :options="roleOptions"
           optionLabel="label"
           optionValue="value"
-          placeholder="All Roles"
+          :placeholder="t('All Roles')"
           showClear
           class="w-full"
         />
@@ -35,7 +35,7 @@
           :options="statusOptions"
           optionLabel="label"
           optionValue="value"
-          placeholder="All Status"
+          :placeholder="t('All Status')"
           showClear
           class="w-full"
         />
@@ -45,7 +45,7 @@
           @update:modelValue="
             emit('update:modelValue', { ...modelValue, joinedDate: $event })
           "
-          placeholder="Joined After"
+          :placeholder="t('Joined After')"
           dateFormat="yy-mm-dd"
           showIcon
           class="w-full"
@@ -69,18 +69,21 @@ export interface UserFiltersModel {
   joinedDate: Date | null;
 }
 
+const { t } = useI18n();
+
 const props = defineProps<{ modelValue: UserFiltersModel }>();
 const emit = defineEmits<{
   (e: "update:modelValue", value: UserFiltersModel): void;
 }>();
 
-const roleOptions = [
+const roleOptions = computed(() => [
   { label: "Admin", value: "Admin" },
+  { label: "Manager", value: "Manager" },
   { label: "Customer", value: "Customer" },
-];
+]);
 
-const statusOptions = [
-  { label: "Active", value: "Active" },
-  { label: "Locked", value: "Locked" },
-];
+const statusOptions = computed(() => [
+  { label: t("Active"), value: "Active" },
+  { label: t("Locked"), value: "Locked" },
+]);
 </script>

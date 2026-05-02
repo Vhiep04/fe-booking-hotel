@@ -73,13 +73,13 @@
           </template>
         </Column>
 
-        <Column field="name" :header="t('Name')" sortable>
+        <Column field="name" :header="t('FName')" sortable>
           <template #body="{ data }">
             <div class="flex items-center gap-2">
               <i class="pi pi-cog text-(--admin-primary)" />
-              <span class="font-medium text-(--admin-text-color)">{{
-                data.name
-              }}</span>
+              <span class="font-medium text-(--admin-text-color)">
+                {{ data.name }}
+              </span>
             </div>
           </template>
         </Column>
@@ -111,7 +111,6 @@
       </DataTable>
     </div>
 
-    <!-- Add/Edit Dialog -->
     <Dialog
       v-model:visible="isModalOpen"
       :header="isEditing ? t('Edit Facility') : t('Add Facility')"
@@ -212,6 +211,7 @@ useHead({ title: "Facility Management" });
 const { t } = useI18n();
 const toast = useToast();
 const facilitiesStore = useFacilitiesStore();
+const { translateFacility } = useFacilityTranslation();
 
 const facilities = ref<FacilityDto[]>([]);
 const isLoading = ref(false);

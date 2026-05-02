@@ -4,25 +4,29 @@
       class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6"
     >
       <div>
-        <h1 class="admin-page-title">Users Management</h1>
-        <p class="admin-page-subtitle">Manage all users and administrators</p>
+        <h1 class="admin-page-title">{{ t("Users Management") }}</h1>
+        <p class="admin-page-subtitle">
+          {{ t("Manage all users and administrators") }}
+        </p>
       </div>
       <div class="flex items-center gap-3">
         <Button
-          label="Export"
+          :label="t('Export')"
           icon="pi pi-download"
           severity="secondary"
           outlined
           @click="exportData"
         />
-        <Button label="Add User" icon="pi pi-plus" @click="openCreateDialog" />
+        <Button
+          :label="t('Add User')"
+          icon="pi pi-plus"
+          @click="openCreateDialog"
+        />
       </div>
     </div>
 
     <UserStatsCard :stats="stats" />
-
     <UserFilter v-model="filters" />
-
     <UserTable
       :users="users"
       :totalCount="pagination.totalCount"
@@ -33,7 +37,6 @@
       @delete-selected="confirmDeleteSelected"
       @page="onPageChange"
     />
-
     <UserFormDialog
       v-model="userDialog"
       :isEditing="isEditing"
@@ -43,7 +46,6 @@
       @save-create="handleCreate"
       @save-update="handleUpdate"
     />
-
     <DeleteConfirmDialog
       v-model="deleteDialog"
       :user="userToDelete"
@@ -71,14 +73,10 @@ import type {
 } from "~/stores/admin/interfaces/users";
 import { useDebounceFn } from "@vueuse/core";
 
-definePageMeta({
-  layout: "admin",
-  middleware: ["admin"],
-});
+definePageMeta({ layout: "admin", middleware: ["admin"] });
 
-useHead({
-  title: "User Management",
-});
+const { t } = useI18n();
+useHead({ title: t("User Management") });
 
 const toast = useToast();
 const usersStore = useUsersStore();
@@ -94,11 +92,7 @@ const isEditing = ref(false);
 const editingUser = ref<UserDto | null>(null);
 const userToDelete = ref<UserDto | null>(null);
 
-const pagination = ref({
-  page: 1,
-  pageSize: 10,
-  totalCount: 0,
-});
+const pagination = ref({ page: 1, pageSize: 10, totalCount: 0 });
 
 const filters = ref<UserFiltersModel>({
   search: "",
@@ -130,23 +124,22 @@ async function fetchUsers() {
       search: filters.value.search || undefined,
       role: filters.value.role ?? undefined,
     });
-
     if (res.success) {
       users.value = res.data.items;
       pagination.value.totalCount = res.data.totalCount;
     } else {
       toast.add({
         severity: "error",
-        summary: "Error",
-        detail: res.message ?? "Failed to load users",
+        summary: t("Error"),
+        detail: res.message ?? t("Failed to load users"),
         life: 3000,
       });
     }
   } catch {
     toast.add({
       severity: "error",
-      summary: "Error",
-      detail: "Unexpected error loading users",
+      summary: t("Error"),
+      detail: t("Unexpected error loading users"),
       life: 3000,
     });
   } finally {
@@ -163,7 +156,6 @@ watch(
   },
   { deep: true },
 );
-
 onMounted(fetchUsers);
 
 function onPageChange({ page, rows }: { page: number; rows: number }) {
@@ -177,18 +169,15 @@ function openCreateDialog() {
   isEditing.value = false;
   userDialog.value = true;
 }
-
 function openEditDialog(user: UserDto) {
   editingUser.value = user;
   isEditing.value = true;
   userDialog.value = true;
 }
-
 function closeUserDialog() {
   userDialog.value = false;
   editingUser.value = null;
 }
-
 function openDeleteDialog(user: UserDto) {
   userToDelete.value = user;
   deleteDialog.value = true;
@@ -201,8 +190,8 @@ async function handleCreate(payload: CreateUserPayload) {
     if (res.success) {
       toast.add({
         severity: "success",
-        summary: "Success",
-        detail: "User created successfully",
+        summary: t("Success"),
+        detail: t("User created successfully"),
         life: 3000,
       });
       closeUserDialog();
@@ -210,16 +199,16 @@ async function handleCreate(payload: CreateUserPayload) {
     } else {
       toast.add({
         severity: "error",
-        summary: "Error",
-        detail: res.message ?? "Failed to create user",
+        summary: t("Error"),
+        detail: res.message ?? t("Failed to create user"),
         life: 3000,
       });
     }
   } catch {
     toast.add({
       severity: "error",
-      summary: "Error",
-      detail: "Unexpected error",
+      summary: t("Error"),
+      detail: t("Unexpected error"),
       life: 3000,
     });
   } finally {
@@ -234,8 +223,8 @@ async function handleUpdate(id: string, payload: UpdateUserPayload) {
     if (res.success) {
       toast.add({
         severity: "success",
-        summary: "Success",
-        detail: "User updated successfully",
+        summary: t("Success"),
+        detail: t("User updated successfully"),
         life: 3000,
       });
       closeUserDialog();
@@ -243,16 +232,16 @@ async function handleUpdate(id: string, payload: UpdateUserPayload) {
     } else {
       toast.add({
         severity: "error",
-        summary: "Error",
-        detail: res.message ?? "Failed to update user",
+        summary: t("Error"),
+        detail: res.message ?? t("Failed to update user"),
         life: 3000,
       });
     }
   } catch {
     toast.add({
       severity: "error",
-      summary: "Error",
-      detail: "Unexpected error",
+      summary: t("Error"),
+      detail: t("Unexpected error"),
       life: 3000,
     });
   } finally {
@@ -268,8 +257,8 @@ async function handleDelete() {
     if (res.success) {
       toast.add({
         severity: "success",
-        summary: "Success",
-        detail: "User deleted successfully",
+        summary: t("Success"),
+        detail: t("User deleted successfully"),
         life: 3000,
       });
       deleteDialog.value = false;
@@ -278,16 +267,16 @@ async function handleDelete() {
     } else {
       toast.add({
         severity: "error",
-        summary: "Error",
-        detail: res.message ?? "Failed to delete user",
+        summary: t("Error"),
+        detail: res.message ?? t("Failed to delete user"),
         life: 3000,
       });
     }
   } catch {
     toast.add({
       severity: "error",
-      summary: "Error",
-      detail: "Unexpected error",
+      summary: t("Error"),
+      detail: t("Unexpected error"),
       life: 3000,
     });
   } finally {
@@ -295,12 +284,11 @@ async function handleDelete() {
   }
 }
 
-function confirmDeleteSelected(selected: UserDto[]) {
-  // TODO: implement bulk delete endpoint
+function confirmDeleteSelected(_selected: UserDto[]) {
   toast.add({
     severity: "warn",
-    summary: "Not implemented",
-    detail: "Bulk delete coming soon",
+    summary: t("Not implemented"),
+    detail: t("Bulk delete coming soon"),
     life: 3000,
   });
 }
@@ -308,8 +296,8 @@ function confirmDeleteSelected(selected: UserDto[]) {
 function exportData() {
   toast.add({
     severity: "info",
-    summary: "Export",
-    detail: "Exporting users data...",
+    summary: t("Export"),
+    detail: t("Exporting users data..."),
     life: 3000,
   });
 }

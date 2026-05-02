@@ -26,7 +26,7 @@
           <p class="text-(--admin-text-muted)">{{ room.hotelName }}</p>
           <div class="flex items-center gap-2 mt-1">
             <Tag
-              :value="room.roomType"
+              :value="translateRoomType(room.roomType)"
               :severity="getRoomTypeSeverity(room.roomType)"
             />
             <Tag
@@ -82,7 +82,7 @@
             :key="facility.facilityId"
             severity="info"
           >
-            {{ facility.name }}
+            {{ translateFacility(facility.name) }}
           </Tag>
         </div>
       </div>
@@ -109,6 +109,8 @@ import Tag from "primevue/tag";
 import type { RoomDto } from "~/stores/admin/interfaces/rooms";
 
 const { t } = useI18n();
+const { translateFacility } = useFacilityTranslation();
+const { translateRoomType } = useRoomTypeTranslation();
 
 const props = defineProps<{
   modelValue: boolean;
@@ -126,9 +128,9 @@ const visible = computed({
 });
 
 function formatPrice(price: number) {
-  return new Intl.NumberFormat("en-US", {
+  return new Intl.NumberFormat("vi-VN", {
     style: "currency",
-    currency: "USD",
+    currency: "VND",
   }).format(price);
 }
 
