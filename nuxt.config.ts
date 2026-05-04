@@ -8,7 +8,9 @@ export default defineNuxtConfig({
 
   runtimeConfig: {
     public: {
-      apiHost: process.env.NUXT_PUBLIC_API_HOST || "http://localhost:44329",
+      apiHost:
+        process.env.NUXT_PUBLIC_API_HOST ||
+        "https://certified-trimmer-humongous.ngrok-free.dev/api",
       apiBase: process.env.NUXT_PUBLIC_API_BASE || "https://localhost:44329",
       googleClientId: process.env.GOOGLE_CLIENT_ID,
     },
