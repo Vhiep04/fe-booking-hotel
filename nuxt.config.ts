@@ -9,6 +9,8 @@ export default defineNuxtConfig({
   runtimeConfig: {
     public: {
       apiHost: process.env.NUXT_PUBLIC_API_HOST || "http://localhost:5000",
+      apiBase: process.env.NUXT_PUBLIC_API_BASE || "https://localhost:44329",
+      googleClientId: process.env.GOOGLE_CLIENT_ID,
     },
   },
 
@@ -21,27 +23,23 @@ export default defineNuxtConfig({
   modules: ["@pinia/nuxt", "@nuxtjs/i18n"],
 
   i18n: {
-    defaultLocale: "en",
-
+    defaultLocale: "vi",
     strategy: "no_prefix",
-
     langDir: "locales/",
-
     locales: [
       {
         code: "en",
         iso: "en-US",
-        file: "en.json",
+        files: ["en.json", "admin-en.json"],
         name: "English",
       },
       {
         code: "vi",
         iso: "vi-VN",
-        file: "vi.json",
+        files: ["vi.json", "admin-vi.json"],
         name: "Tiếng Việt",
       },
     ],
-
     detectBrowserLanguage: {
       useCookie: true,
       cookieKey: "i18n_language",
@@ -54,7 +52,6 @@ export default defineNuxtConfig({
     transpile: ["primevue"],
   },
 
-  // Config cho ofetch global
   app: {
     head: {
       // title: "Booking.com",
@@ -63,7 +60,6 @@ export default defineNuxtConfig({
     },
   },
 
-  // Nitro config cho proxy (development only)
   nitro: {
     devProxy: {
       "/api": {

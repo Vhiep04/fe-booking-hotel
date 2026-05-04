@@ -1,18 +1,23 @@
+import { defineStore } from "pinia";
+import { ref } from "vue";
 import { useApiStore } from "./api";
-import type { FacilityResponse } from "./interface/response/facilities";
+import type {
+  FacilityData,
+  FacilityResponse,
+} from "./interface/response/facilities";
 
 export const useFacilityStore = defineStore("facilityListStore", () => {
   const apiStore = useApiStore();
 
   const namespace = "/Facilities";
 
-  const facilities = ref();
+  const facilities = ref<FacilityData[]>([]);
 
-  async function getFacility() {
+  async function getFacilities() {
     try {
       const res = await apiStore.apiRequest<FacilityResponse>({
         method: "GET",
-        endpoint: `${namespace}`,
+        endpoint: namespace,
         auth: false,
       });
 
@@ -20,12 +25,12 @@ export const useFacilityStore = defineStore("facilityListStore", () => {
         facilities.value = res.data;
       }
     } catch (e) {
-      console.log("Get Facilities: ", e);
+      console.error("Get Facilities: ", e);
     }
   }
 
   return {
     facilities,
-    getFacility,
+    getFacilities,
   };
 });

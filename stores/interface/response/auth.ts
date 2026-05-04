@@ -1,4 +1,4 @@
-interface loginData {
+export interface LoginData {
   token: string;
   firstName: string;
   lastName: string;
@@ -15,7 +15,7 @@ interface registerData {
 export interface LoginResponseData {
   success: boolean;
   message: string;
-  data: loginData;
+  data: LoginData;
 }
 export interface RegisterResponseData {
   success: boolean;
@@ -30,4 +30,37 @@ export interface SendOtpResponseData {
 export interface ResendOtpResponseData {
   success: boolean;
   message: string;
+}
+
+export interface ForgotPasswordData {
+  expiresIn: string;
+}
+
+export interface VerifyResetOtpData {
+  email: string;
+  resetToken: string;
+  expiresIn: string;
+}
+
+export interface ForgotPasswordResponseData {
+  success: boolean;
+  message: string;
+  data: ForgotPasswordData;
+}
+
+export interface VerifyResetOtpResponseData {
+  success: boolean;
+  message: string;
+  data: VerifyResetOtpData;
+}
+
+export interface ResetPasswordResponseData {
+  success: boolean;
+  message: string;
+}
+
+export interface GoogleLoginResponseData {
+  success: boolean;
+  message: string;
+  data: LoginData;
 }

@@ -6,7 +6,23 @@ interface Facility {
 interface ImageHotel {
   isPrimary: boolean;
   displayOrder: number;
-  imgUrl: string;
+  imageUrl: string;
+}
+
+export interface Feedback {
+  feedbackId: number;
+  userName: string;
+  rating: number;
+  comment: string;
+  createdAt: string;
+}
+
+interface RatingDistribution {
+  fiveStar: number;
+  fourStar: number;
+  threeStar: number;
+  twoStar: number;
+  oneStar: number;
 }
 
 export interface HotelData {
@@ -14,14 +30,31 @@ export interface HotelData {
   name: string;
   location: string;
   description: string;
+  latitude: number;
+  longitude: number;
   minPricePerNight: number;
   maxPricePerNight: number;
-  primaryImageUrl: string;
+  minPrice?: number;
+  maxPrice?: number;
+  imgUrl?: string;
+  primaryImageUrl?: string;
   images: ImageHotel[];
-  availableRoomTypes: string[];
-  popularFacilities: Facility[];
-  averageRating?: string;
+  availableRoomTypes?: string[];
+  roomTypes?: RoomType[];
+  popularFacilities?: Facility[];
+  facilities?: string[];
+  averageRating?: number;
+  recentFeedbacks?: Feedback[];
   totalReviews: number;
+  ratingDistribution?: RatingDistribution;
+}
+
+interface RoomType {
+  roomTypeId: number;
+  typeName: string;
+  pricePerNight: number;
+  capacity: number;
+  imgUrl: string;
 }
 
 export interface CityData {

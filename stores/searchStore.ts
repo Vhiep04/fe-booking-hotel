@@ -1,24 +1,34 @@
-// stores/searchStore.ts
 import { defineStore } from "pinia";
 import { ref, computed } from "vue";
+import dayjs from "dayjs";
 
 export const useSearchStore = defineStore(
   "search",
   () => {
-    // State
     const checkIn = ref<string | null>(null);
     const checkOut = ref<string | null>(null);
     const cityName = ref("");
-    const bedType = ref("");
+    const roomTypeName = ref("");
+    const pendingHotelId = ref<number | null>(null);
+    const pendingRoomId = ref<number | null>(null);
 
-    // Getters
-    const checkInDate = computed(() => {
-      return checkIn.value ? new Date(checkIn.value) : null;
-    });
+    const setPendingBooking = (hotelId: number, roomId: number) => {
+      pendingHotelId.value = hotelId;
+      pendingRoomId.value = roomId;
+    };
 
-    const checkOutDate = computed(() => {
-      return checkOut.value ? new Date(checkOut.value) : null;
-    });
+    const clearPendingBooking = () => {
+      pendingHotelId.value = null;
+      pendingRoomId.value = null;
+    };
+
+    const checkInDate = computed(() =>
+      checkIn.value ? dayjs(checkIn.value).toDate() : null,
+    );
+
+    const checkOutDate = computed(() =>
+      checkOut.value ? dayjs(checkOut.value).toDate() : null,
+    );
 
     const dateRange = computed<[Date, Date] | null>(() => {
       if (checkInDate.value && checkOutDate.value) {
@@ -27,20 +37,24 @@ export const useSearchStore = defineStore(
       return null;
     });
 
-    const hasDates = computed(() => {
-      return !!(checkIn.value && checkOut.value);
-    });
+    const checkInDateOnly = computed(() => checkIn.value ?? null);
+    const checkOutDateOnly = computed(() => checkOut.value ?? null);
 
-    // Actions
+    const hasDates = computed(() => !!(checkIn.value && checkOut.value));
+
     const setDates = (newCheckIn: Date | null, newCheckOut: Date | null) => {
-      checkIn.value = newCheckIn ? newCheckIn.toISOString() : null;
-      checkOut.value = newCheckOut ? newCheckOut.toISOString() : null;
+      checkIn.value = newCheckIn
+        ? dayjs(newCheckIn).format("YYYY-MM-DD")
+        : null;
+      checkOut.value = newCheckOut
+        ? dayjs(newCheckOut).format("YYYY-MM-DD")
+        : null;
     };
 
     const setDateRange = (dates: [Date, Date] | null) => {
-      if (dates && dates[0] && dates[1]) {
-        checkIn.value = dates[0].toISOString();
-        checkOut.value = dates[1].toISOString();
+      if (dates?.[0] && dates?.[1]) {
+        checkIn.value = dayjs(dates[0]).format("YYYY-MM-DD");
+        checkOut.value = dayjs(dates[1]).format("YYYY-MM-DD");
       } else {
         checkIn.value = null;
         checkOut.value = null;
@@ -50,48 +64,55 @@ export const useSearchStore = defineStore(
     const setCityName = (name: string) => {
       cityName.value = name;
     };
-
-    const setBedType = (type: string) => {
-      bedType.value = type;
+    const setRoomTypeName = (type: string) => {
+      roomTypeName.value = type;
     };
-
     const clearDates = () => {
       checkIn.value = null;
       checkOut.value = null;
     };
-
     const clearAll = () => {
       checkIn.value = null;
       checkOut.value = null;
       cityName.value = "";
-      bedType.value = "";
+      roomTypeName.value = "";
     };
 
     return {
-      // State
       checkIn,
       checkOut,
       cityName,
-      bedType,
-      // Getters
+      roomTypeName,
       checkInDate,
       checkOutDate,
       dateRange,
       hasDates,
-      // Actions
+      checkInDateOnly,
+      checkOutDateOnly,
+      pendingHotelId,
+      pendingRoomId,
       setDates,
       setDateRange,
       setCityName,
-      setBedType,
+      setRoomTypeName,
       clearDates,
       clearAll,
+      setPendingBooking,
+      clearPendingBooking,
     };
   },
   {
     persist: {
       key: "hotel-search",
-      storage: process.client ? localStorage : undefined,
-      pick: ["checkIn", "checkOut", "cityName", "bedType"],
+      storage: process.client ? sessionStorage : undefined,
+      pick: [
+        "checkIn",
+        "checkOut",
+        "cityName",
+        "roomTypeName",
+        "pendingHotelId",
+        "pendingRoomId",
+      ],
     },
-  }
+  },
 );

@@ -3,6 +3,7 @@ import { useApiStore } from "./api";
 import type { HotelListRequest } from "./interface/request/hotelList";
 import type { HotelsResponse } from "./interface/response/hotelList";
 import type { Room, RoomListResponse } from "./interface/response/roomList";
+import type { HotelData } from "./interface/response/cityList";
 
 export const useHotelStore = defineStore("hotelListStore", () => {
   const apiStore = useApiStore();
@@ -31,6 +32,25 @@ export const useHotelStore = defineStore("hotelListStore", () => {
     pageNumber: 1,
   });
 
+  const currentHotel = ref<HotelData | null>(null);
+
+  async function getHotelById(hotelId: number) {
+    try {
+      isLoading.value = true;
+      const res = await apiStore.apiRequest<{ data: HotelData }>({
+        method: "GET",
+        endpoint: `${namespace}/${hotelId}`,
+        proxy: false,
+        auth: false,
+      });
+      currentHotel.value = res.data;
+    } catch (e) {
+      console.error("Get Hotel By Id:", e);
+    } finally {
+      isLoading.value = false;
+    }
+  }
+
   async function getHotelList(params: HotelListRequest) {
     try {
       isLoading.value = true;
@@ -52,30 +72,28 @@ export const useHotelStore = defineStore("hotelListStore", () => {
     }
   }
 
-  async function getHotelRooms(hotelId: number) {
-    try {
-      isLoadingRooms.value = true;
-
-      const res = await apiStore.apiRequest<RoomListResponse>({
-        method: "GET",
-        endpoint: `${namespace}/${hotelId}/rooms`,
-        proxy: false,
-        auth: false,
-      });
-
-      if (res.success) {
-        roomListData.value = res.data;
-        currentHotelRooms.value = res.data.rooms;
-      }
-
-      return res;
-    } catch (e) {
-      console.error("Get Hotel Rooms Error:", e);
-      throw e;
-    } finally {
-      isLoadingRooms.value = false;
+  async function getHotelRooms(hotelId: number, checkIn?: string, checkOut?: string) {
+  try {
+    isLoadingRooms.value = true;
+    const res = await apiStore.apiRequest<RoomListResponse>({
+      method: "GET",
+      endpoint: `${namespace}/${hotelId}/rooms`,
+      proxy: false,
+      auth: false,
+      params: { checkIn, checkOut },
+    });
+    if (res.success) {
+      roomListData.value = res.data;
+      currentHotelRooms.value = res.data.rooms;
     }
+    return res;
+  } catch (e) {
+    console.error("Get Hotel Rooms Error:", e);
+    throw e;
+  } finally {
+    isLoadingRooms.value = false;
   }
+}
 
   function clearRoomData() {
     currentHotelRooms.value = [];
@@ -90,7 +108,8 @@ export const useHotelStore = defineStore("hotelListStore", () => {
     roomListData,
     isLoading,
     isLoadingRooms,
-
+    currentHotel,
+    getHotelById,
     getHotelList,
     getHotelRooms,
     clearRoomData,

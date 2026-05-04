@@ -11,12 +11,24 @@ export default <ResponseDataType>({
   uri = "",
   headers = {},
   credentials,
-}: Payload): Promise<ResponseDataType> =>
-  $fetch(uri || `${baseURL}${endpoint}`, {
+}: Payload): Promise<ResponseDataType> => {
+  const isFormData = data instanceof FormData;
+
+  // Xóa Content-Type nếu là FormData để browser tự set boundary
+  const finalHeaders = isFormData
+    ? Object.fromEntries(
+        Object.entries(headers as Record<string, string>).filter(
+          ([k]) => k.toLowerCase() !== "content-type",
+        ),
+      )
+    : headers;
+
+  return $fetch(uri || `${baseURL}${endpoint}`, {
     method,
-    headers,
+    headers: finalHeaders,
     credentials: credentials || "include",
     ...(method.toUpperCase() === "GET"
       ? { query: { ...params } }
-      : { method, body: { ...data } }),
+      : { body: isFormData ? data : { ...data } }), // ✅ giữ nguyên FormData
   });
+};

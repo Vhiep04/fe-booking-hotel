@@ -1,0 +1,5 @@
+# tạo file .claudeignore trong thư mục project
+.env
+.env.local
+appsettings.json
+appsettings.Production.json

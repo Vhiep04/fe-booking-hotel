@@ -11,11 +11,15 @@ import type {
   RequestResendOtpVerify,
 } from "./interface/request/auth";
 import type {
+  GoogleLoginResponseData,
+  LoginData,
   LoginResponseData,
   RegisterResponseData,
   SendOtpResponseData,
 } from "./interface/response/auth";
+import type { UserInfoResponse } from "./interface/response/getUserInfo";
 import { ref } from "vue";
+import { ROLE_CLAIM } from "~/constants/auth";
 
 const namespace = "/Auth";
 
@@ -25,38 +29,69 @@ export const useAuthStore = defineStore("auth", () => {
   const token = ref("");
   const jwtPayload = ref<CustomJwtPayload | null>(null);
   const isAuthenticated = ref(false);
+  const userInfo = ref<UserInfoResponse | null>(null);
+
   const userLoginRequesting = ref(false);
   const userRegisterRequesting = ref(false);
   const userSendOtpCode = ref(false);
   const reSendOtpCode = ref(false);
+  const googleLoginRequesting = ref(false);
 
-  // FIX: Thêm function để init auth state từ cookie
+  const isAdmin = computed(() => {
+    const role = jwtPayload.value?.[ROLE_CLAIM];
+    if (!role) return false;
+    return Array.isArray(role) ? role.includes("Admin") : role === "Admin";
+  });
+
+  const isManager = computed(() => {
+    const role = jwtPayload.value?.[ROLE_CLAIM];
+    if (!role) return false;
+    return Array.isArray(role) ? role.includes("Manager") : role === "Manager";
+  });
+
+  const isAdminOrManager = computed(() => isAdmin.value || isManager.value);
+
   function initAuthFromCookie() {
     const savedToken = getCookie("token");
+
     if (savedToken) {
       try {
         const decoded = new authResponse.AuthToken(savedToken).deserialize();
-
-        // Check token còn hạn không
         const now = Math.floor(Date.now() / 1000);
+
         if (decoded.exp > now) {
           token.value = savedToken;
           jwtPayload.value = decoded;
           isAuthenticated.value = true;
-          console.log("Auth restored from cookie");
         } else {
-          // Token hết hạn, xóa cookie
           deleteCookie("token");
-          console.log("Token expired, cleared cookie");
         }
       } catch (e) {
-        console.error("Invalid token in cookie:", e);
+        console.error("Invalid token:", e);
         deleteCookie("token");
       }
     }
   }
 
-  function userLoginSuccess(data: LoginResponseData) {
+  async function fetchUserInfo() {
+    try {
+      const res = await apiStore.apiRequest<{
+        success: boolean;
+        data: UserInfoResponse;
+      }>({
+        method: "GET",
+        endpoint: `${namespace}/me`,
+        auth: true,
+        proxy: false,
+      });
+
+      userInfo.value = res.data;
+    } catch (e) {
+      console.error("fetchUserInfo error:", e);
+    }
+  }
+
+  function userLoginSuccess(data: LoginData) {
     token.value = data.token;
     jwtPayload.value = new authResponse.AuthToken(data.token).deserialize();
     isAuthenticated.value = true;
@@ -68,51 +103,115 @@ export const useAuthStore = defineStore("auth", () => {
       path: "/",
       sameSite: "Lax",
     });
-
-    console.log("Login successful, token saved");
   }
 
-  function userLoginFailed(e: Error) {
-    console.log(e);
-  }
-
-  function userRegisterSuccess(data: RegisterResponseData) {
-    console.log("Registration successful:", data);
-  }
-
-  function userRegisterFailed(e: Error) {
-    console.error("Registration failed:", e);
-  }
-
-  async function userRegister({
-    firstName,
-    lastName,
-    email,
-    phoneNumber,
-    password,
-    confirmPassword,
-  }: RequestRegisterPayload) {
+  async function userLogin({ email, password }: RequestLoginPayload) {
     try {
-      userRegisterRequesting.value = true;
-      const response = await apiStore.apiRequest<RegisterResponseData>({
+      userLoginRequesting.value = true;
+
+      const response = await apiStore.apiRequest<{
+        success: boolean;
+        message: string;
+        data: LoginData;
+      }>({
         method: "POST",
-        endpoint: `${namespace}/register`,
-        data: new authRequest.UserRegister({
-          firstName,
-          lastName,
-          phoneNumber,
-          email,
-          password,
-          confirmPassword,
-        }).serialize(),
+        endpoint: `${namespace}/login`,
+        data: { email, password },
         proxy: false,
         auth: false,
       });
 
-      userRegisterSuccess(response.data);
+      if (response.success && response.data) {
+        userLoginSuccess(response.data);
+        await fetchUserInfo();
+        return response;
+      } else {
+        throw new Error(response.message || "Login failed");
+      }
+    } catch (e: any) {
+      console.error("Login error:", e);
+      throw e;
+    } finally {
+      userLoginRequesting.value = false;
+    }
+  }
+
+  // ── Google Login ──────────────────────────────────────────────────────────
+  /**
+   * Đăng nhập bằng Google OAuth2.
+   * Frontend dùng Google Identity Services để lấy idToken,
+   * sau đó truyền vào đây để gửi lên backend verify.
+   *
+   * @param idToken - id_token từ Google Identity Services (response.credential)
+   */
+  async function loginWithGoogle(idToken: string) {
+    try {
+      googleLoginRequesting.value = true;
+
+      const response = await apiStore.apiRequest<GoogleLoginResponseData>({
+        method: "POST",
+        endpoint: `${namespace}/login-google`,
+        data: { idToken },
+        proxy: false,
+        auth: false,
+      });
+
+      if (response.success && response.data) {
+        userLoginSuccess(response.data);
+        await fetchUserInfo();
+        return response;
+      } else {
+        throw new Error(response.message || "Google login failed");
+      }
+    } catch (e: any) {
+      console.error("Google login error:", e);
+      throw e;
+    } finally {
+      googleLoginRequesting.value = false;
+    }
+  }
+
+  async function loginWithGoogleCode(code: string) {
+    try {
+      googleLoginRequesting.value = true;
+
+      const response = await apiStore.apiRequest<GoogleLoginResponseData>({
+        method: "POST",
+        endpoint: `${namespace}/login-google-code`,
+        data: { code },
+        proxy: false,
+        auth: false,
+      });
+
+      if (response.success && response.data) {
+        userLoginSuccess(response.data);
+        await fetchUserInfo();
+        return response;
+      } else {
+        throw new Error(response.message || "Google login failed");
+      }
+    } catch (e: any) {
+      console.error("Google login error:", e);
+      throw e;
+    } finally {
+      googleLoginRequesting.value = false;
+    }
+  }
+
+  async function userRegister(payload: RequestRegisterPayload) {
+    try {
+      userRegisterRequesting.value = true;
+
+      const response = await apiStore.apiRequest<RegisterResponseData>({
+        method: "POST",
+        endpoint: `${namespace}/register`,
+        data: new authRequest.UserRegister(payload).serialize(),
+        proxy: false,
+        auth: false,
+      });
+
       return response;
     } catch (e) {
-      userRegisterFailed(new Error(JSON.stringify(e)));
       throw e;
     } finally {
       userRegisterRequesting.value = false;
@@ -122,78 +221,32 @@ export const useAuthStore = defineStore("auth", () => {
   async function sendOtpVerify({ email, otpCode }: RequestOtpVerify) {
     try {
       userSendOtpCode.value = true;
-      const res = await apiStore.apiRequest<SendOtpResponseData>({
+
+      return await apiStore.apiRequest<SendOtpResponseData>({
         method: "POST",
         endpoint: `${namespace}/verify-otp`,
         proxy: false,
         auth: false,
-        data: {
-          email,
-          otpCode,
-        },
+        data: { email, otpCode },
       });
-      return res;
-    } catch (e) {
-      console.log("verify otp-failed: ", e);
     } finally {
-      userRegisterRequesting.value = false;
+      userSendOtpCode.value = false;
     }
   }
 
   async function resendOtpVerify({ email }: RequestResendOtpVerify) {
     try {
       reSendOtpCode.value = true;
-      const res = await apiStore.apiRequest<SendOtpResponseData>({
+
+      return await apiStore.apiRequest<SendOtpResponseData>({
         method: "POST",
         endpoint: `${namespace}/resend-otp`,
         proxy: false,
         auth: false,
-        data: {
-          email,
-        },
+        data: { email },
       });
-      return res;
-    } catch (e) {
-      console.log("resend verify-otp failed: ", e);
     } finally {
       reSendOtpCode.value = false;
-    }
-  }
-
-  async function userLogin({
-    email,
-    password,
-    rememberMe,
-  }: RequestLoginPayload) {
-    try {
-      userLoginRequesting.value = true;
-      const response = await apiStore.apiRequest<{
-        success: boolean;
-        message: string;
-        data: LoginResponseData;
-      }>({
-        method: "POST",
-        endpoint: `${namespace}/login`,
-        data: {
-          email,
-          password,
-        },
-        proxy: false,
-        auth: false,
-      });
-
-      if (response.success && response.data) {
-        userLoginSuccess(response.data);
-        return response;
-      } else {
-        throw new Error(response.message || "Login failed");
-      }
-    } catch (e: any) {
-      console.error("Login error:", e);
-      userLoginFailed(new Error(e.message || "Login failed"));
-      throw e;
-    } finally {
-      userLoginRequesting.value = false;
     }
   }
 
@@ -201,21 +254,28 @@ export const useAuthStore = defineStore("auth", () => {
     token.value = "";
     jwtPayload.value = null;
     isAuthenticated.value = false;
+    userInfo.value = null;
     deleteCookie("token");
   }
 
   return {
     token,
     isAuthenticated,
+    userInfo,
+    isAdmin,
+    isManager,
+    isAdminOrManager,
     userLoginRequesting,
     userRegisterRequesting,
+    googleLoginRequesting,
     initAuthFromCookie,
+    fetchUserInfo,
     userLogin,
+    loginWithGoogle,
+    loginWithGoogleCode,
     userRegister,
     userLogout,
     sendOtpVerify,
     resendOtpVerify,
   };
 });
-
-export default null;

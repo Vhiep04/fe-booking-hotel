@@ -13,6 +13,10 @@ export interface Room {
 export interface RoomListData {
   hotelId: number;
   hotelName: string;
+  hotelLocation: string;
+  hotelDescription: string;
+  hotelLatitude: number;
+  hotelLongitude: number;
   rooms: Room[];
   totalRooms: number;
   availableRooms: number;

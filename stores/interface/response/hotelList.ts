@@ -3,19 +3,11 @@ interface HotelData {
   Location: string;
   Description: string;
   ImgUrl: string;
-
-  // City info
   CityName: string;
   Country: string;
-
-  // Pricing info
   MinPrice: number;
   MaxPrice: number;
-
-  // Rating info
   AverageRating: DoubleRange;
-
-  // Room availability
   TotalRooms: number;
   AvailableRooms: number;
 }

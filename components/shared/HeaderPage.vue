@@ -1,226 +1,356 @@
 <template>
-  <header class="bg-gray-100 px-10 py-2">
-    <div class="flex items-center justify-between">
-      <!-- Logo Section -->
-      <div class="flex items-center space-x-6">
-        <img src="../../assets/images/logo_easyset24.svg" alt="" />
-        <i
-          v-if="!authStore.isAuthenticated"
-          class="pi pi-question-circle cursor-pointer"
-          style="font-size: 1.2rem"
-        ></i>
-
-        <img
-          v-if="!authStore.isAuthenticated"
-          src="../../assets/images/england-flag.svg"
-          alt=""
-        />
-      </div>
-
-      <div class="flex items-center">
-        <CustomInputText
-          id="search_global"
-          v-model="search"
-          type="text"
-          placeholder="Search"
-          :show-clear="true"
-          @clear="clearSearch"
-          width="50rem"
-          class="bg-white rounded-2xl"
-        >
-          <template #icon>
-            <i class="pi pi-search" style="font-size: 1rem"></i>
-          </template>
-        </CustomInputText>
-      </div>
-
-      <div v-if="authStore.isAuthenticated" class="flex items-center space-x-5">
-        <button class="hover:opacity-80 transition-opacity">
+  <header
+    class="bg-white border-b border-gray-200 px-6 h-[300] z-50 sticky top-0"
+  >
+    <div class="flex items-center justify-between h-20 gap-6">
+      <div class="flex items-center shrink-0">
+        <NuxtLink to="/">
           <img
-            src="../../assets/images/england-flag.svg"
-            alt="Language"
-            class="w-8 h-6"
+            src="../../assets/images/logo_easyset24.svg"
+            alt="Logo"
+            class="h-12"
           />
-        </button>
-
-        <button class="text-gray-700 hover:text-blue-600 transition-colors">
-          <i class="pi pi-dollar" style="font-size: 1.2rem"></i>
-        </button>
-
-        <button class="text-gray-700 hover:text-blue-600 transition-colors">
-          <i class="pi pi-question-circle" style="font-size: 1.2rem"></i>
-        </button>
-
-        <button
-          class="text-gray-700 hover:text-red-600 transition-colors relative"
-        >
-          <i class="pi pi-heart" style="font-size: 1.2rem"></i>
-        </button>
-
-        <button class="text-gray-700 hover:text-blue-600 transition-colors">
-          <i class="pi pi-phone" style="font-size: 1.2rem"></i>
-        </button>
-
-        <UserProfile
-          :full-name="userData.fullName"
-          :email="userData.email"
-          :avatar-url="userData.avatarUrl"
-          @my-account="handleMyAccount"
-          @payments="handlePayments"
-          @settings="handleSettings"
-          @support="handleSupport"
-          @sign-out="handleSignOut"
-        />
+        </NuxtLink>
       </div>
 
-      <div v-else class="flex items-center space-x-3">
-        <Button
-          @click="login"
-          label="Sign in"
-          size="normal"
-          severity="info"
-          raised
-          class="w-[150px] ring-offset-2 dark:ring-offset-surface-900 transition-all"
-        />
-        <Button
-          @click="register"
-          label="Register"
-          size="normal"
-          severity="info"
-          raised
-          class="w-[150px] ring-offset-2 dark:ring-offset-surface-900 transition-all"
-        />
+      <nav class="flex items-center gap-1 flex-1 justify-center">
+        <NuxtLink
+          v-for="item in navItems"
+          :key="item.name"
+          :to="item.path"
+          class="px-5 py-2 rounded-full text-base text-gray-500 hover:bg-gray-200 hover:text-gray-800 transition-colors whitespace-nowrap"
+          active-class="!bg-[#07689F] !text-white font-medium"
+        >
+          {{ t(item.name) }}
+        </NuxtLink>
+      </nav>
+
+      <div class="flex items-center gap-3 shrink-0">
+        <!-- Language Switcher -->
+        <div class="relative overflow-visible" ref="langWrapper">
+          <button
+            @click="toggleLangPanel"
+            class="hover:opacity-80 transition-opacity flex justify-center"
+            :aria-label="t('Language')"
+          >
+            <img
+              :src="currentFlag"
+              alt="Language"
+              class="w-9 h-6 rounded-sm object-contain"
+            />
+          </button>
+
+          <div
+            v-if="showLangPanel"
+            class="absolute right-0 top-full mt-2 bg-white rounded-xl shadow-xl border border-gray-200 z-50"
+          >
+            <ul class="min-w-45 py-1">
+              <li
+                v-for="lang in languages"
+                :key="lang.code"
+                @click="changeLanguage(lang.code)"
+                class="flex items-center rounded-xl gap-3 px-4 py-2 h-14 cursor-pointer hover:bg-gray-100"
+              >
+                <img :src="lang.flag" class="w-7 h-6 rounded-sm object-fit" />
+                <span class="text-sm">{{ lang.label }}</span>
+                <i
+                  v-if="locale === lang.code"
+                  class="pi pi-check text-blue-600 ml-auto"
+                ></i>
+              </li>
+            </ul>
+          </div>
+        </div>
+
+        <template v-if="authStore.isAuthenticated">
+          <!-- Notifications -->
+          <div class="relative overflow-visible" ref="notificationsWrapper">
+            <button
+              class="w-12 h-12 flex items-center justify-center rounded-full text-gray-500 hover:bg-gray-100 hover:text-blue-600 transition-colors relative"
+              @click="toggleNotifications"
+              :aria-label="t('Notifications')"
+            >
+              <i class="pi pi-bell" style="font-size: 1.1rem"></i>
+              <span
+                v-if="notificationCount > 0"
+                class="absolute top-0.5 right-0.5 w-4 h-4 bg-red-500 text-white text-[10px] rounded-full flex items-center justify-center font-medium"
+              >
+                {{ notificationCount > 9 ? "9+" : notificationCount }}
+              </span>
+            </button>
+
+            <!-- Notifications Dropdown -->
+            <div
+              v-if="showNotifications"
+              class="absolute right-0 top-full mt-2 bg-white rounded-xl shadow-xl border border-gray-200 z-50"
+            >
+              <div
+                class="p-3 flex items-center justify-between border-b border-gray-100"
+              >
+                <h4 class="font-semibold m-0 text-sm">
+                  {{ t("Notifications") }}
+                </h4>
+                <button
+                  v-if="notificationCount > 0"
+                  class="text-xs text-blue-600 hover:underline"
+                  @click="handleMarkAllRead"
+                >
+                  {{ t("Mark all as read") }}
+                </button>
+              </div>
+
+              <div v-if="notificationStore.loading" class="text-center py-6">
+                <i class="pi pi-spin pi-spinner text-gray-400"></i>
+              </div>
+
+              <div v-else class="overflow-y-auto max-h-120 w-100 p-2">
+                <div
+                  v-for="n in notifications"
+                  :key="n.id"
+                  @click="handleClickNotification(n)"
+                  class="p-3 rounded-lg cursor-pointer transition-colors hover:bg-gray-100"
+                  :class="{ 'bg-blue-50': !n.isRead }"
+                >
+                  <div class="flex items-start gap-2">
+                    <i
+                      :class="[
+                        getNotificationIcon(n.type),
+                        getNotificationColor(n.type),
+                      ]"
+                      style="font-size: 1rem; margin-top: 2px"
+                    ></i>
+                    <div class="flex-1 min-w-0">
+                      <p class="text-sm font-medium m-0 leading-snug">
+                        {{ n.title }}
+                      </p>
+                      <p class="text-xs text-gray-500 m-0 mt-1 leading-snug">
+                        {{ n.message }}
+                      </p>
+                      <p class="text-xs text-gray-400 m-0 mt-1">
+                        {{ formatTimeAgo(n.createdAt) }}
+                      </p>
+                    </div>
+                    <span
+                      v-if="!n.isRead"
+                      class="w-2 h-2 rounded-full bg-blue-500 shrink-0 mt-1"
+                    />
+                  </div>
+                </div>
+
+                <div
+                  v-if="notifications.length === 0"
+                  class="text-center py-6 text-gray-400 text-sm"
+                >
+                  {{ t("No notifications") }}
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <UserProfile
+            :full-name="userData.fullName"
+            :email="userData.email"
+            :avatar-url="userData.avatarUrl"
+            :is-admin="false"
+            :is-manager="false"
+            @my-account="handleMyAccount"
+            @payments="handlePayments"
+            @settings="handleSettings"
+            @support="handleSupport"
+            @sign-out="handleSignOut"
+          />
+        </template>
+
+        <template v-else>
+          <Button
+            @click="login"
+            :label="t('Sign in')"
+            size="small"
+            severity="secondary"
+            outlined
+          />
+          <Button
+            @click="register"
+            :label="t('Register')"
+            size="small"
+            severity="info"
+            raised
+          />
+        </template>
       </div>
     </div>
   </header>
 </template>
 
 <script setup lang="ts">
-import { ref, reactive, onMounted, watch } from "vue";
+import { ref, computed, onMounted, onUnmounted } from "vue";
+import { onClickOutside } from "@vueuse/core";
 import { useRouter } from "vue-router";
-import CustomInputText from "./CustomInputText.vue";
 import UserProfile from "../UserProfile.vue";
-import { useApiStore } from "@/stores/api";
 import { useAuthStore } from "@/stores/auth";
-import { getCookie, deleteCookie } from "@/utils/storageHelper";
-import type { UserInfoResponse } from "~/stores/interface/response/getUserInfo";
+import { useNotificationStore, type Notification } from "@/stores/notification";
 import { Button } from "primevue";
+import { useI18n } from "vue-i18n";
+import enFlag from "@/assets/images/england-flag.svg";
+import viFlag from "@/assets/images/vietnam-flag.svg";
+
+const { t, locale, setLocale } = useI18n();
+type LocaleCode = "en" | "vi";
 
 const router = useRouter();
-const apiStore = useApiStore();
 const authStore = useAuthStore();
+const notificationStore = useNotificationStore();
 
-const search = ref("");
-const namespace = "/Auth";
+const navItems = [
+  { name: "Home", path: "/" },
+  { name: "My reservation", path: "/reservation" },
+  { name: "My favourite hotel", path: "/favourite-hotels" },
+  { name: "My reviews", path: "/feedback" },
+];
 
-const userData = reactive<UserInfoResponse>({
-  fullName: "",
-  avatarUrl: "",
-  email: "",
-  phoneNumber: "",
-  birthDate: undefined,
-});
+const languages: { code: LocaleCode; label: string; flag: string }[] = [
+  { code: "en", label: "English", flag: enFlag },
+  { code: "vi", label: "Tiếng Việt", flag: viFlag },
+];
 
-const clearSearch = () => {
-  search.value = "";
+const currentFlag = computed(() => (locale.value === "vi" ? viFlag : enFlag));
+
+const showLangPanel = ref(false);
+const langWrapper = ref<HTMLElement | null>(null);
+
+const toggleLangPanel = () => {
+  showLangPanel.value = !showLangPanel.value;
 };
 
-function login() {
+const changeLanguage = async (code: LocaleCode) => {
+  if (locale.value !== code) await setLocale(code);
+  showLangPanel.value = false;
+};
+
+onClickOutside(langWrapper, () => {
+  showLangPanel.value = false;
+});
+
+const showNotifications = ref(false);
+const notificationsWrapper = ref<HTMLElement | null>(null);
+const { init: initHub, stop: stopHub } = useNotificationHub();
+
+const notifications = computed(() => notificationStore.notifications);
+const notificationCount = computed(() => notificationStore.unreadCount);
+
+const toggleNotifications = () => {
+  showNotifications.value = !showNotifications.value;
+};
+
+onClickOutside(notificationsWrapper, () => {
+  showNotifications.value = false;
+});
+
+const handleMarkAllRead = async () => {
+  await notificationStore.markAllRead();
+};
+
+const handleClickNotification = async (n: Notification) => {
+  await notificationStore.markOneRead(n.id);
+  showNotifications.value = false;
+
+  const REDIRECT_MAP: Record<number, () => string> = {
+    1: () =>
+      n.reservationId ? `/reservation/${n.reservationId}` : "/reservation",
+    2: () =>
+      n.reservationId ? `/reservation/${n.reservationId}` : "/reservation",
+    3: () =>
+      n.reservationId ? `/reservation/${n.reservationId}` : "/reservation",
+    4: () =>
+      n.reservationId ? `/reservation/${n.reservationId}` : "/reservation",
+    5: () =>
+      n.reservationId ? `/reservation/${n.reservationId}` : "/reservation",
+    6: () =>
+      n.reservationId ? `/reservation/${n.reservationId}` : "/reservation",
+  };
+
+  const getRoute = REDIRECT_MAP[Number(n.type)];
+  if (getRoute) await router.push(getRoute());
+};
+
+function getNotificationIcon(type: number): string {
+  const map: Record<number, string> = {
+    0: "pi pi-user-plus",
+    1: "pi pi-calendar-plus",
+    2: "pi pi-check-circle",
+    3: "pi pi-ban",
+    4: "pi pi-times-circle",
+    5: "pi pi-star",
+    6: "pi pi-credit-card",
+    7: "pi pi-exclamation-circle",
+  };
+  return map[type] ?? "pi pi-bell";
+}
+
+function getNotificationColor(type: number): string {
+  const map: Record<number, string> = {
+    0: "text-purple-500",
+    1: "text-blue-500",
+    2: "text-green-500",
+    3: "text-orange-500",
+    4: "text-red-500",
+    5: "text-purple-500",
+    6: "text-green-600",
+    7: "text-red-600",
+  };
+  return map[type] ?? "text-gray-500";
+}
+
+function formatTimeAgo(dateString: string): string {
+  const diff = Date.now() - new Date(dateString).getTime();
+  const mins = Math.floor(diff / 60000);
+  if (mins < 1) return t("Just now");
+  if (mins < 60) return t("{n} minutes ago", { n: mins });
+  const hours = Math.floor(mins / 60);
+  if (hours < 24) return t("{n} hours ago", { n: hours });
+  return t("{n} days ago", { n: Math.floor(hours / 24) });
+}
+
+const userData = computed(() => ({
+  fullName: authStore.userInfo?.fullName ?? "",
+  email: authStore.userInfo?.email ?? "",
+  avatarUrl: authStore.userInfo?.avatarUrl ?? "",
+}));
+
+const login = () => router.push({ name: "login" });
+const register = () => router.push({ name: "register" });
+const handleMyAccount = () => router.push({ name: "my-account" });
+const handlePayments = () => router.push({ name: "payments" });
+const handleSettings = () => router.push({ name: "settings" });
+const handleSupport = () => router.push({ name: "support" });
+
+function handleSignOut() {
+  stopHub();
+  authStore.userLogout();
   router.push({ name: "login" });
 }
 
-function register() {
-  router.push({ name: "register" });
-}
-
-// Handle user menu actions
-const handleMyAccount = () => {
-  router.push({ name: "my-account" });
-};
-
-const handlePayments = () => {
-  router.push({ name: "payments" });
-};
-
-const handleSettings = () => {
-  router.push({ name: "settings" });
-};
-
-const handleSupport = () => {
-  router.push({ name: "support" });
-};
-
-const handleSignOut = () => {
-  authStore.token = "";
-  authStore.isAuthenticated = false;
-
-  deleteCookie("token");
-
-  userData.fullName = "";
-  userData.avatarUrl = "";
-  userData.email = "";
-  userData.phoneNumber = "";
-  userData.birthDate = undefined;
-
-  router.push({ name: "login" });
-};
-
-const getUserInfo = async () => {
-  try {
-    const res = await apiStore.apiRequest<{
-      success: boolean;
-      data: UserInfoResponse;
-    }>({
-      method: "GET",
-      endpoint: `${namespace}/me`,
-      auth: true,
-      proxy: false,
-    });
-
-    const payload = res.data;
-
-    userData.fullName = payload.fullName;
-    userData.avatarUrl = payload.avatarUrl ?? "";
-    userData.email = payload.email ?? "";
-    userData.phoneNumber = payload.phoneNumber ?? "";
-    userData.birthDate = payload.birthDate ?? undefined;
-
-    console.log("User info loaded:", userData);
-  } catch (e) {
-    console.error("getUserInfo error:", e);
-  }
-};
-
-// Check authentication trước khi gọi API
-onMounted(() => {
-  console.log(authStore.isAuthenticated);
-  const token = getCookie("token");
-
-  if (token) {
-    authStore.token = token;
-    authStore.isAuthenticated = true;
-    void getUserInfo();
-  } else {
-    // Explicitly set to false
-    authStore.isAuthenticated = false;
+onMounted(async () => {
+  authStore.initAuthFromCookie();
+  if (authStore.isAuthenticated) {
+    await authStore.fetchUserInfo();
+    await initHub();
   }
 });
 
-// Watch auth state để load user info khi login
 watch(
   () => authStore.isAuthenticated,
-  (newVal) => {
-    if (newVal) {
-      void getUserInfo();
+  async (val) => {
+    if (val) {
+      await authStore.fetchUserInfo();
+      await initHub();
     } else {
-      userData.fullName = "";
-      userData.avatarUrl = "";
-      userData.email = "";
-      userData.phoneNumber = "";
-      userData.birthDate = undefined;
+      stopHub();
     }
-  }
+  },
 );
-</script>
 
-<style scoped></style>
+onUnmounted(() => {
+  stopHub();
+});
+</script>

@@ -19,9 +19,9 @@
         <!-- Room Facilities -->
         <div class="col-span-4">
           <div class="text-sm text-gray-600 space-y-1">
-            <p class="font-semibold text-gray-700 mb-2">Tiện nghi phòng:</p>
-
-            <!-- Display first 10 facilities -->
+            <p class="font-semibold text-gray-700 mb-2">
+              {{ t("Room Facilities") }}:
+            </p>
             <div class="grid grid-cols-2 gap-1">
               <div
                 v-for="facility in displayedFacilities"
@@ -32,8 +32,6 @@
                 <span class="text-xs">{{ facility }}</span>
               </div>
             </div>
-
-            <!-- Show more button if there are more facilities -->
             <button
               v-if="room.facilities.length > 10"
               class="text-blue-600 text-xs hover:underline mt-2"
@@ -41,96 +39,94 @@
             >
               {{
                 showAllFacilities
-                  ? "Thu gọn"
-                  : `+${room.facilities.length - 10} tiện nghi khác`
+                  ? t("Show Less")
+                  : `+${room.facilities.length - 10} ${t("More Facilities")}`
               }}
             </button>
           </div>
         </div>
 
         <!-- Price & Booking Options -->
-        <div class="col-span-3 border-l pl-4">
-          <div class="space-y-2">
-            <!-- Free Cancellation Badge -->
-            <div
-              v-if="room.facilities.includes('Free Cancellation')"
-              class="flex items-center gap-1 text-green-600 text-xs"
-            >
-              <i class="pi pi-check-circle"></i>
-              <span>Hủy miễn phí trước {{ freeCancellationDateVi }}</span>
-            </div>
-
-            <!-- Breakfast Included -->
-            <div
-              v-if="room.facilities.includes('Breakfast Included')"
-              class="flex items-center gap-1 text-green-600 text-xs"
-            >
-              <i class="pi pi-check-circle"></i>
-              <span>Không cần thanh toán trước - thanh toán tại chỗ nghỉ</span>
-            </div>
-
-            <!-- Refund Policy -->
-            <div class="flex items-center gap-1 text-green-600 text-xs">
-              <i class="pi pi-check-circle"></i>
-              <span
-                >Miễn phí hủy trước ngày nhận phòng sẽ được hoàn tiền đầy
-                đủ</span
+        <template v-if="hasSearchData">
+          <div class="col-span-3 border-l pl-4">
+            <div class="space-y-2">
+              <div
+                v-if="room.facilities.includes('Free Cancellation')"
+                class="flex items-center gap-1 text-green-600 text-xs"
               >
+                <i class="pi pi-check-circle"></i>
+                <span
+                  >{{ t("Free Cancellation Before") }}
+                  {{ freeCancellationDateVi }}</span
+                >
+              </div>
+              <div
+                v-if="room.facilities.includes('Breakfast Included')"
+                class="flex items-center gap-1 text-green-600 text-xs"
+              >
+                <i class="pi pi-check-circle"></i>
+                <span>{{ t("No Prepayment Pay At Property") }}</span>
+              </div>
+              <div class="flex items-center gap-1 text-green-600 text-xs">
+                <i class="pi pi-check-circle"></i>
+                <span>{{ t("Free Cancellation Refund") }}</span>
+              </div>
+              <div class="text-xs text-gray-600">
+                <i class="pi pi-info-circle text-gray-400"></i>
+                {{ t("Pay One Night Only") }}
+              </div>
+            </div>
+          </div>
+
+          <!-- Price & Reserve Button -->
+          <div class="col-span-2 flex flex-col items-end justify-between">
+            <div v-if="originalPrice" class="text-right">
+              <p class="text-xs text-gray-400 line-through">
+                {{ formatPrice(originalPrice) }}
+              </p>
             </div>
 
-            <!-- No Prepayment -->
-            <div class="text-xs text-gray-600">
-              <i class="pi pi-info-circle text-gray-400"></i>
-              Chỉ cần thanh toán 1 đêm
+            <div class="text-right">
+              <p class="text-2xl font-bold text-green-600">
+                {{ formatPrice(room.pricePerNight) }}
+              </p>
+              <p class="text-xs text-gray-500">
+                {{ t("Taxes And Fees Included") }}
+              </p>
             </div>
-          </div>
-        </div>
 
-        <!-- Price & Select Button -->
-        <div class="col-span-2 flex flex-col items-end justify-between">
-          <!-- Strikethrough Price -->
-          <div v-if="originalPrice" class="text-right">
-            <p class="text-xs text-gray-400 line-through">
-              {{ formatPrice(originalPrice) }}
-            </p>
-          </div>
+            <div
+              v-if="room.isAvailable"
+              class="bg-green-50 text-green-700 px-2 py-1 rounded text-xs"
+            >
+              {{ t("Available") }}
+            </div>
+            <div
+              v-else
+              class="bg-red-50 text-red-700 px-2 py-1 rounded text-xs"
+            >
+              {{ t("Sold Out") }}
+            </div>
 
-          <!-- Current Price -->
-          <div class="text-right">
-            <p class="text-2xl font-bold text-green-600">
-              {{ formatPrice(room.pricePerNight) }}
-            </p>
-            <p class="text-xs text-gray-500">Đã bao gồm thuế và phí</p>
-          </div>
-
-          <!-- Availability Badge -->
-          <div
-            v-if="room.isAvailable"
-            class="bg-green-50 text-green-700 px-2 py-1 rounded text-xs"
-          >
-            Còn phòng
-          </div>
-          <div v-else class="bg-red-50 text-red-700 px-2 py-1 rounded text-xs">
-            Hết phòng
-          </div>
-
-          <!-- Select Rooms Dropdown & Button -->
-          <div class="flex items-center gap-2 mt-2">
-            <Select
-              v-model="selectedRoomCount"
-              :options="roomCountOptions"
-              placeholder="0"
-              class="w-16"
-              :disabled="!room.isAvailable"
-            />
             <Button
-              label="Tôi sẽ đặt"
-              class="bg-blue-600 hover:bg-blue-700 text-white text-sm px-4 py-2"
-              :disabled="!room.isAvailable || selectedRoomCount === 0"
+              :label="t('Reserve Now')"
+              class="bg-blue-600 hover:bg-blue-700 text-white text-sm px-4 py-2 mt-2"
+              :disabled="!room.isAvailable"
               @click="handleReserve"
             />
           </div>
-        </div>
+        </template>
+
+        <template v-else>
+          <div class="col-span-5 flex items-center justify-end">
+            <Button
+              :label="t('Show prices')"
+              icon="pi pi-tag"
+              class="bg-blue-600 hover:bg-blue-700 text-white text-sm px-6 py-2"
+              @click="emit('showPrices')"
+            />
+          </div>
+        </template>
       </div>
     </template>
   </Card>
@@ -138,67 +134,48 @@
 
 <script setup lang="ts">
 import { ref, computed } from "vue";
-import { Card, Button, Select } from "primevue";
+import { Card, Button } from "primevue";
 import type { Room } from "~/stores/interface/response/roomList";
 import { useSearchStore } from "~/stores/searchStore";
 import dayjs from "dayjs";
 
+const { t } = useI18n();
 const searchStore = useSearchStore();
-
-const freeCancellationDate = computed(() => {
-  if (!searchStore.checkIn) return null;
-
-  return dayjs(searchStore.checkIn).subtract(3, "day").format("D MMMM, YYYY"); // "5 tháng 1, 2026"
-});
 
 const freeCancellationDateVi = computed(() => {
   if (!searchStore.checkIn) return null;
-
   return dayjs(searchStore.checkIn)
     .subtract(3, "day")
     .locale("vi")
     .format("D MMMM, YYYY");
 });
 
-const canCancelFree = computed(() => {
-  if (!searchStore.checkIn) return false;
-
-  const deadline = dayjs(searchStore.checkIn).subtract(3, "day");
-  return dayjs().isBefore(deadline);
-});
-
 interface Props {
   room: Room;
   originalPrice?: number;
+  hasSearchData: boolean;
 }
 
 const props = defineProps<Props>();
 const emit = defineEmits<{
-  reserve: [roomId: number, count: number];
+  reserve: [roomId: number];
+  showPrices: [];
 }>();
 
 const showAllFacilities = ref(false);
-const selectedRoomCount = ref(0);
 
-const roomCountOptions = [0, 1, 2, 3, 4, 5];
+const displayedFacilities = computed(() =>
+  showAllFacilities.value
+    ? props.room.facilities
+    : props.room.facilities.slice(0, 10),
+);
 
-const displayedFacilities = computed(() => {
-  if (showAllFacilities.value) {
-    return props.room.facilities;
-  }
-  return props.room.facilities.slice(0, 10);
-});
-
-const formatPrice = (price: number): string => {
-  return new Intl.NumberFormat("vi-VN", {
-    style: "currency",
-    currency: "VND",
-  }).format(price);
-};
+const formatPrice = (price: number) =>
+  new Intl.NumberFormat("vi-VN", { style: "currency", currency: "VND" }).format(
+    price,
+  );
 
 const handleReserve = () => {
-  if (selectedRoomCount.value > 0) {
-    emit("reserve", props.room.roomId, selectedRoomCount.value);
-  }
+  emit("reserve", props.room.roomId);
 };
 </script>

@@ -5,8 +5,18 @@ import { $fetch } from "ofetch";
 
 export const useApiStore = defineStore("api", () => {
   const authStore = useAuthStore();
+
   async function apiRequest<ResponseDataType>(payload: Payload) {
     let { headers } = payload;
+
+    if (payload.data instanceof FormData) {
+      const { "Content-Type": _, ...rest } = (headers ?? {}) as Record<
+        string,
+        string
+      >;
+      headers = rest;
+    }
+
     if (payload.auth) {
       headers = {
         ...headers,
@@ -19,10 +29,7 @@ export const useApiStore = defineStore("api", () => {
       if (payload?.proxy) {
         response = await $fetch<ResponseDataType>("/api/call", {
           method: "POST",
-          body: {
-            ...payload,
-            headers,
-          },
+          body: { ...payload, headers },
           credentials: "include",
         });
       } else {
@@ -33,8 +40,15 @@ export const useApiStore = defineStore("api", () => {
         });
       }
       return response;
-    } catch (e) {
+    } catch (e: any) {
       console.log(e);
+
+      if (e?.data) {
+        const result = e.data as ResponseDataType & { statusCode?: number };
+        result.statusCode = e.response?.status ?? e.status;
+        return result;
+      }
+
       throw e;
     }
   }

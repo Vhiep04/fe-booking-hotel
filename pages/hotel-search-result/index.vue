@@ -2,12 +2,13 @@
   <div class="h-full mt-6 ml-36 mr-36 space-y-8">
     <div class="text">
       <p class="text-[#07689F] font-bold text-2xl mb-2">
-        Where is your Next Dream Place?
+        {{ t("Where is your Next Dream Place?") }}
       </p>
       <p class="text-[#07689F]">
-        Find exclusive Genius rewards in every corner of the world!
+        {{ t("Find exclusive Genius rewards in every corner of the world!") }}
       </p>
     </div>
+
     <SearchForm
       :loading="cityStore.isLoading"
       @search="handleSearch"
@@ -23,7 +24,6 @@
     <div class="grid grid-cols-[25%_75%] items-start mt-6">
       <FacilityHotel @filter-change="handleFilterChange" />
 
-      <!-- Hotels List Container -->
       <div class="space-y-4">
         <!-- Loading State -->
         <template v-if="cityStore.isLoading">
@@ -41,7 +41,7 @@
 
         <!-- Empty State -->
         <div v-else class="text-center py-12">
-          <p class="text-gray-500 text-lg">No hotels found</p>
+          <p class="text-gray-500 text-lg">{{ t("No hotels found") }}</p>
         </div>
       </div>
     </div>
@@ -57,25 +57,24 @@ import HotelCardDetail from "~/components/HotelCardDetail.vue";
 import HotelCardSkeleton from "~/components/shared/HotelCardSkeleton.vue";
 import FacilityHotel from "~/components/FacilityHotel.vue";
 
+const { t } = useI18n();
+
+useHead({ title: t("Hotel Search Results") });
+
 const cityStore = useCityStore();
 const route = useRoute();
 
-// Computed properties
 const cityInfo = computed(() => cityStore.cityCurrent);
 const hotelTotal = computed(() => cityStore.hotelTotal);
 const hotels = computed(() => cityStore.hotels);
 
-type GetCity = {
-  name: string;
-};
-
+type GetCity = { name: string };
 type SearchParams = {
   cityName: string;
   checkIn: string | null;
   checkOut: string | null;
-  bedType: string;
+  roomTypeName: string;
 };
-
 type FilterParams = {
   minPrice?: number;
   maxPrice?: number;
@@ -84,12 +83,11 @@ type FilterParams = {
 
 const handleSearch = async (params: SearchParams) => {
   cityStore.updateFilters({
-    cityName: params.cityName,
+    cityName: params.cityName.trim(),
     checkIn: params.checkIn || undefined,
     checkOut: params.checkOut || undefined,
-    bedType: params.bedType,
+    roomTypeName: params.roomTypeName,
   });
-
   await cityStore.fetchHotels();
 };
 
@@ -103,15 +101,13 @@ const handleFilterChange = async (filters: FilterParams) => {
     maxPrice: filters.maxPrice,
     facilities: filters.facilities,
   });
-
   await cityStore.debouncedFetchHotels();
 };
 
 onMounted(async () => {
   const cityName = route.query.city as string;
-
   if (cityName && !cityStore.cityCurrent) {
-    await cityStore.getCity({ name: cityName });
+    await cityStore.getCity({ name: cityName.trim() });
   }
 });
 </script>

@@ -1,0 +1,173 @@
+<template>
+  <div class="admin-card h-full">
+    <div class="admin-card-header flex items-center justify-between">
+      <h3 class="admin-card-title">{{ t("Revenue Overview") }}</h3>
+      <Dropdown
+        v-model="selectedPeriod"
+        :options="periodOptions"
+        optionLabel="label"
+        optionValue="value"
+        class="w-36"
+      />
+    </div>
+    <div class="admin-card-body">
+      <div v-if="hasData">
+        <Chart
+          type="line"
+          :data="chartData"
+          :options="chartOptions"
+          class="h-80"
+        />
+      </div>
+      <div v-else class="h-80 flex flex-col items-center justify-center gap-2">
+        <i class="pi pi-chart-line text-4xl text-(--admin-text-muted)"></i>
+        <p class="text-(--admin-text-muted) text-sm">
+          {{ t("No revenue data available") }}
+        </p>
+      </div>
+    </div>
+  </div>
+</template>
+
+<script setup lang="ts">
+import Chart from "primevue/chart";
+import Dropdown from "primevue/dropdown";
+import type { RevenueChart } from "~/stores/admin/interfaces/dashboard";
+
+const { t } = useI18n();
+
+const props = defineProps<{
+  chartData: RevenueChart[];
+}>();
+
+const selectedPeriod = ref("12months");
+
+const periodOptions = computed(() => [
+  { label: t("Last 7 days"), value: "7days" },
+  { label: t("Last 30 days"), value: "30days" },
+  { label: t("Last 12 months"), value: "12months" },
+]);
+
+const filledChartData = computed(() => {
+  const now = new Date();
+  const period = selectedPeriod.value;
+
+  if (period === "7days") {
+    return Array.from({ length: 7 }, (_, i) => {
+      const d = new Date(now);
+      d.setDate(now.getDate() - 6 + i);
+      const dayName = d.toLocaleString("en-US", {
+        month: "short",
+        day: "numeric",
+      });
+      return { monthName: dayName, revenue: 0, reservationCount: 0 };
+    });
+  }
+
+  if (period === "30days") {
+    return Array.from({ length: 30 }, (_, i) => {
+      const d = new Date(now);
+      d.setDate(now.getDate() - 29 + i);
+      const dayName = d.toLocaleString("en-US", {
+        month: "short",
+        day: "numeric",
+      });
+      return { monthName: dayName, revenue: 0, reservationCount: 0 };
+    });
+  }
+
+  return Array.from({ length: 12 }, (_, i) => {
+    const d = new Date(now.getFullYear(), now.getMonth() - 11 + i, 1);
+    const year = d.getFullYear();
+    const month = d.getMonth() + 1;
+    const monthName = d.toLocaleString("en-US", {
+      month: "short",
+      year: "numeric",
+    });
+    const found = (props.chartData ?? []).find(
+      (item) => item.year === year && item.month === month,
+    );
+    return {
+      monthName,
+      revenue: found?.revenue ?? 0,
+      reservationCount: found?.reservationCount ?? 0,
+    };
+  });
+});
+
+const hasData = computed(() => props.chartData && props.chartData.length > 0);
+
+const chartData = computed(() => ({
+  labels: filledChartData.value.map((i) => i.monthName),
+  datasets: [
+    {
+      label: t("Revenue (đ)"),
+      data: filledChartData.value.map((i) => i.revenue),
+      fill: true,
+      borderColor: "#3b82f6",
+      backgroundColor: "rgba(59, 130, 246, 0.1)",
+      tension: 0.4,
+      pointRadius: 4,
+      pointHoverRadius: 6,
+    },
+    {
+      label: t("Bookings"),
+      data: filledChartData.value.map((i) => i.reservationCount),
+      fill: false,
+      borderColor: "#22c55e",
+      backgroundColor: "#22c55e",
+      tension: 0.4,
+      pointRadius: 4,
+      pointHoverRadius: 6,
+      yAxisID: "y1",
+    },
+  ],
+}));
+
+const chartOptions = computed(() => ({
+  maintainAspectRatio: false,
+  responsive: true,
+  interaction: { intersect: false, mode: "index" },
+  plugins: {
+    legend: {
+      display: true,
+      position: "top",
+      labels: { usePointStyle: true, padding: 20 },
+    },
+    tooltip: {
+      backgroundColor: "rgba(0, 0, 0, 0.8)",
+      padding: 12,
+      cornerRadius: 8,
+    },
+  },
+  scales: {
+    x: {
+      grid: { display: false },
+      ticks: { color: "#64748b" },
+    },
+    y: {
+      type: "linear",
+      display: true,
+      position: "left",
+      grid: { color: "rgba(0, 0, 0, 0.05)" },
+      ticks: {
+        color: "#64748b",
+        callback: (value: number) =>
+          new Intl.NumberFormat("vi-VN", {
+            style: "currency",
+            currency: "VND",
+            minimumFractionDigits: 0,
+            maximumFractionDigits: 0,
+          }).format(value),
+      },
+    },
+    y1: {
+      type: "linear",
+      display: true,
+      position: "right",
+      grid: { drawOnChartArea: false },
+      ticks: { color: "#64748b" },
+    },
+  },
+}));
+</script>
