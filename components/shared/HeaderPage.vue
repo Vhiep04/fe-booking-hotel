@@ -1,7 +1,5 @@
 <template>
-  <header
-    class="bg-white border-b border-gray-200 px-6 h-[300] z-50 sticky top-0"
-  >
+  <header class="bg-white border-b border-gray-200 px-6 z-50 sticky top-0">
     <div class="flex items-center justify-between h-20 gap-6">
       <div class="flex items-center shrink-0">
         <NuxtLink to="/">
