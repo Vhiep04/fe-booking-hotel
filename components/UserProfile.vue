@@ -63,7 +63,7 @@
             class="flex items-center w-full px-6 py-3 hover:bg-gray-300 cursor-pointer transition-colors text-blue-600"
           >
             <i class="pi pi-sign-out mr-3" style="font-size: 1rem"></i>
-            <span class="font-medium">Sign Out</span>
+            <span class="font-medium">{{ t("Sign Out") }}</span>
           </a>
         </div>
       </template>
@@ -76,55 +76,48 @@ import { ref, computed } from "vue";
 import Menu from "primevue/menu";
 import type { MenuItem } from "primevue/menuitem";
 
+const { t } = useI18n();
+
 interface Props {
   fullName: string;
   email: string;
   avatarUrl?: string;
   isAdmin?: boolean;
+  isManager?: boolean;
 }
+
 const open = ref(false);
+const menu = ref();
+const router = useRouter();
+const route = useRoute();
+
+const props = defineProps<Props>();
+const emit = defineEmits<{ signOut: [] }>();
 
 const toggle = (event: Event) => {
   open.value = !open.value;
   menu.value.toggle(event);
 };
 
-const router = useRouter();
-const route = useRoute();
-
-const props = defineProps<Props>();
-
-const emit = defineEmits<{
-  signOut: [];
-}>();
-
-const menu = ref();
-
 const avatarImage = computed(() => {
   if (props.avatarUrl) return props.avatarUrl;
   return "/assets/images/avt-df.jpg";
 });
 
-const menuItems = computed<MenuItem[]>(() => [
-  {
-    label: "My Account",
-    icon: "pi pi-user",
-    showArrow: true,
-    route: "/user-info",
-    command: () => router.push("/user-info"),
-  },
-  // ...(!props.isAdmin
-  //   ? [
-  //       {
-  //         label: "My Reservations",
-  //         icon: "pi pi-calendar",
-  //         showArrow: true,
-  //         route: "/reservation",
-  //         command: () => router.push("/reservation"),
-  //       },
-  //     ]
-  //   : []),
-]);
+const menuItems = computed<MenuItem[]>(() => {
+  const isPrivileged = props.isAdmin || props.isManager;
+
+  return [
+    {
+      label: t("My Account"),
+      icon: "pi pi-user",
+      showArrow: true,
+      route: isPrivileged ? "/admin/user-info" : "/user-info",
+      command: () =>
+        router.push(isPrivileged ? "/admin/user-info" : "/user-info"),
+    },
+  ];
+});
 
 const handleSignOut = () => {
   emit("signOut");
@@ -139,16 +132,13 @@ const handleSignOut = () => {
     0 2px 4px -1px rgba(0, 0, 0, 0.06);
   padding: 0;
 }
-
 :deep(.p-menu .p-menuitem-link) {
   padding: 0;
   border-radius: 0;
 }
-
 :deep(.p-menu-list) {
   max-width: 100px !important;
 }
-
 :deep(.p-menu .p-menuitem-link:hover) {
   background: transparent;
 }

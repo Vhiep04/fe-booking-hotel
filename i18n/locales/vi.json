@@ -476,11 +476,20 @@
     "Standard": "Tiêu chuẩn",
     "Suite": "Suite"
   },
+  "Create": "Tạo mới",
   "Hotel Found": "Khách sạn được tìm thấy",
   "Reviews": "đánh giá",
   "Off": "Giảm",
   "Includes taxes and charges": "Đã bao gồm thuế và phí",
   "Trip Sustainable Level, 5": "Mức độ bền vững chuyến đi: 5",
   "We Have 8 Left at 12% off": "Còn 8 phòng với giá giảm 12%",
-  "See Availability": "Xem phòng trống"
+  "See Availability": "Xem phòng trống",
+
+  "booking": {
+    "yourSelection": "Lựa chọn của bạn",
+    "yourDetails": "Thông tin của bạn",
+    "finishBooking": "Hoàn tất đặt phòng"
+  },
+  "My Account": "Tài khoản của tôi",
+  "Sign Out": "Đăng xuất"
 }

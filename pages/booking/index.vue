@@ -110,11 +110,11 @@ const toast = useToast();
 
 const currentStep = ref(2);
 
-const steps = [
-  { id: 1, label: "Your Selection" },
-  { id: 2, label: "Your Details" },
-  { id: 3, label: "Finish booking" },
-];
+const steps = computed(() => [
+  { id: 1, label: t("booking.yourSelection") },
+  { id: 2, label: t("booking.yourDetails") },
+  { id: 3, label: t("booking.finishBooking") },
+]);
 
 const hotelId = computed(() => Number(route.query.hotelId));
 const roomId = computed(() => Number(route.query.roomId));

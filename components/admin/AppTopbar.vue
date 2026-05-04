@@ -9,25 +9,20 @@
       >
         <i class="pi pi-bars"></i>
       </button>
-
       <nav class="layout-breadcrumb hidden md:flex">
-        <NuxtLink to="/admin" class="flex items-center">
-          <i class="pi pi-home"></i>
-        </NuxtLink>
+        <NuxtLink to="/admin" class="flex items-center"
+          ><i class="pi pi-home"></i
+        ></NuxtLink>
         <template v-for="(item, index) in breadcrumbs" :key="index">
           <span class="layout-breadcrumb-separator mx-2">/</span>
-          <NuxtLink v-if="item.to" :to="item.to" class="hover:text-primary">
-            {{ item.label }}
-          </NuxtLink>
-          <span v-else class="layout-breadcrumb-current">
-            {{ item.label }}
-          </span>
+          <NuxtLink v-if="item.to" :to="item.to" class="hover:text-primary">{{
+            item.label
+          }}</NuxtLink>
+          <span v-else class="layout-breadcrumb-current">{{ item.label }}</span>
         </template>
       </nav>
     </div>
-
     <div class="layout-topbar-right">
-      <!-- Language Switcher -->
       <div class="relative" ref="langWrapper">
         <button
           type="button"
@@ -41,7 +36,6 @@
             class="w-7 h-5 rounded-sm object-contain"
           />
         </button>
-
         <div
           v-if="showLangPanel"
           class="absolute right-0 top-full mt-2 bg-white dark:bg-gray-800 rounded-xl shadow-xl border border-gray-200 dark:border-gray-700 z-50"
@@ -63,8 +57,6 @@
           </ul>
         </div>
       </div>
-
-      <!-- Dark Mode Toggle -->
       <button
         type="button"
         class="layout-topbar-button"
@@ -75,8 +67,6 @@
       >
         <i :class="isDarkMode ? 'pi pi-sun' : 'pi pi-moon'"></i>
       </button>
-
-      <!-- Notifications -->
       <div class="relative" ref="notificationsWrapper">
         <button
           type="button"
@@ -92,7 +82,6 @@
             {{ notificationCount > 9 ? "9+" : notificationCount }}
           </span>
         </button>
-
         <div
           v-if="showNotifications"
           class="absolute right-0 top-full mt-2 w-100 bg-white dark:bg-gray-800 rounded-xl shadow-xl border border-gray-200 dark:border-gray-700 z-50"
@@ -147,16 +136,15 @@
           </div>
         </div>
       </div>
-
       <UserProfile
         :full-name="userData.fullName"
         :email="userData.email"
         :avatar-url="userData.avatarUrl"
         :is-admin="true"
+        :is-manager="true"
         @sign-out="handleSignOut"
       />
     </div>
-
     <Dialog
       v-model:visible="searchVisible"
       modal
@@ -205,16 +193,12 @@ const languages: { code: LocaleCode; label: string; flag: string }[] = [
   { code: "en", label: "English", flag: enFlag },
   { code: "vi", label: "Tiếng Việt", flag: viFlag },
 ];
-
 const currentFlag = computed(() => (locale.value === "vi" ? viFlag : enFlag));
-
 const showLangPanel = ref(false);
 const langWrapper = ref<HTMLElement | null>(null);
-
 const toggleLangPanel = () => {
   showLangPanel.value = !showLangPanel.value;
 };
-
 const changeLanguage = async (code: LocaleCode) => {
   if (locale.value !== code) await setLocale(code);
   showLangPanel.value = false;
@@ -230,27 +214,48 @@ const searchVisible = ref(false);
 const searchQuery = ref("");
 const showNotifications = ref(false);
 const notificationsWrapper = ref<HTMLElement | null>(null);
-
 const isDarkMode = computed(() => layoutStore.isDarkMode);
+
+const segmentKeyMap: Record<string, string> = {
+  bookings: "Bookings",
+  hotels: "Hotels",
+  users: "Users",
+  cities: "Cities",
+  facilities: "Facilities",
+  rooms: "Rooms",
+  dashboard: "Dashboard",
+  feedback: "Feedbacks Management",
+  reports: "Reports",
+  settings: "Settings",
+  create: "Create",
+  edit: "Edit",
+  detail: "Detail",
+};
+
+function translateSegment(segment: string): string {
+  // Segment là số (ID) → hiển thị dạng #123
+  if (/^\d+$/.test(segment)) return `#${segment}`;
+  // Có trong map → dịch qua i18n
+  const key = segmentKeyMap[segment.toLowerCase()];
+  if (key) return t(key);
+  // Fallback: capitalize + thay dấu gạch ngang
+  return segment.charAt(0).toUpperCase() + segment.slice(1).replace(/-/g, " ");
+}
 
 const breadcrumbs = computed(() => {
   const items: Array<{ label: string; to?: string }> = [];
   const paths = route.path.split("/").filter(Boolean);
-
   if (paths[0] === "admin") paths.shift();
-
   let currentPath = "/admin";
   paths.forEach((segment, index) => {
     currentPath += `/${segment}`;
-    const label =
-      segment.charAt(0).toUpperCase() + segment.slice(1).replace(/-/g, " ");
+    const label = translateSegment(segment);
     if (index === paths.length - 1) {
       items.push({ label });
     } else {
       items.push({ label, to: currentPath });
     }
   });
-
   return items;
 });
 
@@ -267,14 +272,12 @@ const userData = reactive<UserInfoResponse>({
 
 const notificationStore = useNotificationStore();
 const { init: initHub, stop: stopHub } = useNotificationHub();
-
 const notifications = computed(() => notificationStore.notifications);
 const notificationCount = computed(() => notificationStore.unreadCount);
 
 onClickOutside(notificationsWrapper, () => {
   showNotifications.value = false;
 });
-
 onClickOutside(langWrapper, () => {
   showLangPanel.value = false;
 });
@@ -300,22 +303,18 @@ async function onClickNotification(notification: Notification) {
 function onMenuToggle() {
   layoutStore.onMenuToggle();
 }
-
 function toggleDarkMode() {
   layoutStore.toggleDarkMode();
 }
-
 function performSearch() {
   if (searchQuery.value.trim()) {
     console.log("Searching for:", searchQuery.value);
     searchVisible.value = false;
   }
 }
-
 function toggleNotifications() {
   showNotifications.value = !showNotifications.value;
 }
-
 function handleSignOut() {
   userStore.userLogout();
   router.push({ name: "login" });

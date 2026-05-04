@@ -67,7 +67,7 @@ export const useEditUserStore = defineStore("editUser", () => {
         ? toLocalDateString(new Date(userInfo.birthDate))
         : null,
       avatarUrl: userInfo.avatarUrl ?? null,
-      createdAt: profile.value?.createdAt ?? "",
+      createdAt: userInfo.createdAt ?? "",
     };
   }
 

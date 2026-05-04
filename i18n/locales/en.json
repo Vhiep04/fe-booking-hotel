@@ -478,9 +478,18 @@
   },
   "Hotel Found": "Hotel Found",
   "Reviews": "Reviews",
+  "Create": "Create",
   "Off": "Off",
   "Includes taxes and charges": "Includes taxes and charges",
   "Trip Sustainable Level, 5": "Trip Sustainable Level, 5",
   "We Have 8 Left at 12% off": "We Have 8 Left at 12% off",
-  "See Availability": "See Availability"
+  "See Availability": "See Availability",
+
+  "booking": {
+    "yourSelection": "Your Selection",
+    "yourDetails": "Your Details",
+    "finishBooking": "Finish booking"
+  },
+  "My Account": "My Account",
+  "Sign Out": "Sign Out"
 }

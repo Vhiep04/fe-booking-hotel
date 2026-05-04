@@ -373,5 +373,22 @@
   "Email Verified": "Xác minh Email",
   "Verified": "Đã xác minh",
   "Unverified": "Chưa xác minh",
-  "Joined": "Ngày tham gia"
+  "Joined": "Ngày tham gia",
+  "My Account": "Tài khoản của tôi",
+  "View and update your profile information": "Xem và cập nhật thông tin hồ sơ",
+  "Personal Information": "Thông tin cá nhân",
+  "First name is required": "Tên là bắt buộc",
+  "Last name is required": "Họ là bắt buộc",
+  "Phone Number": "Số điện thoại",
+  "Email cannot be changed": "Email không thể thay đổi",
+  "Member since": "Thành viên từ",
+  "Failed to load profile": "Không tải được hồ sơ",
+  "Could not fetch your account information.": "Không thể lấy thông tin tài khoản của bạn.",
+  "Profile updated successfully": "Cập nhật hồ sơ thành công",
+  "Failed to update profile": "Cập nhật hồ sơ thất bại",
+  "Unexpected error loading profile": "Lỗi không xác định khi tải hồ sơ",
+  "Avatar updated successfully": "Cập nhật ảnh đại diện thành công",
+  "Could not upload image": "Không thể tải ảnh lên",
+  "Unexpected error uploading avatar": "Lỗi không xác định khi tải ảnh đại diện",
+  "Upload failed": "Tải ảnh thất bại"
 }

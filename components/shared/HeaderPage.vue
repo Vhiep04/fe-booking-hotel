@@ -152,6 +152,7 @@
             :email="userData.email"
             :avatar-url="userData.avatarUrl"
             :is-admin="false"
+            :is-manager="false"
             @my-account="handleMyAccount"
             @payments="handlePayments"
             @settings="handleSettings"

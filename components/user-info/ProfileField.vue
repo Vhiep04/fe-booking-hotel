@@ -16,13 +16,13 @@
           <slot name="edit" />
           <div class="flex gap-3 mt-4">
             <Button
-              label="Save"
+              :label="t('Save')"
               @click="handleSave"
               :loading="saving"
               class="px-6"
             />
             <Button
-              label="Cancel"
+              :label="t('Cancel')"
               severity="secondary"
               text
               @click="handleCancel"
@@ -38,7 +38,7 @@
           @click="handleEdit"
           class="text-blue-600 font-medium hover:text-blue-800 transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
         >
-          {{ editLabel }}
+          {{ editLabel ?? t("Edit") }}
         </button>
       </div>
     </div>
@@ -48,6 +48,8 @@
 <script setup lang="ts">
 import { ref } from "vue";
 import Button from "primevue/button";
+
+const { t } = useI18n();
 
 interface Props {
   label: string;
@@ -59,7 +61,6 @@ interface Props {
 }
 
 const props = withDefaults(defineProps<Props>(), {
-  editLabel: "Edit",
   placeholder: "—",
   disabled: false,
   saving: false,

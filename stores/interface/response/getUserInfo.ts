@@ -7,4 +7,5 @@ export interface UserInfoResponse {
   userId: string;
   phoneNumber: string;
   birthDate?: Date;
+  createdAt: string;
 }

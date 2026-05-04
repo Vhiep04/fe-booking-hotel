@@ -44,7 +44,9 @@ export const useApiStore = defineStore("api", () => {
       console.log(e);
 
       if (e?.data) {
-        return e.data as ResponseDataType;
+        const result = e.data as ResponseDataType & { statusCode?: number };
+        result.statusCode = e.response?.status ?? e.status;
+        return result;
       }
 
       throw e;

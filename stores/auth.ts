@@ -35,9 +35,7 @@ export const useAuthStore = defineStore("auth", () => {
   const userRegisterRequesting = ref(false);
   const userSendOtpCode = ref(false);
   const reSendOtpCode = ref(false);
-  // ── Thêm loading state cho Google login ──────────────────────────────────
   const googleLoginRequesting = ref(false);
-  // ─────────────────────────────────────────────────────────────────────────
 
   const isAdmin = computed(() => {
     const role = jwtPayload.value?.[ROLE_CLAIM];

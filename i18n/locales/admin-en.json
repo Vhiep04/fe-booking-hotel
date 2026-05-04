@@ -374,5 +374,22 @@
   "Email Verified": "Email Verified",
   "Verified": "Verified",
   "Unverified": "Unverified",
-  "Joined": "Joined"
+  "Joined": "Joined",
+  "My Account": "My Account",
+  "View and update your profile information": "View and update your profile information",
+  "Personal Information": "Personal Information",
+  "First name is required": "First name is required",
+  "Last name is required": "Last name is required",
+  "Phone Number": "Phone Number",
+  "Email cannot be changed": "Email cannot be changed",
+  "Member since": "Member since",
+  "Failed to load profile": "Failed to load profile",
+  "Could not fetch your account information.": "Could not fetch your account information.",
+  "Profile updated successfully": "Profile updated successfully",
+  "Failed to update profile": "Failed to update profile",
+  "Unexpected error loading profile": "Unexpected error loading profile",
+  "Avatar updated successfully": "Avatar updated successfully",
+  "Could not upload image": "Could not upload image",
+  "Unexpected error uploading avatar": "Unexpected error uploading avatar",
+  "Upload failed": "Upload failed"
 }
