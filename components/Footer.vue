@@ -145,7 +145,7 @@
             class="h-8 bg-white p-2 rounded border"
           />
           <img
-            src="../assets/icons/paypal.png"
+            src="../assets/icons/Paypal.png"
             alt="PayPal"
             class="h-8 bg-white p-2 rounded border"
           />
