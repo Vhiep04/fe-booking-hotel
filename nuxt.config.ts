@@ -12,7 +12,7 @@ export default defineNuxtConfig({
         process.env.NUXT_PUBLIC_API_HOST ||
         "https://certified-trimmer-humongous.ngrok-free.dev/api",
       apiBase: process.env.NUXT_PUBLIC_API_BASE || "https://localhost:44329",
-      googleClientId: process.env.GOOGLE_CLIENT_ID,
+      googleClientId: process.env.NUXT_PUBLIC_GOOGLE_CLIENT_ID,
     },
   },
 

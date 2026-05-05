@@ -62,27 +62,35 @@
       </button>
     </div>
 
-    <!-- Loading -->
     <template v-if="feedbackStore.isLoading">
       <div class="space-y-4">
-        <FeedbackCardSkeleton v-for="i in 3" :key="i" />
+        <FeedbackCardSkeleton v-for="i in pageSize" :key="i" />
       </div>
     </template>
 
-    <!-- List -->
     <template v-else-if="filteredFeedbacks.length > 0">
       <div class="space-y-4">
         <FeedbackCard
-          v-for="fb in filteredFeedbacks"
+          v-for="fb in pagedFeedbacks"
           :key="fb.feedbackId"
           :feedback="fb"
           @edit="handleEdit"
           @delete="handleDelete"
         />
       </div>
+
+      <div class="mt-6">
+        <Paginator
+          v-model:rows="pageSize"
+          :totalRecords="filteredFeedbacks.length"
+          :first="firstRecord"
+          :rowsPerPageOptions="[5, 10, 15]"
+          @page="onPageChange"
+          pt:root:class="bg-transparent!"
+        />
+      </div>
     </template>
 
-    <!-- Empty -->
     <div
       v-else
       class="flex flex-col items-center justify-center py-24 text-center"
@@ -108,7 +116,6 @@
       </NuxtLink>
     </div>
 
-    <!-- Edit Dialog -->
     <Dialog
       v-model:visible="showEditDialog"
       modal
@@ -202,7 +209,6 @@
       </template>
     </Dialog>
 
-    <!-- Delete Dialog -->
     <Dialog
       v-model:visible="showDeleteDialog"
       modal
@@ -262,6 +268,7 @@ import Rating from "primevue/rating";
 import Textarea from "primevue/textarea";
 import Tag from "primevue/tag";
 import Message from "primevue/message";
+import Paginator from "primevue/paginator";
 import { useToast } from "primevue/usetoast";
 import FeedbackCardSkeleton from "~/components/feedback/FeedbackCardSkeleton.vue";
 import FeedbackCard from "~/components/feedback/FeedbackCard.vue";
@@ -271,6 +278,18 @@ useHead({ title: t("My Reviews") });
 
 const feedbackStore = useFeedbackStore();
 const toast = useToast();
+
+const firstRecord = ref(0);
+const pageSize = ref(5);
+
+const currentPage = computed(() =>
+  Math.floor(firstRecord.value / pageSize.value),
+);
+
+function onPageChange(event: { first: number; rows: number }) {
+  firstRecord.value = event.first;
+  pageSize.value = event.rows;
+}
 
 const ratingTabs = computed(() => [
   { label: t("All"), value: "all" },
@@ -282,6 +301,11 @@ const ratingTabs = computed(() => [
 
 const activeTab = ref("all");
 
+function selectTab(val: string) {
+  activeTab.value = val;
+  firstRecord.value = 0;
+}
+
 const filteredFeedbacks = computed(() => {
   const list = feedbackStore.myFeedbacks;
   if (activeTab.value === "all") return list;
@@ -289,9 +313,12 @@ const filteredFeedbacks = computed(() => {
   return list.filter((f) => f.rating === Number(activeTab.value));
 });
 
-function selectTab(val: string) {
-  activeTab.value = val;
-}
+const pagedFeedbacks = computed(() =>
+  filteredFeedbacks.value.slice(
+    firstRecord.value,
+    firstRecord.value + pageSize.value,
+  ),
+);
 
 const averageRating = computed(() => {
   const list = feedbackStore.myFeedbacks;
@@ -389,6 +416,10 @@ async function confirmDelete() {
       detail: t("Your review has been deleted."),
       life: 3000,
     });
+    const newTotal = filteredFeedbacks.value.length;
+    if (firstRecord.value >= newTotal && firstRecord.value > 0) {
+      firstRecord.value = Math.max(0, firstRecord.value - pageSize.value);
+    }
   } else {
     toast.add({
       severity: "error",

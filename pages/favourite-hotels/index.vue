@@ -12,7 +12,6 @@
             <span class="font-semibold text-blue-600 dark:text-blue-400">
               {{ store.totalCount }}
             </span>
-            <!-- {{ store.totalCount }} -->
             {{
               t(store.totalCount !== 1 ? "saved properties" : "saved property")
             }}
@@ -119,7 +118,7 @@
 
       <div v-if="store.isLoading" class="flex flex-col gap-3">
         <div
-          v-for="n in 4"
+          v-for="n in pageSize"
           :key="n"
           class="flex bg-white dark:bg-slate-800 rounded-2xl overflow-hidden border border-slate-100 dark:border-slate-700 h-[170px]"
         >
@@ -152,7 +151,6 @@
               : t("No results found")
           }}
         </h3>
-
         <p class="text-sm text-slate-500 dark:text-slate-400 max-w-xs mb-5">
           {{
             store.favourites.length === 0
@@ -189,14 +187,14 @@
         />
       </div>
 
-      <div v-if="totalPages > 1" class="flex justify-center pt-2">
+      <div v-if="filtered.length > 0" class="mt-6">
         <Paginator
-          v-model:first="paginatorFirst"
-          :rows="PER_PAGE"
-          :total-records="filtered.length"
-          :rows-per-page-options="[5, 10, 20]"
-          template="PrevPageLink PageLinks NextPageLink RowsPerPageDropdown"
-          class="bg-transparent! border-none!"
+          v-model:rows="pageSize"
+          :totalRecords="filtered.length"
+          :first="firstRecord"
+          :rowsPerPageOptions="[5, 10, 20]"
+          @page="onPageChange"
+          pt:root:class="bg-transparent!"
         />
       </div>
     </div>
@@ -233,8 +231,19 @@ const filters = ref({
 });
 const sortBy = ref<string | null>(null);
 
-const PER_PAGE = 10;
-const paginatorFirst = ref(0);
+// --- Pagination ---
+const firstRecord = ref(0);
+const pageSize = ref(5);
+
+function onPageChange(event: { first: number; rows: number }) {
+  firstRecord.value = event.first;
+  pageSize.value = event.rows;
+}
+
+const paginated = computed(() =>
+  filtered.value.slice(firstRecord.value, firstRecord.value + pageSize.value),
+);
+// ------------------
 
 const locationOptions = computed(() =>
   [...new Set(store.favourites.map((h) => h.cityName))]
@@ -310,12 +319,6 @@ const filtered = computed(() => {
   return list;
 });
 
-const totalPages = computed(() => Math.ceil(filtered.value.length / PER_PAGE));
-
-const paginated = computed(() =>
-  filtered.value.slice(paginatorFirst.value, paginatorFirst.value + PER_PAGE),
-);
-
 const hasActiveFilters = computed(
   () =>
     !!(
@@ -326,10 +329,11 @@ const hasActiveFilters = computed(
     ),
 );
 
+// Reset về trang đầu khi filter hoặc sort thay đổi
 watch(
   [filters, sortBy],
   () => {
-    paginatorFirst.value = 0;
+    firstRecord.value = 0;
   },
   { deep: true },
 );

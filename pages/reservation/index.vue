@@ -33,21 +33,30 @@
       </button>
     </div>
 
-    <!-- Loading -->
     <template v-if="reservationStore.isLoading">
       <div class="space-y-4">
-        <ReservationCardSkeleton v-for="i in 3" :key="i" />
+        <ReservationCardSkeleton v-for="i in pageSize" :key="i" />
       </div>
     </template>
 
-    <!-- List -->
     <template v-else-if="reservations.length > 0">
       <div class="space-y-4">
         <ReservationCard
-          v-for="r in reservations"
+          v-for="r in pagedReservations"
           :key="r.reservationId"
           :reservation="r"
           @cancel="handleCancel"
+        />
+      </div>
+
+      <div class="mt-6">
+        <Paginator
+          v-model:rows="pageSize"
+          :totalRecords="reservations.length"
+          :first="firstRecord"
+          :rowsPerPageOptions="[5, 10, 15]"
+          @page="onPageChange"
+          pt:root:class="bg-transparent!"
         />
       </div>
     </template>
@@ -119,6 +128,7 @@
 <script setup lang="ts">
 import ReservationCard from "~/components/reservation/ReservationCard.vue";
 import ReservationCardSkeleton from "~/components/reservation/ReservationCardSkeleton.vue";
+import Paginator from "primevue/paginator";
 import { useToast } from "primevue/usetoast";
 
 const { t } = useI18n();
@@ -127,6 +137,21 @@ useHead({ title: t("My Reservations") });
 const reservationStore = useReservationStore();
 const toast = useToast();
 
+const firstRecord = ref(0);
+const pageSize = ref(5);
+
+function onPageChange(event: { first: number; rows: number }) {
+  firstRecord.value = event.first;
+  pageSize.value = event.rows;
+}
+
+const pagedReservations = computed(() =>
+  reservations.value.slice(
+    firstRecord.value,
+    firstRecord.value + pageSize.value,
+  ),
+);
+
 const tabs = [
   { labelKey: "All", value: "all" },
   { labelKey: "Pending", value: "Pending" },
@@ -134,14 +159,7 @@ const tabs = [
   { labelKey: "Cancelled", value: "Cancelled" },
 ];
 
-const sortOptions = [
-  { label: "Newest First", value: "newest" },
-  { label: "Oldest First", value: "oldest" },
-  { label: "Check-in Date", value: "checkin" },
-];
-
 const activeTab = ref("all");
-const sortOption = ref("newest");
 const showCancelDialog = ref(false);
 const cancelTarget = ref<UserReservation | null>(null);
 
@@ -150,12 +168,12 @@ const reservations = computed(() => reservationStore.reservations);
 async function fetchData() {
   await reservationStore.fetchReservations({
     status: activeTab.value !== "all" ? activeTab.value : undefined,
-    sort: sortOption.value,
   });
 }
 
 function selectTab(val: string) {
   activeTab.value = val;
+  firstRecord.value = 0; // reset về trang đầu khi đổi tab
   fetchData();
 }
 
@@ -177,6 +195,10 @@ async function confirmCancel() {
       detail: t("Reservation cancelled successfully."),
       life: 3000,
     });
+    const newTotal = reservations.value.length;
+    if (firstRecord.value >= newTotal && firstRecord.value > 0) {
+      firstRecord.value = Math.max(0, firstRecord.value - pageSize.value);
+    }
   } else {
     toast.add({
       severity: "error",
