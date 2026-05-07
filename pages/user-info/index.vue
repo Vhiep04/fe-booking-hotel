@@ -205,6 +205,10 @@
       </div>
     </div>
   </div>
+  <PaymentLoading
+    v-model="isAvatarUploading"
+    message="Đang tải ảnh đại diện của bạn..."
+  />
 </template>
 
 <script setup lang="ts">
@@ -216,6 +220,7 @@ import ProfileField from "@/components/user-info/ProfileField.vue";
 import AvatarUpload from "@/components/user-info/AvatarUpload.vue";
 import { useEditUserStore, toLocalDateString } from "@/stores/editUser";
 import { useUploadStore } from "~/stores/admin/uploadImage";
+import PaymentLoading from "~/components/shared/PaymentLoading.vue";
 
 const { t } = useI18n();
 useHead({ title: t("User Information") });
@@ -225,7 +230,7 @@ type ProfileFieldInstance = InstanceType<typeof ProfileField>;
 const uploadStore = useUploadStore();
 const authStore = useAuthStore();
 const editUserStore = useEditUserStore();
-
+const isAvatarUploading = ref(false);
 const activeSection = ref("personal");
 
 const form = ref({
@@ -345,13 +350,18 @@ const saveField = async (field: string) => {
 };
 
 const handleAvatarUpload = async (file: File, _previewUrl: string) => {
-  const res = await uploadStore.uploadImage(file, "avatars");
-  if (res?.success && res.data?.url) {
-    await editUserStore.updateProfile({ avatarUrl: res.data.url });
+  isAvatarUploading.value = true;
+  try {
+    const res = await uploadStore.uploadImage(file, "avatars");
+    if (res?.success && res.data?.url) {
+      await editUserStore.updateProfile({ avatarUrl: res.data.url });
+    }
+    await editUserStore.fetchProfile();
+    mapProfileToForm();
+    await authStore.fetchUserInfo();
+  } finally {
+    isAvatarUploading.value = false;
   }
-  await editUserStore.fetchProfile();
-  mapProfileToForm();
-  await authStore.fetchUserInfo();
 };
 
 onMounted(async () => {

@@ -99,14 +99,14 @@
     </div>
 
     <template #footer>
-      <Button
+      <!-- <Button
         :label="t('Edit')"
         icon="pi pi-pencil"
         severity="secondary"
         outlined
         @click="emit('edit', feedback!)"
-      />
-      <Button :label="t('Close')" @click="emit('update:modelValue', false)" />
+      /> -->
+      <!-- <Button :label="t('Close')" @click="emit('update:modelValue', false)" /> -->
     </template>
   </Dialog>
 </template>

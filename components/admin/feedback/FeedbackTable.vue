@@ -142,7 +142,7 @@
               v-tooltip.top="t('View')"
               @click="emit('view', data)"
             />
-            <Button
+            <!-- <Button
               icon="pi pi-pencil"
               severity="secondary"
               text
@@ -150,7 +150,7 @@
               size="small"
               v-tooltip.top="t('Edit')"
               @click="emit('edit', data)"
-            />
+            /> -->
             <Button
               icon="pi pi-trash"
               severity="danger"
@@ -174,7 +174,7 @@ import Button from "primevue/button";
 import Avatar from "primevue/avatar";
 import type { AdminFeedbackDto } from "~/stores/admin/interfaces/feedbacks";
 
-const { t } = useI18n();
+const { t, locale } = useI18n();
 
 const props = defineProps<{
   feedbacks: AdminFeedbackDto[];
@@ -199,7 +199,7 @@ function getInitial(f: AdminFeedbackDto) {
 }
 
 function formatDate(dateString: string) {
-  return new Date(dateString).toLocaleDateString("en-US", {
+  return new Date(dateString).toLocaleDateString(locale.value, {
     month: "short",
     day: "numeric",
     year: "numeric",

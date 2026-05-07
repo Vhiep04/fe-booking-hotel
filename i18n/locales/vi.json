@@ -491,5 +491,11 @@
     "finishBooking": "Hoàn tất đặt phòng"
   },
   "My Account": "Tài khoản của tôi",
-  "Sign Out": "Đăng xuất"
+  "Sign Out": "Đăng xuất",
+  "Update profile photo": "Cập nhật ảnh đại diện",
+  "Click to upload or drag & drop": "Nhấn để tải lên hoặc kéo thả",
+  "PNG, JPG, WEBP": "PNG, JPG, WEBP",
+  "Only image files are allowed (PNG, JPG, WEBP).": "Chỉ cho phép file ảnh (PNG, JPG, WEBP).",
+  "Unable to read image file.": "Không thể đọc file ảnh.",
+  "Save photo": "Lưu ảnh"
 }

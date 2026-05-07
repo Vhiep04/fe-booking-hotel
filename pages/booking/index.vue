@@ -218,7 +218,7 @@ const cancellationPolicy = computed(() => ({
 const specialRequest = ref("");
 const arrivalTime = ref("");
 
-const isRedirecting = ref(false);
+const isRedirecting = ref(true);
 
 async function handleSubmit(method: "vnpay" | "cash") {
   if (method === "vnpay") {
