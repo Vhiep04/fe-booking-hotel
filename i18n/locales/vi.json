@@ -225,7 +225,8 @@
   "Go Back": "Quay lại",
   "Room": "Phòng",
   "Capacity": "Sức chứa",
-  "guests": "khách",
+  "guests": "Người",
+  "guest": "Người",
   "Price per night": "Giá mỗi đêm",
   "Stay Details": "Chi tiết lưu trú",
   "Check-in": "Nhận phòng",
@@ -497,5 +498,6 @@
   "PNG, JPG, WEBP": "PNG, JPG, WEBP",
   "Only image files are allowed (PNG, JPG, WEBP).": "Chỉ cho phép file ảnh (PNG, JPG, WEBP).",
   "Unable to read image file.": "Không thể đọc file ảnh.",
-  "Save photo": "Lưu ảnh"
+  "Save photo": "Lưu ảnh",
+  "Show prices": "Xem giá"
 }

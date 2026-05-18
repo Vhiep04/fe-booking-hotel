@@ -6,13 +6,16 @@
         <div class="col-span-3">
           <img
             :src="room.imgUrl"
-            :alt="room.roomType"
+            :alt="translateRoomType(room.roomType)"
             class="w-full h-32 object-cover rounded-lg mb-2"
           />
-          <h3 class="font-bold text-lg text-gray-900">{{ room.roomType }}</h3>
+          <h3 class="font-bold text-lg text-gray-900">
+            {{ translateRoomType(room.roomType) }}
+          </h3>
           <p class="text-sm text-gray-600">
             <i class="pi pi-users text-xs mr-1"></i>
-            {{ room.capacity }} {{ room.capacity > 1 ? "guests" : "guest" }}
+            {{ room.capacity }}
+            {{ room.capacity > 1 ? t("guests") : t("guest") }}
           </p>
         </div>
 
@@ -29,7 +32,7 @@
                 class="flex items-center gap-1"
               >
                 <i class="pi pi-check text-green-600 text-xs"></i>
-                <span class="text-xs">{{ facility }}</span>
+                <span class="text-xs">{{ translateFacility(facility) }}</span>
               </div>
             </div>
             <button
@@ -137,10 +140,16 @@ import { ref, computed } from "vue";
 import { Card, Button } from "primevue";
 import type { Room } from "~/stores/interface/response/roomList";
 import { useSearchStore } from "~/stores/searchStore";
+import {
+  useFacilityTranslation,
+  useRoomTypeTranslation,
+} from "~/composables/useTranslation";
 import dayjs from "dayjs";
 
 const { t } = useI18n();
 const searchStore = useSearchStore();
+const { translateFacility } = useFacilityTranslation();
+const { translateRoomType } = useRoomTypeTranslation();
 
 const freeCancellationDateVi = computed(() => {
   if (!searchStore.checkIn) return null;

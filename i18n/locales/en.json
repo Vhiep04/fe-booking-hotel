@@ -225,6 +225,7 @@
   "Room": "Room",
   "Capacity": "Capacity",
   "guests": "guests",
+  "guest": "guest",
   "Price per night": "Price per night",
   "Stay Details": "Stay Details",
   "Check-in": "Check-in",
@@ -497,5 +498,6 @@
   "PNG, JPG, WEBP": "PNG, JPG, WEBP",
   "Only image files are allowed (PNG, JPG, WEBP).": "Only image files are allowed (PNG, JPG, WEBP).",
   "Unable to read image file.": "Unable to read image file.",
-  "Save photo": "Save photo"
+  "Save photo": "Save photo",
+  "Show prices": "Show prices"
 }

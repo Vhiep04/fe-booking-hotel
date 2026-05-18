@@ -234,12 +234,6 @@
 
     <!-- Footer Actions -->
     <div class="flex justify-end items-center gap-4 py-4">
-      <span
-        class="text-blue-600 text-sm flex items-center gap-1 cursor-pointer"
-      >
-        <i class="pi pi-tag" />
-        {{ t("We Price Match") }}
-      </span>
       <Button
         :label="t('Pay with cash')"
         icon="pi pi-wallet"
@@ -255,11 +249,6 @@
         :disabled="isPaying"
         @click="validateAndSubmit('vnpay')"
       />
-    </div>
-    <div class="text-center pb-4">
-      <a href="#" class="text-blue-600 text-sm underline">
-        {{ t("What are my booking conditions?") }}
-      </a>
     </div>
 
     <!-- Main Guest Dialog -->
