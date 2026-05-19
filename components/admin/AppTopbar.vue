@@ -91,7 +91,7 @@
           >
             <h4 class="font-semibold m-0">{{ t("Notifications") }}</h4>
             <Button
-              :label="t('Mark all read')"
+              :label="t('Mark all as read')"
               link
               size="small"
               @click="markAllRead"
@@ -268,6 +268,7 @@ const userData = reactive<UserInfoResponse>({
   firstName: "",
   lastName: "",
   userId: "",
+  createdAt: "",
 });
 
 const notificationStore = useNotificationStore();

@@ -31,7 +31,9 @@
                 :class="getFacilityIcon(facility)"
                 class="text-blue-500 text-lg"
               ></i>
-              <span class="text-sm font-medium">{{ facility }}</span>
+              <span class="text-sm font-medium">{{
+                translateFacility(facility)
+              }}</span>
             </div>
           </div>
           <div v-else class="text-gray-400 text-sm">
@@ -104,7 +106,9 @@
 <script setup lang="ts">
 import { computed } from "vue";
 import { Tabs, TabList, Tab, TabPanels, TabPanel } from "primevue";
+import { useFacilityTranslation } from "~/composables/useTranslation";
 
+const { translateFacility } = useFacilityTranslation();
 interface Props {
   description: string;
   facilities?: string[];

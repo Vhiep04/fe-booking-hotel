@@ -104,7 +104,7 @@
         <Column field="amount" :header="t('Amount')" style="min-width: 100px">
           <template #body="{ data }">
             <span class="font-semibold"
-              >${{ data.amount.toLocaleString() }}</span
+              >{{ data.amount.toLocaleString() }} đ</span
             >
           </template>
         </Column>
