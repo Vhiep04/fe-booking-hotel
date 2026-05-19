@@ -128,7 +128,7 @@
                 type="submit"
                 :label="t('Register now')"
                 class="w-full text-white mt-3"
-                :loading="isLoading"
+                :loading="isLoadingRegis"
                 severity="info"
               />
             </form>
@@ -233,6 +233,7 @@ const formErrors = reactive({
 });
 
 const isLoading = ref(false);
+const isLoadingRegis = ref(false);
 
 const resetErrors = () => {
   Object.keys(formErrors).forEach((key) => {
@@ -295,7 +296,7 @@ const login = () => {
 
 const handleRegister = async () => {
   if (!validateForm()) return;
-  isLoading.value = true;
+  isLoadingRegis.value = true;
   try {
     const response = await authStore.userRegister({
       firstName: form.firstName.trim(),
@@ -325,7 +326,7 @@ const handleRegister = async () => {
   } catch (error) {
     console.error("Register error:", error);
   } finally {
-    isLoading.value = false;
+    isLoadingRegis.value = false;
   }
 };
 

@@ -499,5 +499,8 @@
   "Only image files are allowed (PNG, JPG, WEBP).": "Chỉ cho phép file ảnh (PNG, JPG, WEBP).",
   "Unable to read image file.": "Không thể đọc file ảnh.",
   "Save photo": "Lưu ảnh",
-  "Show prices": "Xem giá"
+  "Show prices": "Xem giá",
+  "What our customers say about us": "Khách hàng nói gì về chúng tôi",
+  "{n} reviews from real guests": "{n} đánh giá từ khách thực tế",
+  "Invalid email or password": "Email hoặc mật khẩu không đúng"
 }

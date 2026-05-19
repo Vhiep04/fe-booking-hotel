@@ -34,7 +34,7 @@
 
           <div class="flex gap-2 shrink-0">
             <Button
-              label="Edit"
+              :label="t('Edit')"
               icon="pi pi-pencil"
               size="small"
               severity="info"
@@ -43,7 +43,7 @@
               @click="emit('edit', feedback)"
             />
             <Button
-              label="Delete"
+              :label="t('Delete')"
               icon="pi pi-trash"
               size="small"
               severity="danger"
@@ -58,7 +58,7 @@
         <div class="flex items-center gap-1.5 mb-3">
           <i class="pi pi-building text-[#07689F] text-xs" />
           <NuxtLink
-            :to="`/hotel/${feedback.hotelId}`"
+            :to="`/hotels/${feedback.hotelId}`"
             class="text-sm text-[#07689F] font-medium hover:underline truncate"
           >
             {{ feedback.hotelName }}
@@ -78,7 +78,7 @@
             class="inline-flex items-center gap-1 text-xs text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full font-medium"
           >
             <i class="pi pi-verified text-[10px]" />
-            Verified Stay
+            {{ t("Verified") }}
           </span>
           <span class="text-xs text-gray-400">
             <i class="pi pi-calendar mr-1" />
@@ -92,6 +92,7 @@
 
 <script setup lang="ts">
 import { computed } from "vue";
+import { useI18n } from "vue-i18n";
 import Rating from "primevue/rating";
 import Tag from "primevue/tag";
 import Button from "primevue/button";
@@ -102,6 +103,8 @@ const emit = defineEmits<{
   (e: "edit", feedback: Feedback): void;
   (e: "delete", feedback: Feedback): void;
 }>();
+
+const { t, locale } = useI18n();
 
 const avatarPalette = [
   "#10b981",
@@ -122,7 +125,7 @@ const avatarColor = computed(() => {
 });
 
 function formatDate(dateStr: string) {
-  return new Date(dateStr).toLocaleDateString("vi-VN", {
+  return new Date(dateStr).toLocaleDateString(locale.value, {
     day: "2-digit",
     month: "2-digit",
     year: "numeric",

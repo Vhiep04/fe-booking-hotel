@@ -5,10 +5,12 @@
       <div class="flex items-center justify-between mb-8">
         <div>
           <h2 class="section-title text-2xl font-bold text-gray-900 mb-1">
-            Khách hàng nói gì về chúng tôi
+            {{ t("What our customers say about us") }}
           </h2>
           <p class="text-gray-500 text-sm">
-            {{ hotel?.totalReviews ?? 0 }} đánh giá từ khách thực tế
+            {{
+              t("{n} reviews from real guests", { n: hotel?.totalReviews ?? 0 })
+            }}
           </p>
         </div>
 
@@ -28,7 +30,9 @@
                 :class="getStarClass(star, Number(hotel?.averageRating ?? 0))"
               />
             </div>
-            <div class="text-xs text-gray-400 mt-0.5">Điểm trung bình</div>
+            <div class="text-xs text-gray-400 mt-0.5">
+              {{ t("Average score") }}
+            </div>
           </div>
           <div class="w-px h-12 bg-gray-200" />
           <div class="space-y-1 min-w-[140px]">
@@ -60,7 +64,7 @@
           :class="{ 'opacity-30 cursor-not-allowed': currentIndex === 0 }"
           :disabled="currentIndex === 0"
           @click="prev"
-          aria-label="Previous"
+          :aria-label="t('Previous')"
         >
           <i class="pi pi-chevron-left text-sm" />
         </button>
@@ -70,7 +74,7 @@
           :class="{ 'opacity-30 cursor-not-allowed': currentIndex >= maxIndex }"
           :disabled="currentIndex >= maxIndex"
           @click="next"
-          aria-label="Next"
+          :aria-label="t('Next')"
         >
           <i class="pi pi-chevron-right text-sm" />
         </button>
@@ -86,7 +90,7 @@
             <div
               v-for="fb in feedbacks"
               :key="fb.feedbackId"
-              class="feedback-card shrink-0"
+              class="feedback-card shrink-0 flex flex-col"
               :style="{
                 width: `calc(${100 / visibleCards}% - ${(20 * (visibleCards - 1)) / visibleCards}px)`,
               }"
@@ -131,17 +135,17 @@
 
               <!-- Bottom Tag -->
               <div
-                class="mt-4 pt-3 border-t border-gray-100 flex items-center gap-2"
+                class="mt-auto pt-3 border-t border-gray-100 flex items-center gap-2"
               >
                 <span
                   class="inline-flex items-center gap-1 text-xs text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full font-medium"
                 >
                   <i class="pi pi-verified text-[10px]" />
-                  Đã xác minh
+                  {{ t("Verified") }}
                 </span>
-                <span class="ml-auto text-xs text-amber-500 font-semibold"
-                  >{{ fb.rating }}/5</span
-                >
+                <span class="ml-auto text-xs text-amber-500 font-semibold">
+                  {{ fb.rating }}/5
+                </span>
               </div>
             </div>
           </div>
@@ -164,7 +168,7 @@
         class="text-center py-16 text-gray-400"
       >
         <i class="pi pi-comment text-4xl mb-3 block" />
-        <p class="text-sm">Chưa có đánh giá nào</p>
+        <p class="text-sm">{{ t("No reviews yet") }}</p>
       </div>
     </div>
   </section>
@@ -172,11 +176,14 @@
 
 <script setup lang="ts">
 import { computed, ref, onMounted, onBeforeUnmount } from "vue";
+import { useI18n } from "vue-i18n";
 import type { HotelData, Feedback } from "~/stores/interface/response/cityList";
 
 const props = defineProps<{
   hotel: HotelData | null;
 }>();
+
+const { t, locale } = useI18n();
 
 const currentIndex = ref(0);
 const windowWidth = ref(
@@ -237,7 +244,7 @@ function getStarClass(star: number, rating: number) {
 
 function formatDate(dateStr: string) {
   const d = new Date(dateStr);
-  return d.toLocaleDateString("vi-VN", {
+  return d.toLocaleDateString(locale.value, {
     day: "2-digit",
     month: "2-digit",
     year: "numeric",

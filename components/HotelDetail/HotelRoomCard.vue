@@ -63,16 +63,9 @@
                   {{ freeCancellationDateVi }}</span
                 >
               </div>
-              <div
-                v-if="room.facilities.includes('Breakfast Included')"
-                class="flex items-center gap-1 text-green-600 text-xs"
-              >
-                <i class="pi pi-check-circle"></i>
-                <span>{{ t("No Prepayment Pay At Property") }}</span>
-              </div>
               <div class="flex items-center gap-1 text-green-600 text-xs">
                 <i class="pi pi-check-circle"></i>
-                <span>{{ t("Free Cancellation Refund") }}</span>
+                <span>{{ t("No Prepayment Pay At Property") }}</span>
               </div>
               <div class="text-xs text-gray-600">
                 <i class="pi pi-info-circle text-gray-400"></i>

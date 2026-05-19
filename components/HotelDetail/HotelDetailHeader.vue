@@ -1,40 +1,7 @@
 <template>
   <div class="max-w-7xl mx-auto px-4 py-4">
-    <!-- Breadcrumb -->
-    <nav class="text-sm text-gray-500 mb-3">
-      <ol class="flex flex-wrap gap-1">
-        <li v-for="(item, index) in breadcrumbs" :key="index">
-          <NuxtLink
-            v-if="item.link"
-            :to="item.link"
-            class="hover:underline text-blue-600"
-          >
-            {{ item.label }}
-          </NuxtLink>
-          <span v-else class="text-gray-700 font-medium">{{ item.label }}</span>
-          <span v-if="index < breadcrumbs.length - 1"> › </span>
-        </li>
-      </ol>
-    </nav>
-
-    <!-- Header -->
     <div class="flex flex-col lg:flex-row justify-between gap-4">
       <div>
-        <!-- Stars mapped from averageRating -->
-        <div class="flex items-center gap-1 mb-1">
-          <span
-            v-for="star in starCount"
-            :key="'filled-' + star"
-            class="text-yellow-400 text-sm"
-            >★</span
-          >
-          <span
-            v-for="empty in 5 - starCount"
-            :key="'empty-' + empty"
-            class="text-gray-300 text-sm"
-            >★</span
-          >
-        </div>
         <h1 class="text-2xl font-bold text-gray-900">{{ hotel.name }}</h1>
         <div class="flex items-center text-sm text-gray-600 mt-1">
           <i class="pi pi-map-marker mr-1 text-blue-600"></i>
@@ -49,7 +16,6 @@
       </div>
 
       <div class="flex items-start gap-3">
-        <!-- Heart button wired to toggleFavourite -->
         <button
           class="border rounded-lg p-2 hover:bg-gray-100 transition-colors"
           :class="{ 'text-red-500 border-red-300 bg-red-50': isFavourited }"
@@ -60,9 +26,6 @@
             class="pi"
             :class="isFavourited ? 'pi-heart-fill' : 'pi-heart'"
           ></i>
-        </button>
-        <button class="border rounded-lg p-2 hover:bg-gray-100">
-          <i class="pi pi-share-alt"></i>
         </button>
         <button
           class="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2 rounded-lg font-semibold"

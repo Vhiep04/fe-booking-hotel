@@ -1,7 +1,6 @@
 <template>
   <Teleport to="body">
     <div v-if="open" class="fixed inset-0 z-50 flex">
-      <!-- Sidebar trái -->
       <div
         class="w-[370px] bg-white flex flex-col shadow-xl overflow-y-auto shrink-0"
       >
@@ -28,9 +27,18 @@
                 </button>
               </div>
 
-              <!-- Stars -->
-              <div class="flex items-center gap-1 mt-1">
-                <span class="text-yellow-400 text-xs">★ ★ ★</span>
+              <div class="flex items-center gap-0.5 mt-1">
+                <template v-for="i in 5" :key="i">
+                  <span
+                    class="text-xs"
+                    :class="
+                      i <= Math.round(ratingScore ?? 0)
+                        ? 'text-yellow-400'
+                        : 'text-gray-300'
+                    "
+                    >★</span
+                  >
+                </template>
               </div>
 
               <!-- Rating -->
@@ -47,11 +55,6 @@
                   </p>
                 </div>
               </div>
-
-              <p v-if="locationScore" class="text-xs text-gray-600 mt-1">
-                <span class="font-semibold">{{ locationScore }}</span>
-                {{ t("Location") }}
-              </p>
             </div>
           </div>
 
@@ -186,7 +189,7 @@ const displayedPlaces = computed(() => {
 });
 
 const formattedRating = computed(() => {
-  return props.ratingScore ? props.ratingScore.toFixed(1) : "8.2";
+  return props.ratingScore ? props.ratingScore.toFixed(1) : "5";
 });
 
 const ratingLabel = computed(() => {

@@ -133,7 +133,7 @@
       >
         <template #body="{ data }">
           <p class="font-bold text-(--admin-text-color)">
-            ${{ data.totalPrice.toLocaleString() }}
+            {{ data.totalPrice.toLocaleString() }} đ
           </p>
           <Tag
             :value="t(data.paymentStatus)"
@@ -228,7 +228,6 @@ const statusOptions = computed(() => [
   { label: t("Confirmed"), value: "Confirmed" },
   { label: t("Completed"), value: "Completed" },
   { label: t("Cancelled"), value: "Cancelled" },
-  { label: t("Refunded"), value: "Refunded" },
 ]);
 
 function onPage(event: any) {

@@ -271,7 +271,7 @@ const statusOptions = computed(() => [
   { value: "Available", label: t("Available"), dotClass: "bg-green-500" },
   { value: "Occupied", label: t("Occupied"), dotClass: "bg-red-500" },
   { value: "Maintenance", label: t("Maintenance"), dotClass: "bg-yellow-500" },
-  { value: "Reserved", label: t("Reserved"), dotClass: "bg-blue-500" },
+  // { value: "Reserved", label: t("Reserved"), dotClass: "bg-blue-500" },
 ]);
 
 const translatedFacilities = computed(() =>
@@ -376,10 +376,7 @@ async function handleSave() {
         const publicId = extractCloudinaryPublicId(oldImgUrl.value);
         if (publicId) await uploadStore.deleteImage(publicId);
       }
-      const up = await uploadStore.uploadImage(
-        roomTypeFile.value,
-        "room-types",
-      );
+      const up = await uploadStore.uploadImage(roomTypeFile.value, "rooms");
       if (up?.success && up.data) finalImgUrl = up.data.url;
     } finally {
       uploadingImage.value = false;

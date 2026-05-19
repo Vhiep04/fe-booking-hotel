@@ -10,7 +10,7 @@
       <Slider
         v-model="localBudgetRange"
         :min="0"
-        :max="25000000"
+        :max="5000000"
         :step="10"
         range
         class="mb-4"
@@ -36,7 +36,7 @@
             suffix=" đ"
             class="w-20"
             :min="localBudgetRange[0]"
-            :max="25000000"
+            :max="5000000"
             @update:modelValue="emitPriceChange"
           />
         </InputGroup>
@@ -111,7 +111,7 @@ interface Props {
 
 const props = withDefaults(defineProps<Props>(), {
   minPrice: 0,
-  maxPrice: 25000000,
+  maxPrice: 5000000,
   facilities: () => [],
 });
 
@@ -142,7 +142,7 @@ watch(
 watch(
   () => [props.minPrice, props.maxPrice],
   ([newMin, newMax]) => {
-    localBudgetRange.value = [newMin ?? 0, newMax ?? 25000000];
+    localBudgetRange.value = [newMin ?? 0, newMax ?? 5000000];
   },
 );
 
@@ -163,7 +163,7 @@ const emitFiltersChange = () => {
 };
 
 const resetFilters = () => {
-  localBudgetRange.value = [0, 25000000];
+  localBudgetRange.value = [0, 5000000];
   localRoomFacilities.value = [];
   emitFiltersChange();
 };

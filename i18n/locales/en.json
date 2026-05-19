@@ -40,6 +40,8 @@
   "{n} hours ago": "{n} hours ago",
   "{n} days ago": "{n} days ago",
   "Hotel Not Found": "Hotel not found",
+  "What our customers say about us": "What our customers say about us",
+  "{n} reviews from real guests": "{n} reviews from real guests",
 
   "Why choose us?": "Why choose us?",
   "Book now, pay at the property": "Book now, pay at the property",
@@ -499,5 +501,6 @@
   "Only image files are allowed (PNG, JPG, WEBP).": "Only image files are allowed (PNG, JPG, WEBP).",
   "Unable to read image file.": "Unable to read image file.",
   "Save photo": "Save photo",
-  "Show prices": "Show prices"
+  "Show prices": "Show prices",
+  "Invalid email or password": "Invalid email or password"
 }

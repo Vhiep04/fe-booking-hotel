@@ -200,14 +200,14 @@ const handleSearch = () => {
   }
 
   emit("search", {
-    cityName: searchStore.cityName,
+    cityName: searchStore.cityName.trim(),
     checkIn: searchStore.checkInDateOnly,
     checkOut: searchStore.checkOutDateOnly,
     roomTypeName: localRoomType.value?.code ?? "",
   });
 
   emit("getCity", {
-    name: searchStore.cityName,
+    name: searchStore.cityName.trim(),
   });
 };
 

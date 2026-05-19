@@ -185,9 +185,9 @@
               <NuxtLink
                 v-if="
                   !reservation.hasFeedback &&
-                  reservation.paymentStatus === 'Confirmed'
+                  reservation.paymentStatus === 'Completed'
                 "
-                :to="`/reservation/${reservation.reservationId}/feedback`"
+                :to="`/hotels/${reservation.hotelId}`"
                 class="text-sm text-[#07689F] font-semibold hover:underline"
               >
                 {{ t("+ Write a review") }}

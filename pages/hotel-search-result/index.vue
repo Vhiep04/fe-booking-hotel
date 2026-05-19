@@ -4,9 +4,6 @@
       <p class="text-[#07689F] font-bold text-2xl mb-2">
         {{ t("Where is your Next Dream Place?") }}
       </p>
-      <p class="text-[#07689F]">
-        {{ t("Find exclusive Genius rewards in every corner of the world!") }}
-      </p>
     </div>
 
     <SearchForm
@@ -40,8 +37,69 @@
         </template>
 
         <!-- Empty State -->
-        <div v-else class="text-center py-12">
-          <p class="text-gray-500 text-lg">{{ t("No hotels found") }}</p>
+        <!-- Empty State -->
+        <div
+          v-else
+          class="flex flex-col items-center justify-center py-20 px-6 text-center"
+        >
+          <!-- Illustration -->
+          <div class="relative mb-6">
+            <div
+              class="w-24 h-24 bg-[#e8f4fb] rounded-full flex items-center justify-center"
+            >
+              <svg
+                class="w-12 h-12 text-[#07689F]"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="1.5"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  d="M2.25 21 12 3l9.75 18H2.25z"
+                />
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  d="M12 9v4m0 4h.01"
+                />
+              </svg>
+            </div>
+            <!-- Decorative dots -->
+            <span
+              class="absolute -top-1 -right-1 w-3 h-3 bg-yellow-400 rounded-full opacity-80"
+            />
+            <span
+              class="absolute -bottom-1 -left-2 w-2 h-2 bg-[#07689F] rounded-full opacity-40"
+            />
+          </div>
+
+          <h3 class="text-xl font-bold text-gray-800 mb-2">
+            {{ t("No hotels found") }}
+          </h3>
+          <p class="text-gray-500 text-sm max-w-xs leading-relaxed">
+            {{
+              t(
+                "We couldn't find any hotels matching your search. Try adjusting your dates, location, or filters.",
+              )
+            }}
+          </p>
+
+          <!-- Suggestions -->
+          <div class="mt-6 flex flex-wrap gap-2 justify-center">
+            <span
+              v-for="tip in [
+                t('Try different dates'),
+                t('Broaden location'),
+                t('Remove filters'),
+              ]"
+              :key="tip"
+              class="text-xs bg-gray-100 text-gray-600 px-3 py-1.5 rounded-full border border-gray-200"
+            >
+              {{ tip }}
+            </span>
+          </div>
         </div>
       </div>
     </div>

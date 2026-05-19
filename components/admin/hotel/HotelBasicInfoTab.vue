@@ -84,7 +84,6 @@
             :minFractionDigits="0"
             :maxFractionDigits="6"
             mode="decimal"
-            locale="en-US"
             class="w-full"
           />
         </div>
@@ -97,7 +96,6 @@
             :minFractionDigits="0"
             :maxFractionDigits="6"
             mode="decimal"
-            locale="en-US"
             class="w-full"
           />
         </div>

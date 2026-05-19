@@ -234,7 +234,7 @@ const handleLogin = async () => {
     }
   } catch (error: any) {
     console.error("Login error:", error);
-    let errorMessage = t("An unexpected error occurred");
+    let errorMessage = t("Invalid email or password");
     if (error?.data) {
       errorMessage = error.data.message || errorMessage;
       if (error.data.requiresVerification) {

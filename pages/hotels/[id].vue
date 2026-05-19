@@ -76,11 +76,6 @@
           >
             <span class="font-semibold">{{ roomListData.availableRooms }}</span>
             {{ t("Availability") }}
-            <span class="mx-2">|</span>
-            <span
-              >{{ formatPrice(roomListData.minPrice) }} -
-              {{ formatPrice(roomListData.maxPrice) }}</span
-            >
           </div>
         </div>
 
@@ -139,10 +134,10 @@
     :lat="lat"
     :lng="lng"
     :name="hotel.name"
-    :hotel-image="hotel.images?.find((i) => i.isPrimary)?.imageUrl"
+    :hotel-image="hotel.imgUrl"
+    :rating-score="hotel.averageRating"
     :total-reviews="hotel.totalReviews"
     :address="hotel.location"
-    :location-score="9.0"
     @close="showMap = false"
     @bookNow="scrollToRooms"
   />
@@ -268,7 +263,12 @@ const handleSearch = async (params: {
   try {
     const hotelId = parseInt(route.params.id as string);
     hasSearchData.value = true;
-    await hotelStore.getHotelRooms(hotelId, params.checkIn, params.checkOut);
+    await hotelStore.getHotelRooms(
+      hotelId,
+      params.checkIn,
+      params.checkOut,
+      params.roomTypeName,
+    );
   } catch (error) {
     console.error("Search error:", error);
   } finally {
@@ -319,9 +319,9 @@ onMounted(async () => {
       const checkOut = searchStore.checkOutDateOnly ?? undefined;
       await Promise.all([
         hotelStore.getHotelRooms(hotelId, checkIn, checkOut),
-        feedbackStore.fetchMyFeedbacks(),
-        bookingStore.fetchReservations(),
-        favouriteStore.fetchFavourites(),
+        // feedbackStore.fetchMyFeedbacks(),
+        // bookingStore.fetchReservations(),
+        // favouriteStore.fetchFavourites(),
       ]);
     }
   } catch (error) {
