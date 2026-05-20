@@ -182,10 +182,10 @@
           )
         }}
       </p>
-      <label class="block text-sm text-gray-700 mb-2">
+      <!-- <label class="block text-sm text-gray-700 mb-2">
         {{ t("Please write your requests in English.") }}
         <span class="text-gray-400">({{ t("optional") }})</span>
-      </label>
+      </label> -->
       <Textarea
         :value="specialRequest"
         rows="4"

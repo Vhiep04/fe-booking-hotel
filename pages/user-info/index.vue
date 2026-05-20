@@ -73,25 +73,6 @@
                   {{ t("Verified") }}
                 </span>
               </div>
-              <p class="text-sm text-gray-500 mb-3">
-                {{
-                  t(
-                    "This is the email address you use to sign in. It's also where we send your booking confirmations.",
-                  )
-                }}
-              </p>
-              <div class="border border-gray-200 rounded-lg p-4 bg-gray-50">
-                <p class="text-sm text-gray-600 mb-2">
-                  {{
-                    t(
-                      "Unable to access your email? If you added a cell phone number for one of your previous completed stays, you can change your email address using cell phone verification.",
-                    )
-                  }}
-                </p>
-                <a href="#" class="text-sm text-blue-600 hover:underline">
-                  {{ t("Change email with phone verification") }}
-                </a>
-              </div>
               <div class="mt-3">
                 <InputText
                   v-model="form.email"
