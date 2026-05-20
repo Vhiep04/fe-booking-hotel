@@ -115,7 +115,7 @@
 
           <div class="flex flex-col gap-1">
             <label class="text-sm font-medium">
-              {{ t("Role") }} <span class="text-red-500">*</span>
+              {{ t("Role") }}
             </label>
             <Dropdown
               v-model="selectedRole"
@@ -123,6 +123,7 @@
               optionLabel="label"
               optionValue="value"
               :placeholder="t('Select a role')"
+              :disabled="isEditing"
               class="w-full"
             />
           </div>
@@ -193,13 +194,20 @@ const defaultForm = {
   phoneNumber: "",
 };
 const form = ref({ ...defaultForm });
-const selectedRole = ref<string>("Customer");
+const selectedRole = ref<string>("Manager");
 
-const roleOptions = computed(() => [
+const allRoleOptions = [
   { label: "Admin", value: "Admin" },
-  { label: "Customer", value: "Customer" },
+  { label: "User", value: "User" },
   { label: "Manager", value: "Manager" },
-]);
+];
+
+const roleOptions = computed(() => {
+  if (!props.isEditing) {
+    return [{ label: "Manager", value: "Manager" }];
+  }
+  return allRoleOptions;
+});
 
 watch(
   () => props.editingUser,
@@ -215,10 +223,10 @@ watch(
         }
       : { ...defaultForm };
     selectedRole.value = user?.roles?.[0]
-      ? (roleOptions.value.find(
+      ? (allRoleOptions.find(
           (r) => r.value.toLowerCase() === user.roles[0]!.toLowerCase(),
-        )?.value ?? "Customer")
-      : "Customer";
+        )?.value ?? "Manager")
+      : "Manager";
     submitted.value = false;
   },
   { immediate: true },

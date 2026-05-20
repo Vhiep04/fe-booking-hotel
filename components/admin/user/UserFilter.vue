@@ -79,7 +79,7 @@ const emit = defineEmits<{
 const roleOptions = computed(() => [
   { label: "Admin", value: "Admin" },
   { label: "Manager", value: "Manager" },
-  { label: "Customer", value: "Customer" },
+  { label: "User", value: "User" },
 ]);
 
 const statusOptions = computed(() => [
