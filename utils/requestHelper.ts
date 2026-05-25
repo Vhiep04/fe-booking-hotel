@@ -29,6 +29,6 @@ export default <ResponseDataType>({
     credentials: credentials || "include",
     ...(method.toUpperCase() === "GET"
       ? { query: { ...params } }
-      : { body: isFormData ? data : { ...data } }), // ✅ giữ nguyên FormData
+      : { body: isFormData ? data : { ...data } }),
   });
 };
