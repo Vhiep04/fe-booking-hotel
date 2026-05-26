@@ -23,7 +23,7 @@ export const useAdminFeedbackStore = defineStore("adminFeedback", () => {
 
     return await apiStore.apiRequest<ApiResponse<PaginatedFeedbacks>>({
       method: "GET",
-      endpoint: "/admin/feedbacks",
+      endpoint: "/api/admin/feedbacks",
       params: queryParams,
       auth: true,
     });
@@ -34,7 +34,7 @@ export const useAdminFeedbackStore = defineStore("adminFeedback", () => {
   ): Promise<ApiResponse<AdminFeedbackDto>> {
     return await apiStore.apiRequest<ApiResponse<AdminFeedbackDto>>({
       method: "GET",
-      endpoint: `/admin/feedbacks/${id}`,
+      endpoint: `/api/admin/feedbacks/${id}`,
       auth: true,
     });
   }
@@ -45,7 +45,7 @@ export const useAdminFeedbackStore = defineStore("adminFeedback", () => {
   ): Promise<ApiResponse<AdminFeedbackDto>> {
     return await apiStore.apiRequest<ApiResponse<AdminFeedbackDto>>({
       method: "PUT",
-      endpoint: `/admin/feedbacks/${id}`,
+      endpoint: `/api/admin/feedbacks/${id}`,
       data: payload,
       auth: true,
     });
@@ -54,7 +54,7 @@ export const useAdminFeedbackStore = defineStore("adminFeedback", () => {
   async function deleteFeedback(id: number): Promise<ApiResponse<boolean>> {
     return await apiStore.apiRequest<ApiResponse<boolean>>({
       method: "DELETE",
-      endpoint: `/admin/feedbacks/${id}`,
+      endpoint: `/api/admin/feedbacks/${id}`,
       auth: true,
     });
   }

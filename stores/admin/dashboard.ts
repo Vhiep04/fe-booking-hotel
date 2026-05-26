@@ -19,7 +19,7 @@ export const useDashboardStore = defineStore("dashboard", () => {
 
     try {
       const response = await apiStore.apiRequest<DashboardResponse>({
-        endpoint: "/admin/dashboard",
+        endpoint: "/api/admin/dashboard",
         method: "GET",
         auth: true,
       });

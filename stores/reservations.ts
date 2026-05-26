@@ -59,7 +59,7 @@ export const useReservationStore = defineStore("reservation", () => {
       const response = await apiStore.apiRequest<
         ApiResponse<UserReservation[]>
       >({
-        endpoint: "/reservations",
+        endpoint: "/api/reservations",
         method: "GET",
         auth: true,
         params: {
@@ -90,7 +90,7 @@ export const useReservationStore = defineStore("reservation", () => {
 
     try {
       const response = await apiStore.apiRequest<ApiResponse<UserReservation>>({
-        endpoint: `/reservations/${id}`,
+        endpoint: `/api/reservations/${id}`,
         method: "GET",
         auth: true,
       });
@@ -116,7 +116,7 @@ export const useReservationStore = defineStore("reservation", () => {
 
     try {
       const response = await apiStore.apiRequest<ApiResponse<null>>({
-        endpoint: `/reservations/${id}/cancel`,
+        endpoint: `/api/reservations/${id}/cancel`,
         method: "PATCH",
         auth: true,
       });

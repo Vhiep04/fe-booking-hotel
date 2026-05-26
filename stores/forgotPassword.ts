@@ -28,7 +28,7 @@ export const useForgotPasswordStore = defineStore("forgotPassword", () => {
 
     try {
       const response = await apiStore.apiRequest<ForgotPasswordResponseData>({
-        endpoint: "/Auth/forgot-password",
+        endpoint: "/api/Auth/forgot-password",
         method: "POST",
         data: payload,
       });
@@ -55,7 +55,7 @@ export const useForgotPasswordStore = defineStore("forgotPassword", () => {
 
     try {
       const response = await apiStore.apiRequest<VerifyResetOtpResponseData>({
-        endpoint: "/Auth/verify-reset-otp",
+        endpoint: "/api/Auth/verify-reset-otp",
         method: "POST",
         data: payload,
       });
@@ -82,7 +82,7 @@ export const useForgotPasswordStore = defineStore("forgotPassword", () => {
 
     try {
       const response = await apiStore.apiRequest<ResetPasswordResponseData>({
-        endpoint: "/Auth/reset-password",
+        endpoint: "/api/Auth/reset-password",
         method: "POST",
         data: payload,
       });

@@ -21,7 +21,7 @@ export const useFeedbackStore = defineStore("feedback", () => {
 
     try {
       const response = await apiStore.apiRequest<ApiResponse<Feedback[]>>({
-        endpoint: "/feedbacks/my",
+        endpoint: "/api/feedbacks/my",
         method: "GET",
         auth: true,
       });
@@ -48,7 +48,7 @@ export const useFeedbackStore = defineStore("feedback", () => {
 
     try {
       const response = await apiStore.apiRequest<ApiResponse<Feedback>>({
-        endpoint: "/feedbacks",
+        endpoint: "/api/feedbacks",
         method: "POST",
         auth: true,
         data: payload,
@@ -76,7 +76,7 @@ export const useFeedbackStore = defineStore("feedback", () => {
 
     try {
       const response = await apiStore.apiRequest<ApiResponse<Feedback>>({
-        endpoint: `/feedbacks/${id}`,
+        endpoint: `/api/feedbacks/${id}`,
         method: "PUT",
         auth: true,
         data: payload,
@@ -106,7 +106,7 @@ export const useFeedbackStore = defineStore("feedback", () => {
 
     try {
       const response = await apiStore.apiRequest<ApiResponse<null>>({
-        endpoint: `/feedbacks/${id}`,
+        endpoint: `/api/feedbacks/${id}`,
         method: "DELETE",
         auth: true,
       });

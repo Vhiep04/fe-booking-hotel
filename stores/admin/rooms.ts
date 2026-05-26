@@ -24,7 +24,7 @@ export const useRoomStore = defineStore("room", () => {
 
     return await apiStore.apiRequest<ApiResponse<PaginatedRooms>>({
       method: "GET",
-      endpoint: "/admin/rooms",
+      endpoint: "/api/admin/rooms",
       params: queryParams,
       auth: true,
     });
@@ -33,7 +33,7 @@ export const useRoomStore = defineStore("room", () => {
   async function getRoomById(id: number): Promise<ApiResponse<RoomDto>> {
     return await apiStore.apiRequest<ApiResponse<RoomDto>>({
       method: "GET",
-      endpoint: `/admin/rooms/${id}`,
+      endpoint: `/api/admin/rooms/${id}`,
       auth: true,
     });
   }
@@ -43,7 +43,7 @@ export const useRoomStore = defineStore("room", () => {
   ): Promise<ApiResponse<RoomDto[]>> {
     return await apiStore.apiRequest<ApiResponse<RoomDto[]>>({
       method: "GET",
-      endpoint: `/admin/rooms/by-hotel/${hotelId}`,
+      endpoint: `/api/admin/rooms/by-hotel/${hotelId}`,
       auth: true,
     });
   }
@@ -53,7 +53,7 @@ export const useRoomStore = defineStore("room", () => {
   ): Promise<ApiResponse<RoomDto>> {
     return await apiStore.apiRequest<ApiResponse<RoomDto>>({
       method: "POST",
-      endpoint: "/admin/rooms",
+      endpoint: "/api/admin/rooms",
       data: payload,
       auth: true,
     });
@@ -64,7 +64,7 @@ export const useRoomStore = defineStore("room", () => {
   ): Promise<ApiResponse<RoomDto[]>> {
     return await apiStore.apiRequest<ApiResponse<RoomDto[]>>({
       method: "POST",
-      endpoint: "/admin/rooms/bulk",
+      endpoint: "/api/admin/rooms/bulk",
       data: payload,
       auth: true,
     });
@@ -76,7 +76,7 @@ export const useRoomStore = defineStore("room", () => {
   ): Promise<ApiResponse<RoomDto>> {
     return await apiStore.apiRequest<ApiResponse<RoomDto>>({
       method: "PUT",
-      endpoint: `/admin/rooms/${id}`,
+      endpoint: `/api/admin/rooms/${id}`,
       data: payload,
       auth: true,
     });
@@ -85,7 +85,7 @@ export const useRoomStore = defineStore("room", () => {
   async function deleteRoom(id: number): Promise<ApiResponse<boolean>> {
     return await apiStore.apiRequest<ApiResponse<boolean>>({
       method: "DELETE",
-      endpoint: `/admin/rooms/${id}`,
+      endpoint: `/api/admin/rooms/${id}`,
       auth: true,
     });
   }
@@ -96,7 +96,7 @@ export const useRoomStore = defineStore("room", () => {
   ): Promise<ApiResponse<RoomDto>> {
     return await apiStore.apiRequest<ApiResponse<RoomDto>>({
       method: "PATCH",
-      endpoint: `/admin/rooms/${id}/status`,
+      endpoint: `/api/admin/rooms/${id}/status`,
       data: { status },
       auth: true,
     });

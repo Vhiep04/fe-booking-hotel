@@ -21,7 +21,7 @@ export const useGetRoomStore = defineStore("getRoom", () => {
         message: string;
         data: RoomDetail;
       }>({
-        endpoint: `/Hotels/${hotelId}/rooms/${roomId}`,
+        endpoint: `/api/Hotels/${hotelId}/rooms/${roomId}`,
         method: "GET",
       });
 

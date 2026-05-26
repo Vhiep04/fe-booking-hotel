@@ -25,7 +25,7 @@ export const useAdminHotelStore = defineStore("adminHotel", () => {
 
     try {
       const response = await apiStore.apiRequest<ApiResponse<PaginatedHotels>>({
-        endpoint: "/admin/hotels",
+        endpoint: "/api/admin/hotels",
         method: "GET",
         auth: true,
         params: {
@@ -57,7 +57,7 @@ export const useAdminHotelStore = defineStore("adminHotel", () => {
 
     try {
       const response = await apiStore.apiRequest<ApiResponse<Hotel>>({
-        endpoint: `/admin/hotels/${id}`,
+        endpoint: `/api/admin/hotels/${id}`,
         method: "GET",
         auth: true,
       });
@@ -83,7 +83,7 @@ export const useAdminHotelStore = defineStore("adminHotel", () => {
 
     try {
       const response = await apiStore.apiRequest<ApiResponse<Hotel>>({
-        endpoint: "/admin/hotels",
+        endpoint: "/api/admin/hotels",
         method: "POST",
         auth: true,
         data: payload,
@@ -113,7 +113,7 @@ export const useAdminHotelStore = defineStore("adminHotel", () => {
 
     try {
       const response = await apiStore.apiRequest<ApiResponse<Hotel>>({
-        endpoint: `/admin/hotels/${id}`,
+        endpoint: `/api/admin/hotels/${id}`,
         method: "PUT",
         auth: true,
         data: payload,
@@ -146,7 +146,7 @@ export const useAdminHotelStore = defineStore("adminHotel", () => {
 
     try {
       const response = await apiStore.apiRequest<ApiResponse<boolean>>({
-        endpoint: `/admin/hotels/${id}`,
+        endpoint: `/api/admin/hotels/${id}`,
         method: "DELETE",
         auth: true,
       });
@@ -180,7 +180,7 @@ export const useAdminHotelStore = defineStore("adminHotel", () => {
 
     try {
       const response = await apiStore.apiRequest<ApiResponse<HotelImage>>({
-        endpoint: `/admin/hotels/${hotelId}/images`,
+        endpoint: `/api/admin/hotels/${hotelId}/images`,
         method: "POST",
         auth: true,
         data: payload,
@@ -211,7 +211,7 @@ export const useAdminHotelStore = defineStore("adminHotel", () => {
 
     try {
       const response = await apiStore.apiRequest<ApiResponse<boolean>>({
-        endpoint: `/admin/hotels/${hotelId}/images/${imageId}`,
+        endpoint: `/api/admin/hotels/${hotelId}/images/${imageId}`,
         method: "DELETE",
         auth: true,
       });
@@ -244,7 +244,7 @@ export const useAdminHotelStore = defineStore("adminHotel", () => {
 
     try {
       const response = await apiStore.apiRequest<ApiResponse<boolean>>({
-        endpoint: `/admin/hotels/${hotelId}/images/${imageId}/set-primary`,
+        endpoint: `/api/admin/hotels/${hotelId}/images/${imageId}/set-primary`,
         method: "POST",
         auth: true,
       });
@@ -279,7 +279,7 @@ export const useAdminHotelStore = defineStore("adminHotel", () => {
 
     try {
       const response = await apiStore.apiRequest<ApiResponse<boolean>>({
-        endpoint: `/admin/hotels/${hotelId}/images/reorder`,
+        endpoint: `/api/admin/hotels/${hotelId}/images/reorder`,
         method: "POST",
         auth: true,
         data: imageIds,
@@ -304,7 +304,7 @@ export const useAdminHotelStore = defineStore("adminHotel", () => {
 
     try {
       const response = await apiStore.apiRequest<ApiResponse<HotelImage[]>>({
-        endpoint: `/admin/hotels/${hotelId}/images/bulk`,
+        endpoint: `/api/admin/hotels/${hotelId}/images/bulk`,
         method: "POST",
         auth: true,
         data: { imageUrls },

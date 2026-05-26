@@ -19,7 +19,7 @@ export const useCityStore = defineStore(
   () => {
     const apiStore = useApiStore();
     const isLoading = ref(false);
-    const namespace = "/Cities";
+    const namespace = "Cities";
 
     const cityCurrent = ref<CityResponse>();
     const cityRes = ref<CitiesResponse | null>(null);
@@ -66,7 +66,7 @@ export const useCityStore = defineStore(
 
         const res = await apiStore.apiRequest<CitiesResponse>({
           method: "GET",
-          endpoint: `${namespace}/hotels`,
+          endpoint: `/api/${namespace}/hotels`,
           auth: false,
           params: filters.value,
         });
@@ -88,7 +88,7 @@ export const useCityStore = defineStore(
       try {
         const res = await apiStore.apiRequest<CityResponse>({
           method: "GET",
-          endpoint: `${namespace}`,
+          endpoint: `/api/${namespace}`,
           auth: false,
           params: name,
         });
@@ -107,7 +107,7 @@ export const useCityStore = defineStore(
         isLoadingRoomTypes.value = true;
         const res = await apiStore.apiRequest<RoomTypesResponse>({
           method: "GET",
-          endpoint: `${namespace}/room-types`,
+          endpoint: `/api/${namespace}/room-types`,
           auth: false,
         });
         roomTypes.value = res.data;

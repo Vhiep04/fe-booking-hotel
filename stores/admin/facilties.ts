@@ -13,7 +13,7 @@ export const useFacilitiesStore = defineStore("facilities", () => {
   async function getAllFacilities() {
     return apiStore.apiRequest<ApiResponse<FacilityDto[]>>({
       method: "GET",
-      endpoint: "/admin/facilities/all",
+      endpoint: "/api/admin/facilities/all",
       auth: true,
     });
   }
@@ -21,7 +21,7 @@ export const useFacilitiesStore = defineStore("facilities", () => {
   async function getFacilityById(id: number) {
     return apiStore.apiRequest<ApiResponse<FacilityDto>>({
       method: "GET",
-      endpoint: `/admin/facilities/${id}`,
+      endpoint: `/api/admin/facilities/${id}`,
       auth: true,
     });
   }
@@ -29,7 +29,7 @@ export const useFacilitiesStore = defineStore("facilities", () => {
   async function createFacility(payload: CreateFacilityPayload) {
     return apiStore.apiRequest<ApiResponse<FacilityDto>>({
       method: "POST",
-      endpoint: "/admin/facilities",
+      endpoint: "/api/admin/facilities",
       data: payload,
       auth: true,
     });
@@ -38,7 +38,7 @@ export const useFacilitiesStore = defineStore("facilities", () => {
   async function updateFacility(id: number, payload: UpdateFacilityPayload) {
     return apiStore.apiRequest<ApiResponse<FacilityDto>>({
       method: "PUT",
-      endpoint: `/admin/facilities/${id}`,
+      endpoint: `/api/admin/facilities/${id}`,
       data: payload,
       auth: true,
     });
@@ -47,7 +47,7 @@ export const useFacilitiesStore = defineStore("facilities", () => {
   async function deleteFacility(id: number) {
     return apiStore.apiRequest<ApiResponse<boolean>>({
       method: "DELETE",
-      endpoint: `/admin/facilities/${id}`,
+      endpoint: `/api/admin/facilities/${id}`,
       auth: true,
     });
   }

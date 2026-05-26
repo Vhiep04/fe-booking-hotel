@@ -47,7 +47,7 @@ export const useFavouriteHotelStore = defineStore("favouriteHotel", () => {
     try {
       const response = await apiStore.apiRequest<ApiResponse<FavouriteHotel[]>>(
         {
-          endpoint: "/Favourites",
+          endpoint: "/api/Favourites",
           method: "GET",
           auth: true,
         },
@@ -75,7 +75,7 @@ export const useFavouriteHotelStore = defineStore("favouriteHotel", () => {
 
     try {
       const response = await apiStore.apiRequest<ApiResponse<FavouriteHotel>>({
-        endpoint: "/Favourites",
+        endpoint: "/api/Favourites",
         method: "POST",
         auth: true,
         data: { hotelId },
@@ -106,7 +106,7 @@ export const useFavouriteHotelStore = defineStore("favouriteHotel", () => {
 
     try {
       const response = await apiStore.apiRequest<ApiResponse<null>>({
-        endpoint: `/Favourites/${favouriteId}`,
+        endpoint: `/api/Favourites/${favouriteId}`,
         method: "DELETE",
         auth: true,
       });

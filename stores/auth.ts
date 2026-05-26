@@ -21,7 +21,7 @@ import type { UserInfoResponse } from "./interface/response/getUserInfo";
 import { ref } from "vue";
 import { ROLE_CLAIM } from "~/constants/auth";
 
-const namespace = "/Auth";
+const namespace = "Auth";
 
 export const useAuthStore = defineStore("auth", () => {
   const apiStore = useApiStore();
@@ -80,7 +80,7 @@ export const useAuthStore = defineStore("auth", () => {
         data: UserInfoResponse;
       }>({
         method: "GET",
-        endpoint: `${namespace}/me`,
+        endpoint: `/api/${namespace}/me`,
         auth: true,
         proxy: false,
       });
@@ -115,7 +115,7 @@ export const useAuthStore = defineStore("auth", () => {
         data: LoginData;
       }>({
         method: "POST",
-        endpoint: `${namespace}/login`,
+        endpoint: `/api/${namespace}/login`,
         data: { email, password },
         proxy: false,
         auth: false,
@@ -150,7 +150,7 @@ export const useAuthStore = defineStore("auth", () => {
 
       const response = await apiStore.apiRequest<GoogleLoginResponseData>({
         method: "POST",
-        endpoint: `${namespace}/login-google`,
+        endpoint: `/api/${namespace}/login-google`,
         data: { idToken },
         proxy: false,
         auth: false,
@@ -177,7 +177,7 @@ export const useAuthStore = defineStore("auth", () => {
 
       const response = await apiStore.apiRequest<GoogleLoginResponseData>({
         method: "POST",
-        endpoint: `${namespace}/login-google-code`,
+        endpoint: `/api/${namespace}/login-google-code`,
         data: { code },
         proxy: false,
         auth: false,
@@ -204,7 +204,7 @@ export const useAuthStore = defineStore("auth", () => {
 
       const response = await apiStore.apiRequest<RegisterResponseData>({
         method: "POST",
-        endpoint: `${namespace}/register`,
+        endpoint: `/api/${namespace}/register`,
         data: new authRequest.UserRegister(payload).serialize(),
         proxy: false,
         auth: false,
@@ -224,7 +224,7 @@ export const useAuthStore = defineStore("auth", () => {
 
       return await apiStore.apiRequest<SendOtpResponseData>({
         method: "POST",
-        endpoint: `${namespace}/verify-otp`,
+        endpoint: `/api/${namespace}/verify-otp`,
         proxy: false,
         auth: false,
         data: { email, otpCode },
@@ -240,7 +240,7 @@ export const useAuthStore = defineStore("auth", () => {
 
       return await apiStore.apiRequest<SendOtpResponseData>({
         method: "POST",
-        endpoint: `${namespace}/resend-otp`,
+        endpoint: `/api/${namespace}/resend-otp`,
         proxy: false,
         auth: false,
         data: { email },

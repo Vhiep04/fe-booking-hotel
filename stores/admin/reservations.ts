@@ -24,7 +24,7 @@ export const useReservationsStore = defineStore("reservations", () => {
       const response = await apiStore.apiRequest<
         ApiResponse<PaginatedReservations>
       >({
-        endpoint: "/admin/reservations",
+        endpoint: "/api/admin/reservations",
         method: "GET",
         auth: true,
         params: {
@@ -59,7 +59,7 @@ export const useReservationsStore = defineStore("reservations", () => {
 
     try {
       const response = await apiStore.apiRequest<ApiResponse<Reservation>>({
-        endpoint: `/admin/reservations/${id}`,
+        endpoint: `/api/admin/reservations/${id}`,
         method: "GET",
         auth: true,
       });
@@ -85,7 +85,7 @@ export const useReservationsStore = defineStore("reservations", () => {
 
     try {
       const response = await apiStore.apiRequest<ApiResponse<boolean>>({
-        endpoint: `/admin/reservations/${id}/status`,
+        endpoint: `/api/admin/reservations/${id}/status`,
         method: "PATCH",
         auth: true,
         data: { paymentStatus },

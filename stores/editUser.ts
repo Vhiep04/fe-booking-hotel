@@ -3,7 +3,7 @@ import { useApiStore } from "./api";
 import { useAuthStore } from "./auth";
 import { ref, computed } from "vue";
 
-const namespace = "/User";
+const namespace = "User";
 
 export function toLocalDateString(date: Date): string {
   const y = date.getFullYear();
@@ -105,7 +105,7 @@ export const useEditUserStore = defineStore("editUser", () => {
 
       await apiStore.apiRequest<{ success: boolean; message?: string }>({
         method: "PUT",
-        endpoint: `${namespace}/profile`,
+        endpoint: `/api/${namespace}/profile`,
         data: merged,
         auth: true,
         proxy: false,

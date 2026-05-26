@@ -15,7 +15,7 @@ export const useUploadStore = defineStore("upload", () => {
     formData.append("Folder", folder);
 
     return await apiStore.apiRequest<UploadResponse>({
-      endpoint: "/upload/image",
+      endpoint: "api/upload/image",
       method: "POST",
       data: formData as any,
       auth: true,
@@ -24,7 +24,7 @@ export const useUploadStore = defineStore("upload", () => {
 
   async function deleteImage(publicId: string) {
     return await apiStore.apiRequest<DeleteResponse>({
-      endpoint: `/upload/image?publicId=${encodeURIComponent(publicId)}`,
+      endpoint: `api/upload/image?publicId=${encodeURIComponent(publicId)}`,
       method: "DELETE",
       auth: true,
     });
@@ -36,7 +36,7 @@ export const useUploadStore = defineStore("upload", () => {
     formData.append("Folder", folder);
 
     return await apiStore.apiRequest<UploadMultipleResponse>({
-      endpoint: "/upload/images",
+      endpoint: "api/upload/images",
       method: "POST",
       data: formData as any,
       auth: true,

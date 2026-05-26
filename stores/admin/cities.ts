@@ -31,7 +31,7 @@ export const useCitiesStore = defineStore("cities", () => {
 
     return await apiStore.apiRequest<ApiResponse<PaginatedCities>>({
       method: "GET",
-      endpoint: "/admin/cities",
+      endpoint: "/api/admin/cities",
       params: queryParams,
       auth: true,
     });
@@ -42,7 +42,7 @@ export const useCitiesStore = defineStore("cities", () => {
   ): Promise<ApiResponse<CityDto>> {
     return await apiStore.apiRequest<ApiResponse<CityDto>>({
       method: "POST",
-      endpoint: "/admin/cities",
+      endpoint: "/api/admin/cities",
       data: payload,
       auth: true,
     });
@@ -51,7 +51,7 @@ export const useCitiesStore = defineStore("cities", () => {
   async function getCityById(id: number): Promise<ApiResponse<CityDto>> {
     return await apiStore.apiRequest<ApiResponse<CityDto>>({
       method: "GET",
-      endpoint: `/admin/cities/${id}`,
+      endpoint: `/api/admin/cities/${id}`,
       auth: true,
     });
   }
@@ -62,7 +62,7 @@ export const useCitiesStore = defineStore("cities", () => {
   ): Promise<ApiResponse<CityDto>> {
     return await apiStore.apiRequest<ApiResponse<CityDto>>({
       method: "PUT",
-      endpoint: `/admin/cities/${id}`,
+      endpoint: `/api/admin/cities/${id}`,
       data: payload,
       auth: true,
     });
@@ -71,7 +71,7 @@ export const useCitiesStore = defineStore("cities", () => {
   async function deleteCity(id: number): Promise<ApiResponse<boolean>> {
     return await apiStore.apiRequest<ApiResponse<boolean>>({
       method: "DELETE",
-      endpoint: `/admin/cities/${id}`,
+      endpoint: `/api/admin/cities/${id}`,
       auth: true,
     });
   }
@@ -79,7 +79,7 @@ export const useCitiesStore = defineStore("cities", () => {
   async function getCountries(): Promise<ApiResponse<string[]>> {
     return await apiStore.apiRequest<ApiResponse<string[]>>({
       method: "GET",
-      endpoint: "/admin/cities/countries",
+      endpoint: "/api/admin/cities/countries",
       auth: true,
     });
   }
@@ -90,7 +90,7 @@ export const useCitiesStore = defineStore("cities", () => {
   ): Promise<ApiResponse<CityImageDto>> {
     return await apiStore.apiRequest<ApiResponse<CityImageDto>>({
       method: "POST",
-      endpoint: `/admin/cities/${cityId}/images`,
+      endpoint: `/api/admin/cities/${cityId}/images`,
       data: payload,
       auth: true,
     });
@@ -102,7 +102,7 @@ export const useCitiesStore = defineStore("cities", () => {
   ): Promise<ApiResponse<boolean>> {
     return await apiStore.apiRequest<ApiResponse<boolean>>({
       method: "DELETE",
-      endpoint: `/admin/cities/${cityId}/images/${imageId}`,
+      endpoint: `/api/admin/cities/${cityId}/images/${imageId}`,
       auth: true,
     });
   }

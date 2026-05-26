@@ -25,7 +25,7 @@ export const useNotificationStore = defineStore("notification", () => {
 
   // Endpoint tùy theo role
   const endpoint = computed(() =>
-    authStore.isAdmin ? "/notifications/admin" : "/notifications",
+    authStore.isAdmin ? "/api/notifications/admin" : "/api/notifications",
   );
 
   // stores/notification.ts
@@ -59,8 +59,8 @@ export const useNotificationStore = defineStore("notification", () => {
   async function markAllRead() {
     try {
       const ep = authStore.isAdmin
-        ? "/notifications/admin/read-all"
-        : "/notifications/read-all";
+        ? "/api/notifications/admin/read-all"
+        : "/api/notifications/read-all";
 
       await apiStore.apiRequest({
         method: "PATCH",
@@ -81,7 +81,7 @@ export const useNotificationStore = defineStore("notification", () => {
     try {
       await apiStore.apiRequest({
         method: "PATCH",
-        endpoint: `/notifications/${id}/read`,
+        endpoint: `/api/notifications/${id}/read`,
         auth: true,
         proxy: false,
       });

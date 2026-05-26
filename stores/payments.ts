@@ -28,7 +28,7 @@ export const usePaymentStore = defineStore("payment", () => {
 
     try {
       const response = await apiStore.apiRequest<CreatePaymentRes>({
-        endpoint: "/Payment/create-payment",
+        endpoint: "/api/Payment/create-payment",
         method: "POST",
         data: payload,
         auth: true,
@@ -56,7 +56,7 @@ export const usePaymentStore = defineStore("payment", () => {
 
     try {
       const response = await apiStore.apiRequest<SendReceiptRes>({
-        endpoint: "/Payment/send-receipt",
+        endpoint: "/api/Payment/send-receipt",
         method: "POST",
         data: payload,
         auth: true,
@@ -78,7 +78,7 @@ export const usePaymentStore = defineStore("payment", () => {
 
     try {
       const response = await apiStore.apiRequest<CashBookingRes>({
-        endpoint: "/Payment/cash-booking",
+        endpoint: "/api/Payment/cash-booking",
         method: "POST",
         data: payload,
         auth: true,

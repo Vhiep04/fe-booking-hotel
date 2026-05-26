@@ -9,7 +9,7 @@ import type {
 export const useFacilityStore = defineStore("facilityListStore", () => {
   const apiStore = useApiStore();
 
-  const namespace = "/Facilities";
+  const namespace = "Facilities";
 
   const facilities = ref<FacilityData[]>([]);
 
@@ -17,7 +17,7 @@ export const useFacilityStore = defineStore("facilityListStore", () => {
     try {
       const res = await apiStore.apiRequest<FacilityResponse>({
         method: "GET",
-        endpoint: namespace,
+        endpoint: `/api/${namespace}`,
         auth: false,
       });
 

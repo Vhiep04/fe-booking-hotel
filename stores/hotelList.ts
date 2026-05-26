@@ -10,7 +10,7 @@ export const useHotelStore = defineStore("hotelListStore", () => {
 
   const isLoading = ref(false);
   const isLoadingRooms = ref(false);
-  const namespace = "/Hotels";
+  const namespace = "Hotels";
 
   const hotel = ref();
   const currentHotelRooms = ref<Room[]>([]);
@@ -39,7 +39,7 @@ export const useHotelStore = defineStore("hotelListStore", () => {
       isLoading.value = true;
       const res = await apiStore.apiRequest<{ data: HotelData }>({
         method: "GET",
-        endpoint: `${namespace}/${hotelId}`,
+        endpoint: `/api/${namespace}/${hotelId}`,
         proxy: false,
         auth: false,
       });
@@ -57,7 +57,7 @@ export const useHotelStore = defineStore("hotelListStore", () => {
 
       const res = await apiStore.apiRequest<HotelsResponse>({
         method: "GET",
-        endpoint: `${namespace}`,
+        endpoint: `/api/${namespace}`,
         proxy: false,
         auth: false,
         params,
@@ -82,7 +82,7 @@ export const useHotelStore = defineStore("hotelListStore", () => {
       isLoadingRooms.value = true;
       const res = await apiStore.apiRequest<RoomListResponse>({
         method: "GET",
-        endpoint: `${namespace}/${hotelId}/rooms`,
+        endpoint: `/api/${namespace}/${hotelId}/rooms`,
         proxy: false,
         auth: false,
         params: { checkIn, checkOut, roomType },
